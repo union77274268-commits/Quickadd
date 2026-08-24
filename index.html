@@ -4,14 +4,64 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
     <title>Inventory Scanner · Supabase Sync</title>
-    <!-- Libraries -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.8/html5-qrcode.min.js">
+    
+    <!-- Load libraries with fallbacks -->
+    <script>
+        // Check if libraries load, if not use fallbacks
+        function loadScript(src, fallbackSrc) {
+            return new Promise((resolve, reject) => {
+                const script = document.createElement('script');
+                script.src = src;
+                script.onload = resolve;
+                script.onerror = () => {
+                    if (fallbackSrc) {
+                        console.warn(`⚠️ Failed to load ${src}, trying fallback...`);
+                        const fallbackScript = document.createElement('script');
+                        fallbackScript.src = fallbackSrc;
+                        fallbackScript.onload = resolve;
+                        fallbackScript.onerror = reject;
+                        document.head.appendChild(fallbackScript);
+                    } else {
+                        reject(new Error(`Failed to load ${src}`));
+                    }
+                };
+                document.head.appendChild(script);
+            });
+        }
+
+        // Load all required libraries with fallbacks
+        async function loadLibraries() {
+            try {
+                // HTML5 QR Code
+                await loadScript(
+                    'https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.8/html5-qrcode.min.js',
+                    'https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js'
+                );
+                console.log('✅ QR Scanner loaded');
+
+                // XLSX
+                await loadScript(
+                    'https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js',
+                    'https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js'
+                );
+                console.log('✅ XLSX loaded');
+
+                // Supabase
+                await loadScript(
+                    'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2',
+                    'https://unpkg.com/@supabase/supabase-js@2/dist/umd/supabase.min.js'
+                );
+                console.log('✅ Supabase loaded');
+
+                return true;
+            } catch (err) {
+                console.error('❌ Failed to load libraries:', err);
+                alert('Failed to load required libraries. Please check your internet connection and try refreshing the page.');
+                return false;
+            }
+        }
     </script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js">
-    </script>
-    <!-- Supabase JS -->
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2">
-    </script>
+
     <style>
         /* --- styles (unchanged) --- */
         * {
@@ -523,6 +573,24 @@
         .sync-status .dot.offline {
             background: #ef4444;
         }
+        .loading-indicator {
+            text-align: center;
+            padding: 2rem;
+            color: #64748b;
+        }
+        .loading-spinner {
+            display: inline-block;
+            width: 30px;
+            height: 30px;
+            border: 3px solid #e2e8f0;
+            border-top-color: #3b82f6;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin-bottom: 0.5rem;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
     </style>
 </head>
 <body>
@@ -559,8 +627,14 @@
 
         <!-- STEP CARD -->
         <div class="step-card" id="stepCard">
+            <!-- Loading State -->
+            <div id="loadingState" class="loading-indicator">
+                <div class="loading-spinner"></div>
+                <div>Loading libraries...</div>
+            </div>
+
             <!-- STEP 1: Barcode -->
-            <div class="step-content active" data-step="1">
+            <div class="step-content" data-step="1" style="display:none;">
                 <div class="step-title">Step 1 of 4</div>
                 <div class="step-headline">📷 Scan Barcode</div>
                 <div id="reader-container">
@@ -577,7 +651,7 @@
             </div>
 
             <!-- STEP 2: Product Name -->
-            <div class="step-content" data-step="2">
+            <div class="step-content" data-step="2" style="display:none;">
                 <div class="step-title">Step 2 of 4</div>
                 <div class="step-headline">✏️ Product Name</div>
                 <input type="text" class="big-input" id="productName" placeholder="e.g. Organic Cotton T‑Shirt" autocomplete="off">
@@ -589,7 +663,7 @@
             </div>
 
             <!-- STEP 3: MRP -->
-            <div class="step-content" data-step="3">
+            <div class="step-content" data-step="3" style="display:none;">
                 <div class="step-title">Step 3 of 4</div>
                 <div class="step-headline">💰 MRP (₹)</div>
                 <input type="number" class="big-input" id="productMrp" placeholder="0.00" step="0.01" min="0">
@@ -601,7 +675,7 @@
             </div>
 
             <!-- STEP 4: Quantity -->
-            <div class="step-content" data-step="4">
+            <div class="step-content" data-step="4" style="display:none;">
                 <div class="step-title">Step 4 of 4</div>
                 <div class="step-headline">🔢 Quantity</div>
                 <input type="number" class="big-input" id="productQty" placeholder="1" step="1" min="0">
@@ -654,11 +728,43 @@
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImduZm9wdnF6amNwaHZ4aXZpamJuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODc1NDI1MjQsImV4cCI6MjEwMzExODUyNH0.bFGCCX32zlNnkRlC3O_nAenmNORDzyT5Aw1uMd1VFrM';
         // ================================================================
 
-        // Wait for all libraries to load
-        document.addEventListener('DOMContentLoaded', function() {
+        // Wait for libraries to load
+        async function initApp() {
+            console.log('📦 Loading libraries...');
+
+            // Show loading state
+            const loadingState = document.getElementById('loadingState');
+            const stepContents = document.querySelectorAll('.step-content');
+            
+            // Load all libraries first
+            const librariesLoaded = await loadLibraries();
+            
+            if (!librariesLoaded) {
+                loadingState.innerHTML = `
+                    <div style="color:#ef4444;font-size:1.2rem;margin-bottom:0.5rem;">❌</div>
+                    <div>Failed to load required libraries.</div>
+                    <div style="font-size:0.9rem;margin-top:0.5rem;color:#94a3b8;">Please check your internet connection and refresh.</div>
+                    <button onclick="location.reload()" style="margin-top:1rem;padding:0.5rem 2rem;border:none;border-radius:30px;background:#3b82f6;color:white;font-weight:600;cursor:pointer;">Refresh</button>
+                `;
+                return;
+            }
+
+            // Hide loading, show step 1
+            loadingState.style.display = 'none';
+            stepContents.forEach(el => {
+                if (parseInt(el.dataset.step) === 1) {
+                    el.style.display = 'flex';
+                }
+            });
+
+            // Now start the app
+            startApp();
+        }
+
+        function startApp() {
             'use strict';
 
-            console.log('📦 App starting...');
+            console.log('🚀 App starting...');
 
             // ---------- STATE ----------
             let inventory = [];
@@ -746,7 +852,8 @@
 
                 currentStep = step;
                 stepContents.forEach(el => {
-                    el.classList.toggle('active', parseInt(el.dataset.step) === step);
+                    const isActive = parseInt(el.dataset.step) === step;
+                    el.style.display = isActive ? 'flex' : 'none';
                 });
                 stepDots.forEach(dot => {
                     const s = parseInt(dot.dataset.step);
@@ -769,7 +876,6 @@
             // ---------- BARCODE SCANNER ----------
             async function startScanner() {
                 console.log('📷 Starting camera...');
-                // Clean up old scanner
                 if (html5QrCode) {
                     try {
                         await html5QrCode.stop();
@@ -782,13 +888,12 @@
                 readerDiv.innerHTML = '';
 
                 try {
-                    // Check if Html5Qrcode is available
                     if (typeof Html5Qrcode === 'undefined') {
                         console.error('Html5Qrcode library not loaded!');
                         document.getElementById('reader-container').innerHTML = `
                             <div style="display:flex;align-items:center;justify-content:center;height:100%;color:#94a3b8;background:#0f172a;border-radius:18px;padding:1rem;text-align:center;flex-direction:column;gap:0.5rem;">
                                 <span style="font-size:2rem;">⚠️</span>
-                                <span style="font-size:0.9rem;">Scanner library failed to load.<br>Please check your internet connection.</span>
+                                <span style="font-size:0.9rem;">Scanner library not loaded.<br>Please refresh the page.</span>
                             </div>
                         `;
                         return;
@@ -840,7 +945,7 @@
             }
 
             function onScanError(err) {
-                // ignore - keep scanning
+                // ignore
             }
 
             function updateBarcodeNextState() {
@@ -852,7 +957,6 @@
             // ---------- SUPABASE FUNCTIONS ----------
             async function initSupabase() {
                 try {
-                    // Check if supabaseJs is available
                     if (typeof supabaseJs === 'undefined') {
                         console.error('Supabase library not loaded!');
                         setSyncStatus(false, 'Library missing');
@@ -862,7 +966,6 @@
                     const { createClient } = supabaseJs;
                     supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-                    // Test connection
                     const { data, error } = await supabase
                         .from('inventory')
                         .select('*', { count: 'exact', head: true });
@@ -878,10 +981,7 @@
                     setSyncStatus(true, 'Synced');
                     isSupabaseReady = true;
 
-                    // Load data
                     await loadFromSupabase();
-
-                    // Subscribe to realtime
                     subscribeRealtime();
 
                 } catch (err) {
@@ -969,7 +1069,6 @@
 
             async function insertItem(item) {
                 if (!isSupabaseReady) {
-                    // Local fallback
                     inventory.push({
                         id: nextId++,
                         uuid: null,
@@ -1010,7 +1109,6 @@
                 } catch (err) {
                     console.error('Insert error:', err);
                     showToast('❌ Failed to save to server.', true);
-                    // Still add locally
                     inventory.push({
                         id: nextId++,
                         uuid: null,
@@ -1211,22 +1309,15 @@
 
             // ---------- INIT ----------
             console.log('🚀 Initializing app...');
-
-            // Set initial sync status
             setSyncStatus(false, 'Connecting...');
-
-            // Render empty table
             renderTable();
 
-            // Initialize Supabase first
             initSupabase().then(() => {
-                // Start camera after Supabase init (with a small delay)
                 setTimeout(() => {
                     startScanner();
                 }, 500);
             });
 
-            // Handle visibility change for camera
             document.addEventListener('visibilitychange', () => {
                 if (document.hidden) {
                     if (currentStep === 1) stopScanner();
@@ -1236,7 +1327,10 @@
             });
 
             console.log('✅ App ready!');
-        });
+        }
+
+        // Start the app
+        initApp();
     </script>
 
 </body>
