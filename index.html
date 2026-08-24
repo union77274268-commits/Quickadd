@@ -20,14 +20,15 @@
         body {
             background: #f1f5f9;
             min-height: 100vh;
+            padding: 1rem 0.8rem 2rem;
             display: flex;
             justify-content: center;
-            padding: 1rem 0.8rem 2rem;
         }
 
         .app {
             max-width: 520px;
             width: 100%;
+            position: relative;
         }
 
         /* HEADER */
@@ -36,15 +37,14 @@
             justify-content: space-between;
             align-items: center;
             background: white;
-            padding: 0.8rem 1.2rem;
+            padding: 0.7rem 1rem 0.7rem 1.2rem;
             border-radius: 18px;
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
-            margin-bottom: 1.2rem;
-            flex-wrap: wrap;
+            margin-bottom: 1rem;
         }
 
         .app-header h1 {
-            font-size: 1.3rem;
+            font-size: 1.2rem;
             font-weight: 700;
             color: #0f172a;
             display: flex;
@@ -53,7 +53,7 @@
         }
 
         .app-header h1 small {
-            font-size: 0.6rem;
+            font-size: 0.55rem;
             background: #3b82f6;
             color: white;
             padding: 0.1rem 0.6rem;
@@ -61,20 +61,47 @@
             font-weight: 500;
         }
 
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+        }
+
         .badge-total {
             background: #eef2ff;
             color: #1e293b;
-            padding: 0.3rem 1rem;
+            padding: 0.25rem 0.9rem;
             border-radius: 30px;
             font-weight: 600;
-            font-size: 0.85rem;
+            font-size: 0.8rem;
             border: 1px solid #c7d2fe;
             white-space: nowrap;
         }
 
         .badge-total span {
-            font-size: 1.1rem;
+            font-size: 1rem;
             margin-right: 0.2rem;
+        }
+
+        /* HAMBURGER BUTTON */
+        .hamburger {
+            background: none;
+            border: none;
+            font-size: 1.8rem;
+            line-height: 1;
+            cursor: pointer;
+            padding: 0.2rem 0.2rem 0 0.2rem;
+            color: #1e293b;
+            transition: 0.2s;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .hamburger:active {
+            transform: scale(0.88);
+            background: #f1f5f9;
         }
 
         /* STEP INDICATOR */
@@ -82,13 +109,13 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            gap: 0.6rem;
-            margin: 1rem 0 1.2rem;
+            gap: 0.5rem;
+            margin: 0.6rem 0 1rem;
         }
 
         .step-dot {
-            width: 36px;
-            height: 36px;
+            width: 34px;
+            height: 34px;
             border-radius: 50%;
             background: #e2e8f0;
             color: #64748b;
@@ -96,7 +123,7 @@
             align-items: center;
             justify-content: center;
             font-weight: 700;
-            font-size: 0.85rem;
+            font-size: 0.8rem;
             transition: 0.25s;
             border: 2px solid transparent;
         }
@@ -106,7 +133,7 @@
             color: white;
             border-color: #3b82f6;
             transform: scale(1.05);
-            box-shadow: 0 4px 10px rgba(59, 130, 246, 0.25);
+            box-shadow: 0 4px 10px rgba(59, 130, 246, 0.2);
         }
 
         .step-dot.done {
@@ -116,7 +143,7 @@
         }
 
         .step-line {
-            flex: 0 0 28px;
+            flex: 0 0 22px;
             height: 3px;
             background: #e2e8f0;
             border-radius: 4px;
@@ -131,33 +158,32 @@
         .step-card {
             background: white;
             border-radius: 28px;
-            padding: 1.8rem 1.5rem 2rem;
+            padding: 1.5rem 1.2rem 1.8rem;
             box-shadow: 0 12px 32px rgba(0, 0, 0, 0.06);
             border: 1px solid #e9edf4;
-            min-height: 380px;
+            min-height: 350px;
             display: flex;
             flex-direction: column;
             transition: 0.2s;
         }
 
         .step-title {
-            font-size: 0.75rem;
+            font-size: 0.7rem;
             text-transform: uppercase;
             letter-spacing: 0.8px;
             color: #94a3b8;
             font-weight: 600;
-            margin-bottom: 0.2rem;
+            margin-bottom: 0.1rem;
         }
 
         .step-headline {
-            font-size: 1.5rem;
+            font-size: 1.3rem;
             font-weight: 700;
             color: #0f172a;
-            margin-bottom: 1.5rem;
+            margin-bottom: 1.2rem;
             line-height: 1.3;
         }
 
-        /* Step content containers */
         .step-content {
             display: none;
             flex-direction: column;
@@ -168,11 +194,11 @@
             display: flex;
         }
 
-        /* LARGE INPUTS (exactly what you asked for) */
+        /* BIG INPUTS */
         .big-input {
             width: 100%;
-            padding: 1.2rem 1.2rem;
-            font-size: 1.6rem;
+            padding: 1rem 1.2rem;
+            font-size: 1.4rem;
             font-weight: 500;
             border: 2px solid #e2e8f0;
             border-radius: 18px;
@@ -180,34 +206,34 @@
             transition: 0.2s;
             background: #fafcff;
             color: #0f172a;
-            margin-bottom: 0.5rem;
+            margin-bottom: 0.3rem;
         }
 
         .big-input:focus {
             border-color: #3b82f6;
-            box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.12);
+            box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
             background: white;
         }
 
         .big-input::placeholder {
             color: #b9c3d4;
             font-weight: 400;
-            font-size: 1.2rem;
+            font-size: 1.1rem;
         }
 
         .input-hint {
-            font-size: 0.85rem;
+            font-size: 0.8rem;
             color: #64748b;
-            margin-bottom: 1rem;
+            margin-bottom: 0.8rem;
         }
 
-        /* CAMERA BOX */
+        /* CAMERA */
         #reader-container {
             width: 100%;
             background: #0f172a;
             border-radius: 20px;
             overflow: hidden;
-            margin-bottom: 1rem;
+            margin-bottom: 0.8rem;
             aspect-ratio: 4/3;
             position: relative;
             border: 2px solid #e2e8f0;
@@ -229,15 +255,15 @@
             display: flex;
             gap: 0.5rem;
             align-items: center;
-            margin: 0.5rem 0 0.3rem;
+            margin: 0.3rem 0 0.2rem;
         }
 
         .manual-fallback input {
             flex: 1;
-            padding: 0.8rem 1rem;
+            padding: 0.7rem 1rem;
             border: 1.5px solid #e2e8f0;
             border-radius: 14px;
-            font-size: 1rem;
+            font-size: 0.95rem;
             background: #f8fafc;
             outline: none;
         }
@@ -246,41 +272,38 @@
             border-color: #3b82f6;
         }
 
-        /* BUTTONS - large and thumb-friendly */
+        /* BUTTONS */
         .btn-row {
             display: flex;
-            gap: 0.8rem;
-            margin-top: 1.8rem;
+            gap: 0.7rem;
+            margin-top: 1.2rem;
             flex-wrap: wrap;
         }
 
         .btn-row .btn {
             flex: 1;
-            min-height: 58px;
+            min-height: 52px;
             border: none;
             border-radius: 40px;
-            font-size: 1.1rem;
+            font-size: 1rem;
             font-weight: 600;
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            gap: 0.5rem;
+            gap: 0.4rem;
             cursor: pointer;
             transition: 0.15s;
-            padding: 0 1.2rem;
-            min-width: 100px;
+            padding: 0 1rem;
+            min-width: 80px;
         }
 
         .btn-row .btn:active {
-            transform: scale(0.96);
+            transform: scale(0.95);
         }
 
         .btn-primary {
             background: #1e293b;
             color: white;
-        }
-        .btn-primary:hover {
-            background: #0f172a;
         }
         .btn-primary:disabled {
             opacity: 0.4;
@@ -319,166 +342,24 @@
             background: #fee2e2;
             color: #b91c1c;
         }
-        .btn-danger-soft:hover {
-            background: #fecaca;
-        }
 
-        /* summary step */
-        .summary-box {
-            background: #f8fafc;
-            padding: 1.2rem 1.5rem;
-            border-radius: 20px;
-            border-left: 5px solid #3b82f6;
-            margin: 0.5rem 0 1rem;
-        }
-
-        .summary-box p {
-            font-size: 1.1rem;
-            padding: 0.3rem 0;
-            display: flex;
-            justify-content: space-between;
-            border-bottom: 1px dashed #e2e8f0;
-        }
-
-        .summary-box p:last-child {
-            border-bottom: none;
-        }
-
-        .summary-box .label {
-            color: #64748b;
-            font-weight: 500;
-        }
-        .summary-box .value {
-            font-weight: 600;
-            color: #0f172a;
-            text-align: right;
-            max-width: 60%;
-            word-break: break-word;
-        }
-
-        /* TABLE / INVENTORY LIST */
-        .inventory-section {
-            margin-top: 1.8rem;
-            background: white;
-            border-radius: 20px;
-            padding: 0.2rem 0 0.5rem;
-            border: 1px solid #e9edf4;
-            overflow: hidden;
-        }
-
-        .inv-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 0.8rem 1.2rem;
-            border-bottom: 1px solid #edf2f7;
-            flex-wrap: wrap;
-            gap: 0.3rem;
-        }
-
-        .inv-header h3 {
-            font-size: 1rem;
-            color: #1e293b;
-        }
-
-        .inv-header .actions {
-            display: flex;
-            gap: 0.5rem;
-        }
-
-        .inv-header .actions button {
-            background: none;
-            border: none;
-            font-weight: 600;
-            font-size: 0.8rem;
-            padding: 0.3rem 0.8rem;
-            border-radius: 30px;
-            cursor: pointer;
-            transition: 0.15s;
-        }
-
-        .btn-export {
-            background: #dbeafe;
-            color: #1d4ed8;
-        }
-        .btn-export:hover {
-            background: #bfdbfe;
-        }
-
-        .btn-clear-all {
-            background: #fee2e2;
-            color: #b91c1c;
-        }
-        .btn-clear-all:hover {
-            background: #fecaca;
-        }
-
-        .scroll-table {
-            max-height: 240px;
-            overflow-y: auto;
-            padding: 0 0.2rem 0.2rem;
-        }
-
-        .scroll-table::-webkit-scrollbar {
-            width: 4px;
-        }
-        .scroll-table::-webkit-scrollbar-thumb {
-            background: #cbd5e1;
-            border-radius: 10px;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 0.85rem;
-        }
-
-        thead th {
-            position: sticky;
-            top: 0;
-            background: #f8fafc;
-            color: #475569;
-            font-weight: 600;
-            font-size: 0.7rem;
-            text-transform: uppercase;
-            letter-spacing: 0.3px;
-            padding: 0.6rem 0.5rem;
-            text-align: left;
-            border-bottom: 2px solid #e2e8f0;
-        }
-
-        tbody td {
-            padding: 0.5rem 0.5rem;
-            border-bottom: 1px solid #f1f5f9;
-            color: #1e293b;
-        }
-
-        tbody tr:last-child td {
-            border-bottom: none;
-        }
-
-        .empty-state {
-            text-align: center;
-            color: #94a3b8;
-            padding: 1.8rem 0;
-            font-style: italic;
-        }
-
-        /* Toast */
+        /* TOAST */
         .toast {
             background: #065f46;
             color: white;
-            padding: 0.8rem 1.2rem;
+            padding: 0.7rem 1.2rem;
             border-radius: 40px;
             font-weight: 500;
             text-align: center;
-            margin-top: 1rem;
+            margin-top: 0.8rem;
             display: none;
             animation: fadeUp 0.3s ease;
         }
-
         .toast.show {
             display: block;
+        }
+        .toast.error {
+            background: #991b1b;
         }
 
         @keyframes fadeUp {
@@ -492,30 +373,206 @@
             }
         }
 
-        /* responsive tweaks */
+        /* ===== SIDEMENU ===== */
+        .sidemenu-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.35);
+            z-index: 999;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+
+        .sidemenu-overlay.open {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .sidemenu {
+            position: fixed;
+            top: 0;
+            right: -100%;
+            width: 86%;
+            max-width: 380px;
+            height: 100%;
+            background: white;
+            z-index: 1000;
+            padding: 1.2rem 1.2rem 2rem;
+            transition: right 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+            box-shadow: -8px 0 30px rgba(0, 0, 0, 0.08);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .sidemenu.open {
+            right: 0;
+        }
+
+        .sidemenu-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-bottom: 0.8rem;
+            border-bottom: 1px solid #edf2f7;
+            flex-shrink: 0;
+        }
+
+        .sidemenu-header h2 {
+            font-size: 1.1rem;
+            color: #0f172a;
+        }
+
+        .sidemenu-header h2 span {
+            font-size: 0.8rem;
+            font-weight: 400;
+            color: #64748b;
+            margin-left: 0.3rem;
+        }
+
+        .close-menu {
+            background: none;
+            border: none;
+            font-size: 1.8rem;
+            cursor: pointer;
+            color: #64748b;
+            padding: 0 0.2rem;
+            line-height: 1;
+        }
+        .close-menu:active {
+            transform: scale(0.9);
+        }
+
+        .sidemenu-actions {
+            display: flex;
+            gap: 0.6rem;
+            padding: 0.8rem 0;
+            flex-shrink: 0;
+            flex-wrap: wrap;
+        }
+
+        .sidemenu-actions button {
+            flex: 1;
+            min-height: 44px;
+            border: none;
+            border-radius: 30px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            cursor: pointer;
+            padding: 0 0.8rem;
+            transition: 0.15s;
+            min-width: 70px;
+        }
+
+        .sidemenu-actions button:active {
+            transform: scale(0.95);
+        }
+
+        .btn-export-sm {
+            background: #dbeafe;
+            color: #1d4ed8;
+        }
+        .btn-export-sm:hover {
+            background: #bfdbfe;
+        }
+
+        .btn-clear-sm {
+            background: #fee2e2;
+            color: #b91c1c;
+        }
+        .btn-clear-sm:hover {
+            background: #fecaca;
+        }
+
+        .sidemenu-table-wrap {
+            flex: 1;
+            overflow-y: auto;
+            margin-top: 0.2rem;
+            padding-right: 0.2rem;
+        }
+
+        .sidemenu-table-wrap::-webkit-scrollbar {
+            width: 4px;
+        }
+        .sidemenu-table-wrap::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 10px;
+        }
+
+        .sidemenu-table-wrap table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.82rem;
+        }
+
+        .sidemenu-table-wrap thead th {
+            position: sticky;
+            top: 0;
+            background: #f8fafc;
+            color: #475569;
+            font-weight: 600;
+            font-size: 0.65rem;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+            padding: 0.5rem 0.4rem;
+            text-align: left;
+            border-bottom: 2px solid #e2e8f0;
+            z-index: 2;
+        }
+
+        .sidemenu-table-wrap tbody td {
+            padding: 0.4rem 0.4rem;
+            border-bottom: 1px solid #f1f5f9;
+            color: #1e293b;
+        }
+
+        .sidemenu-table-wrap tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        .empty-state {
+            text-align: center;
+            color: #94a3b8;
+            padding: 2rem 0;
+            font-style: italic;
+        }
+
+        /* Responsive */
         @media (max-width: 480px) {
             .step-card {
-                padding: 1.2rem 1rem 1.5rem;
-                min-height: 320px;
+                padding: 1rem 1rem 1.2rem;
+                min-height: 300px;
             }
             .big-input {
-                font-size: 1.4rem;
-                padding: 1rem;
+                font-size: 1.2rem;
+                padding: 0.9rem 1rem;
             }
             .step-headline {
-                font-size: 1.2rem;
+                font-size: 1.1rem;
+                margin-bottom: 0.8rem;
             }
             .btn-row .btn {
-                min-height: 50px;
-                font-size: 1rem;
-                min-width: 70px;
+                min-height: 46px;
+                font-size: 0.9rem;
+                min-width: 60px;
             }
             .app-header h1 {
-                font-size: 1.1rem;
+                font-size: 1rem;
             }
             .badge-total {
-                font-size: 0.75rem;
-                padding: 0.2rem 0.8rem;
+                font-size: 0.7rem;
+                padding: 0.2rem 0.7rem;
+            }
+            .hamburger {
+                font-size: 1.6rem;
+            }
+            .sidemenu {
+                width: 92%;
+                padding: 1rem;
             }
         }
     </style>
@@ -523,18 +580,21 @@
 <body>
 
     <div class="app">
-        <!-- Header -->
+        <!-- HEADER -->
         <div class="app-header">
             <h1>
-                📦 Count<span style="font-weight:400;font-size:0.9rem;margin-left:0.2rem;">Flow</span>
+                📦 Count<span style="font-weight:400;font-size:0.85rem;margin-left:0.1rem;">Flow</span>
                 <small>v2</small>
             </h1>
-            <div class="badge-total">
-                <span>📋</span> <strong id="totalItems">0</strong>
+            <div class="header-actions">
+                <div class="badge-total">
+                    <span>📋</span> <strong id="totalItems">0</strong>
+                </div>
+                <button class="hamburger" id="hamburgerBtn" aria-label="Open inventory menu">☰</button>
             </div>
         </div>
 
-        <!-- Step Dots -->
+        <!-- STEP DOTS -->
         <div class="step-indicator" id="stepIndicator">
             <div class="step-dot active" data-step="1">1</div>
             <div class="step-line" data-between="1-2"></div>
@@ -545,7 +605,7 @@
             <div class="step-dot" data-step="4">4</div>
         </div>
 
-        <!-- Step Card -->
+        <!-- STEP CARD -->
         <div class="step-card" id="stepCard">
             <!-- STEP 1: Barcode -->
             <div class="step-content active" data-step="1">
@@ -556,7 +616,7 @@
                 </div>
                 <div class="manual-fallback">
                     <input type="text" id="manualBarcode" placeholder="Or type barcode manually" autocomplete="off">
-                    <button class="btn btn-outline" id="skipBarcodeBtn" style="flex:0.4;min-height:44px;border-radius:30px;padding:0 1rem;font-size:0.9rem;">Skip</button>
+                    <button class="btn btn-outline" id="skipBarcodeBtn" style="flex:0.4;min-height:42px;border-radius:30px;padding:0 0.8rem;font-size:0.85rem;">Skip</button>
                 </div>
                 <div class="input-hint">📌 Point camera at barcode. It auto‑advances.</div>
                 <div class="btn-row">
@@ -600,20 +660,22 @@
                 </div>
             </div>
 
-            <!-- Toast notification -->
+            <!-- Toast -->
             <div class="toast" id="toast">✅ Item added!</div>
         </div>
 
-        <!-- Inventory List & Export -->
-        <div class="inventory-section">
-            <div class="inv-header">
-                <h3>📋 Inventory (<span id="rowCount">0</span>)</h3>
-                <div class="actions">
-                    <button class="btn-export" id="exportExcelBtn">⬇️ Excel</button>
-                    <button class="btn-clear-all" id="clearAllBtn">✖ Clear</button>
-                </div>
+        <!-- ===== SIDEMENU ===== -->
+        <div class="sidemenu-overlay" id="sidemenuOverlay"></div>
+        <div class="sidemenu" id="sidemenu">
+            <div class="sidemenu-header">
+                <h2>📋 Inventory <span id="sidemenuCount">(0)</span></h2>
+                <button class="close-menu" id="closeMenuBtn">✕</button>
             </div>
-            <div class="scroll-table">
+            <div class="sidemenu-actions">
+                <button class="btn-export-sm" id="exportExcelBtn">⬇️ Export Excel</button>
+                <button class="btn-clear-sm" id="clearAllBtn">✖ Clear All</button>
+            </div>
+            <div class="sidemenu-table-wrap">
                 <table>
                     <thead>
                         <tr>
@@ -639,13 +701,8 @@
             // ---------- STATE ----------
             let inventory = [];
             let nextId = 1;
-            let currentStep = 1; // 1-4
-            let currentItem = {
-                barcode: '',
-                name: '',
-                mrp: '',
-                qty: ''
-            };
+            let currentStep = 1;
+            let currentItem = { barcode: '', name: '', mrp: '', qty: '' };
             let html5QrCode = null;
             let isScanning = false;
 
@@ -654,9 +711,11 @@
             const stepDots = document.querySelectorAll('.step-dot');
             const stepLines = document.querySelectorAll('.step-line');
             const totalItemsSpan = document.getElementById('totalItems');
-            const rowCountSpan = document.getElementById('rowCount');
+            const sidemenuCount = document.getElementById('sidemenuCount');
             const tbody = document.getElementById('inventoryBody');
             const toast = document.getElementById('toast');
+            const sidemenu = document.getElementById('sidemenu');
+            const overlay = document.getElementById('sidemenuOverlay');
 
             // Inputs
             const manualBarcode = document.getElementById('manualBarcode');
@@ -665,6 +724,8 @@
             const productQty = document.getElementById('productQty');
 
             // Buttons
+            const hamburgerBtn = document.getElementById('hamburgerBtn');
+            const closeMenuBtn = document.getElementById('closeMenuBtn');
             const barcodeNextBtn = document.getElementById('barcodeNextBtn');
             const skipBarcodeBtn = document.getElementById('skipBarcodeBtn');
             const nameBackBtn = document.getElementById('nameBackBtn');
@@ -676,12 +737,34 @@
             const exportExcelBtn = document.getElementById('exportExcelBtn');
             const clearAllBtn = document.getElementById('clearAllBtn');
 
-            // ---------- HELPER: RENDER TABLE ----------
+            // ---------- SIDEMENU TOGGLE ----------
+            function openMenu() {
+                sidemenu.classList.add('open');
+                overlay.classList.add('open');
+                document.body.style.overflow = 'hidden';
+            }
+
+            function closeMenu() {
+                sidemenu.classList.remove('open');
+                overlay.classList.remove('open');
+                document.body.style.overflow = '';
+            }
+
+            hamburgerBtn.addEventListener('click', openMenu);
+            closeMenuBtn.addEventListener('click', closeMenu);
+            overlay.addEventListener('click', closeMenu);
+
+            // Close on Escape
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape' && sidemenu.classList.contains('open')) closeMenu();
+            });
+
+            // ---------- RENDER TABLE ----------
             function renderTable() {
                 if (inventory.length === 0) {
                     tbody.innerHTML = `<tr><td colspan="5" class="empty-state">📭 No items added yet.</td></tr>`;
                     totalItemsSpan.textContent = '0';
-                    rowCountSpan.textContent = '0';
+                    sidemenuCount.textContent = '(0)';
                     return;
                 }
                 let html = '';
@@ -698,28 +781,18 @@
                 });
                 tbody.innerHTML = html;
                 totalItemsSpan.textContent = inventory.length;
-                rowCountSpan.textContent = inventory.length;
+                sidemenuCount.textContent = `(${inventory.length})`;
             }
 
-            // ---------- STEP NAVIGATION ----------
+            // ---------- STEP NAV ----------
             function goToStep(step) {
-                // stop camera if leaving step 1
-                if (currentStep === 1 && step !== 1) {
-                    stopScanner();
-                }
-                // start camera if entering step 1
-                if (step === 1 && currentStep !== 1) {
-                    startScanner();
-                }
+                if (currentStep === 1 && step !== 1) stopScanner();
+                if (step === 1 && currentStep !== 1) startScanner();
 
                 currentStep = step;
-
-                // Update contents
                 stepContents.forEach(el => {
                     el.classList.toggle('active', parseInt(el.dataset.step) === step);
                 });
-
-                // Update dots & lines
                 stepDots.forEach(dot => {
                     const s = parseInt(dot.dataset.step);
                     dot.classList.remove('active', 'done');
@@ -731,45 +804,28 @@
                     line.classList.toggle('done', b <= step);
                 });
 
-                // Focus logic
                 if (step === 2) setTimeout(() => productName.focus(), 300);
                 if (step === 3) setTimeout(() => productMrp.focus(), 300);
                 if (step === 4) setTimeout(() => productQty.focus(), 300);
-
-                // Update barcode next button state
                 if (step === 1) updateBarcodeNextState();
-
-                // Reset toast
                 toast.classList.remove('show');
             }
 
             // ---------- BARCODE SCANNER ----------
             async function startScanner() {
                 if (html5QrCode) {
-                    try {
-                        await html5QrCode.stop();
-                        await html5QrCode.clear();
-                    } catch (_) {}
+                    try { await html5QrCode.stop();
+                        await html5QrCode.clear(); } catch (_) {}
                     html5QrCode = null;
                 }
                 const readerDiv = document.getElementById('reader');
-                readerDiv.innerHTML = ''; // clean
+                readerDiv.innerHTML = '';
                 try {
                     html5QrCode = new Html5Qrcode('reader');
-                    const config = {
-                        fps: 15,
-                        qrbox: { width: 240, height: 240 },
-                        aspectRatio: 1.0
-                    };
-                    await html5QrCode.start({ facingMode: 'environment' },
-                        config,
-                        onScanSuccess,
-                        onScanError
-                    );
+                    await html5QrCode.start({ facingMode: 'environment' }, { fps: 15, qrbox: { width: 220,
+                            height: 220 }, aspectRatio: 1.0 }, onScanSuccess, onScanError);
                     isScanning = true;
                 } catch (err) {
-                    console.warn('Camera start error:', err);
-                    // If camera fails, user can still type manually
                     document.getElementById('reader-container').innerHTML = `
                         <div style="display:flex;align-items:center;justify-content:center;height:100%;color:#94a3b8;background:#0f172a;border-radius:18px;padding:1rem;text-align:center;flex-direction:column;gap:0.5rem;">
                             <span style="font-size:2rem;">📷</span>
@@ -781,38 +837,26 @@
 
             async function stopScanner() {
                 if (html5QrCode && isScanning) {
-                    try {
-                        await html5QrCode.stop();
-                        await html5QrCode.clear();
-                    } catch (_) {}
+                    try { await html5QrCode.stop();
+                        await html5QrCode.clear(); } catch (_) {}
                     html5QrCode = null;
                     isScanning = false;
                 }
-                // Reset the container just in case, but keep placeholder
-                const container = document.getElementById('reader-container');
-                // If we manually overwrote it, we need to reset on next start.
-                // The startScanner recreates the reader div.
             }
 
-            function onScanSuccess(decodedText, decodedResult) {
-                // decodedText is the barcode number
+            function onScanSuccess(decodedText) {
                 manualBarcode.value = decodedText;
                 currentItem.barcode = decodedText;
                 updateBarcodeNextState();
-                // auto advance to next step after a tiny delay
                 toast.textContent = '✅ Barcode scanned!';
                 toast.classList.add('show');
                 setTimeout(() => {
                     toast.classList.remove('show');
-                    if (currentStep === 1) {
-                        goToStep(2);
-                    }
+                    if (currentStep === 1) goToStep(2);
                 }, 400);
             }
 
-            function onScanError(err) {
-                // ignore, keep scanning
-            }
+            function onScanError(err) { /* ignore */ }
 
             function updateBarcodeNextState() {
                 const val = manualBarcode.value.trim();
@@ -820,35 +864,28 @@
                 if (val) currentItem.barcode = val;
             }
 
-            // ---------- VALIDATION & ADD ITEM ----------
+            // ---------- ADD ITEM ----------
             function addCurrentItem() {
                 const name = currentItem.name.trim();
                 const mrp = parseFloat(currentItem.mrp);
                 const qty = parseInt(currentItem.qty, 10);
 
                 if (!name) {
-                    toast.textContent = '❌ Please enter a Product Name.';
-                    toast.classList.add('show');
-                    setTimeout(() => toast.classList.remove('show'), 2000);
+                    showToast('❌ Please enter a Product Name.', true);
                     goToStep(2);
                     return;
                 }
                 if (isNaN(mrp) || mrp < 0) {
-                    toast.textContent = '❌ Enter a valid MRP.';
-                    toast.classList.add('show');
-                    setTimeout(() => toast.classList.remove('show'), 2000);
+                    showToast('❌ Enter a valid MRP.', true);
                     goToStep(3);
                     return;
                 }
                 if (isNaN(qty) || qty < 0) {
-                    toast.textContent = '❌ Enter a valid Quantity.';
-                    toast.classList.add('show');
-                    setTimeout(() => toast.classList.remove('show'), 2000);
+                    showToast('❌ Enter a valid Quantity.', true);
                     goToStep(4);
                     return;
                 }
 
-                // Push to inventory
                 inventory.push({
                     id: nextId++,
                     barcode: currentItem.barcode || 'N/A',
@@ -856,30 +893,29 @@
                     mrp: mrp.toFixed(2),
                     qty: qty
                 });
-
                 renderTable();
 
-                // Reset current item
                 currentItem = { barcode: '', name: '', mrp: '', qty: '' };
                 manualBarcode.value = '';
                 productName.value = '';
                 productMrp.value = '';
                 productQty.value = '';
 
-                // Show success and go back to step 1
-                toast.textContent = '✅ Item added to list!';
-                toast.classList.add('show');
-                setTimeout(() => toast.classList.remove('show'), 1500);
-
+                showToast('✅ Item added to list!', false);
                 goToStep(1);
             }
 
-            // ---------- EXPORT EXCEL ----------
+            function showToast(msg, isError) {
+                toast.textContent = msg;
+                toast.className = 'toast show' + (isError ? ' error' : '');
+                clearTimeout(toast._timer);
+                toast._timer = setTimeout(() => toast.classList.remove('show'), 2000);
+            }
+
+            // ---------- EXPORT ----------
             function exportExcel() {
                 if (inventory.length === 0) {
-                    toast.textContent = '📭 No data to export.';
-                    toast.classList.add('show');
-                    setTimeout(() => toast.classList.remove('show'), 2000);
+                    showToast('📭 No data to export.', true);
                     return;
                 }
                 const data = inventory.map((item, idx) => ({
@@ -892,58 +928,37 @@
                 try {
                     const wb = XLSX.utils.book_new();
                     const ws = XLSX.utils.json_to_sheet(data);
-                    ws['!cols'] = [
-                        { wch: 6 },
-                        { wch: 18 },
-                        { wch: 30 },
-                        { wch: 12 },
-                        { wch: 10 }
-                    ];
+                    ws['!cols'] = [{ wch: 6 }, { wch: 18 }, { wch: 30 }, { wch: 12 }, { wch: 10 }];
                     XLSX.utils.book_append_sheet(wb, ws, 'Inventory');
-                    const dateStr = new Date().toISOString().slice(0, 10);
-                    XLSX.writeFile(wb, `inventory_${dateStr}.xlsx`);
-                    toast.textContent = `✅ Exported ${inventory.length} items!`;
-                    toast.classList.add('show');
-                    setTimeout(() => toast.classList.remove('show'), 2000);
-                } catch (e) {
-                    alert('Export failed. Check library loading.');
-                }
+                    XLSX.writeFile(wb, `inventory_${new Date().toISOString().slice(0, 10)}.xlsx`);
+                    showToast(`✅ Exported ${inventory.length} items!`, false);
+                    closeMenu();
+                } catch (e) { alert('Export failed.'); }
             }
 
-            // ---------- CLEAR ALL ----------
+            // ---------- CLEAR ----------
             function clearAll() {
-                if (inventory.length === 0) {
-                    toast.textContent = '📭 Already empty.';
-                    toast.classList.add('show');
-                    setTimeout(() => toast.classList.remove('show'), 1500);
-                    return;
-                }
+                if (inventory.length === 0) { showToast('📭 Already empty.', true); return; }
                 if (confirm('⚠️ Delete ALL inventory items?')) {
                     inventory = [];
                     nextId = 1;
                     renderTable();
-                    toast.textContent = '🗑️ All cleared.';
-                    toast.classList.add('show');
-                    setTimeout(() => toast.classList.remove('show'), 1500);
+                    showToast('🗑️ All cleared.', false);
+                    closeMenu();
                 }
             }
 
             // ---------- EVENT LISTENERS ----------
-            // Manual barcode input
             manualBarcode.addEventListener('input', function() {
                 currentItem.barcode = this.value.trim();
                 updateBarcodeNextState();
             });
-
-            // Skip barcode
             skipBarcodeBtn.addEventListener('click', function() {
                 manualBarcode.value = '';
                 currentItem.barcode = '';
                 updateBarcodeNextState();
                 goToStep(2);
             });
-
-            // Barcode Next
             barcodeNextBtn.addEventListener('click', function() {
                 if (manualBarcode.value.trim()) {
                     currentItem.barcode = manualBarcode.value.trim();
@@ -951,83 +966,47 @@
                 }
             });
 
-            // Name step
             productName.addEventListener('input', function() { currentItem.name = this.value; });
-            productName.addEventListener('keydown', function(e) {
-                if (e.key === 'Enter') { e.preventDefault();
-                    nameNextBtn.click(); }
-            });
+            productName.addEventListener('keydown', function(e) { if (e.key === 'Enter') { e.preventDefault();
+                    nameNextBtn.click(); } });
             nameBackBtn.addEventListener('click', () => goToStep(1));
             nameNextBtn.addEventListener('click', function() {
                 const val = productName.value.trim();
-                if (!val) {
-                    toast.textContent = '❌ Please enter a product name.';
-                    toast.classList.add('show');
-                    setTimeout(() => toast.classList.remove('show'), 1500);
-                    productName.focus();
-                    return;
-                }
+                if (!val) { showToast('❌ Enter a product name.', true);
+                    productName.focus(); return; }
                 currentItem.name = val;
                 goToStep(3);
             });
 
-            // MRP step
             productMrp.addEventListener('input', function() { currentItem.mrp = this.value; });
-            productMrp.addEventListener('keydown', function(e) {
-                if (e.key === 'Enter') { e.preventDefault();
-                    mrpNextBtn.click(); }
-            });
+            productMrp.addEventListener('keydown', function(e) { if (e.key === 'Enter') { e.preventDefault();
+                    mrpNextBtn.click(); } });
             mrpBackBtn.addEventListener('click', () => goToStep(2));
             mrpNextBtn.addEventListener('click', function() {
                 const val = parseFloat(productMrp.value);
-                if (isNaN(val) || val < 0) {
-                    toast.textContent = '❌ Enter a valid MRP (₹).';
-                    toast.classList.add('show');
-                    setTimeout(() => toast.classList.remove('show'), 1500);
-                    productMrp.focus();
-                    return;
-                }
+                if (isNaN(val) || val < 0) { showToast('❌ Enter a valid MRP.', true);
+                    productMrp.focus(); return; }
                 currentItem.mrp = productMrp.value;
                 goToStep(4);
             });
 
-            // Qty step
             productQty.addEventListener('input', function() { currentItem.qty = this.value; });
-            productQty.addEventListener('keydown', function(e) {
-                if (e.key === 'Enter') { e.preventDefault();
-                    addItemBtn.click(); }
-            });
+            productQty.addEventListener('keydown', function(e) { if (e.key === 'Enter') { e.preventDefault();
+                    addItemBtn.click(); } });
             qtyBackBtn.addEventListener('click', () => goToStep(3));
             addItemBtn.addEventListener('click', addCurrentItem);
 
-            // Export & Clear
             exportExcelBtn.addEventListener('click', exportExcel);
             clearAllBtn.addEventListener('click', clearAll);
 
             // ---------- INIT ----------
             renderTable();
-            // Start scanner on load
-            setTimeout(() => {
-                startScanner();
-            }, 500);
+            setTimeout(startScanner, 500);
 
-            // Handle page visibility to stop/start camera
             document.addEventListener('visibilitychange', () => {
-                if (document.hidden) {
-                    if (currentStep === 1) stopScanner();
-                } else {
-                    if (currentStep === 1) startScanner();
-                }
+                if (document.hidden) { if (currentStep === 1) stopScanner(); } else { if (currentStep === 1)
+                        startScanner(); }
             });
-
-            // Prevent default form submit
-            document.addEventListener('keydown', (e) => {
-                if (e.key === 'Enter' && e.target.tagName === 'INPUT') {
-                    // handled per field
-                }
-            });
-
-            console.log('📦 Inventory Flow ready. Step by step.');
         })();
     </script>
 
