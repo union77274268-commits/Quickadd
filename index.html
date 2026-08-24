@@ -3,67 +3,15 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-    <title>Inventory Scanner · Supabase Sync</title>
+    <title>Inventory Scanner · Supabase Sync (No Libraries)</title>
     
-    <!-- Load libraries with fallbacks -->
-    <script>
-        // Check if libraries load, if not use fallbacks
-        function loadScript(src, fallbackSrc) {
-            return new Promise((resolve, reject) => {
-                const script = document.createElement('script');
-                script.src = src;
-                script.onload = resolve;
-                script.onerror = () => {
-                    if (fallbackSrc) {
-                        console.warn(`⚠️ Failed to load ${src}, trying fallback...`);
-                        const fallbackScript = document.createElement('script');
-                        fallbackScript.src = fallbackSrc;
-                        fallbackScript.onload = resolve;
-                        fallbackScript.onerror = reject;
-                        document.head.appendChild(fallbackScript);
-                    } else {
-                        reject(new Error(`Failed to load ${src}`));
-                    }
-                };
-                document.head.appendChild(script);
-            });
-        }
-
-        // Load all required libraries with fallbacks
-        async function loadLibraries() {
-            try {
-                // HTML5 QR Code
-                await loadScript(
-                    'https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.8/html5-qrcode.min.js',
-                    'https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js'
-                );
-                console.log('✅ QR Scanner loaded');
-
-                // XLSX
-                await loadScript(
-                    'https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js',
-                    'https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js'
-                );
-                console.log('✅ XLSX loaded');
-
-                // Supabase
-                await loadScript(
-                    'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2',
-                    'https://unpkg.com/@supabase/supabase-js@2/dist/umd/supabase.min.js'
-                );
-                console.log('✅ Supabase loaded');
-
-                return true;
-            } catch (err) {
-                console.error('❌ Failed to load libraries:', err);
-                alert('Failed to load required libraries. Please check your internet connection and try refreshing the page.');
-                return false;
-            }
-        }
+    <!-- Only load QR scanner and XLSX from CDN (no Supabase library needed!) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.8/html5-qrcode.min.js">
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js">
     </script>
 
     <style>
-        /* --- styles (unchanged) --- */
         * {
             margin: 0;
             padding: 0;
@@ -364,14 +312,8 @@
             background: #991b1b;
         }
         @keyframes fadeUp {
-            0% {
-                opacity: 0;
-                transform: translateY(10px);
-            }
-            100% {
-                opacity: 1;
-                transform: translateY(0);
-            }
+            0% { opacity: 0; transform: translateY(10px); }
+            100% { opacity: 1; transform: translateY(0); }
         }
         .sidemenu-overlay {
             position: fixed;
@@ -521,37 +463,14 @@
             font-style: italic;
         }
         @media (max-width: 480px) {
-            .step-card {
-                padding: 1rem 1rem 1.2rem;
-                min-height: 300px;
-            }
-            .big-input {
-                font-size: 1.2rem;
-                padding: 0.9rem 1rem;
-            }
-            .step-headline {
-                font-size: 1.1rem;
-                margin-bottom: 0.8rem;
-            }
-            .btn-row .btn {
-                min-height: 46px;
-                font-size: 0.9rem;
-                min-width: 60px;
-            }
-            .app-header h1 {
-                font-size: 1rem;
-            }
-            .badge-total {
-                font-size: 0.7rem;
-                padding: 0.2rem 0.7rem;
-            }
-            .hamburger {
-                font-size: 1.6rem;
-            }
-            .sidemenu {
-                width: 92%;
-                padding: 1rem;
-            }
+            .step-card { padding: 1rem 1rem 1.2rem; min-height: 300px; }
+            .big-input { font-size: 1.2rem; padding: 0.9rem 1rem; }
+            .step-headline { font-size: 1.1rem; margin-bottom: 0.8rem; }
+            .btn-row .btn { min-height: 46px; font-size: 0.9rem; min-width: 60px; }
+            .app-header h1 { font-size: 1rem; }
+            .badge-total { font-size: 0.7rem; padding: 0.2rem 0.7rem; }
+            .hamburger { font-size: 1.6rem; }
+            .sidemenu { width: 92%; padding: 1rem; }
         }
         .sync-status {
             font-size: 0.7rem;
@@ -630,7 +549,8 @@
             <!-- Loading State -->
             <div id="loadingState" class="loading-indicator">
                 <div class="loading-spinner"></div>
-                <div>Loading libraries...</div>
+                <div>Loading scanner &amp; connecting to Supabase...</div>
+                <div style="font-size:0.8rem;margin-top:0.5rem;color:#94a3b8;">No libraries needed! Using direct API calls.</div>
             </div>
 
             <!-- STEP 1: Barcode -->
@@ -722,49 +642,58 @@
 
     <script>
         // ================================================================
-        //  🔐  YOUR SUPABASE CREDENTIALS (ALREADY INSERTED)
+        //  🔐  YOUR SUPABASE CREDENTIALS
         // ================================================================
         const SUPABASE_URL = 'https://gnfopvqzjcphvxivijbn.supabase.co';
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImduZm9wdnF6amNwaHZ4aXZpamJuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODc1NDI1MjQsImV4cCI6MjEwMzExODUyNH0.bFGCCX32zlNnkRlC3O_nAenmNORDzyT5Aw1uMd1VFrM';
         // ================================================================
 
-        // Wait for libraries to load
-        async function initApp() {
-            console.log('📦 Loading libraries...');
+        // ---------- DIRECT SUPABASE API HELPERS (No Library!) ----------
+        const SUPABASE_HEADERS = {
+            'apikey': SUPABASE_ANON_KEY,
+            'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+            'Content-Type': 'application/json',
+            'Prefer': 'return=representation'
+        };
 
-            // Show loading state
-            const loadingState = document.getElementById('loadingState');
-            const stepContents = document.querySelectorAll('.step-content');
-            
-            // Load all libraries first
-            const librariesLoaded = await loadLibraries();
-            
-            if (!librariesLoaded) {
-                loadingState.innerHTML = `
-                    <div style="color:#ef4444;font-size:1.2rem;margin-bottom:0.5rem;">❌</div>
-                    <div>Failed to load required libraries.</div>
-                    <div style="font-size:0.9rem;margin-top:0.5rem;color:#94a3b8;">Please check your internet connection and refresh.</div>
-                    <button onclick="location.reload()" style="margin-top:1rem;padding:0.5rem 2rem;border:none;border-radius:30px;background:#3b82f6;color:white;font-weight:600;cursor:pointer;">Refresh</button>
-                `;
-                return;
-            }
-
-            // Hide loading, show step 1
-            loadingState.style.display = 'none';
-            stepContents.forEach(el => {
-                if (parseInt(el.dataset.step) === 1) {
-                    el.style.display = 'flex';
+        async function supabaseFetch(endpoint, options = {}) {
+            const url = `${SUPABASE_URL}/rest/v1/${endpoint}`;
+            const response = await fetch(url, {
+                ...options,
+                headers: {
+                    ...SUPABASE_HEADERS,
+                    ...options.headers
                 }
             });
-
-            // Now start the app
-            startApp();
+            if (!response.ok) {
+                const errorText = await response.text();
+                throw new Error(`Supabase API error (${response.status}): ${errorText}`);
+            }
+            return response.json();
         }
 
-        function startApp() {
+        async function supabaseGet(endpoint) {
+            return supabaseFetch(endpoint);
+        }
+
+        async function supabasePost(endpoint, data) {
+            return supabaseFetch(endpoint, {
+                method: 'POST',
+                body: JSON.stringify(data)
+            });
+        }
+
+        async function supabaseDelete(endpoint) {
+            return supabaseFetch(endpoint, {
+                method: 'DELETE'
+            });
+        }
+
+        // ---------- START APP ----------
+        document.addEventListener('DOMContentLoaded', function() {
             'use strict';
 
-            console.log('🚀 App starting...');
+            console.log('📦 App starting (no Supabase library needed!)');
 
             // ---------- STATE ----------
             let inventory = [];
@@ -773,10 +702,11 @@
             let currentItem = { barcode: '', name: '', mrp: '', qty: '' };
             let html5QrCode = null;
             let isScanning = false;
-            let supabase = null;
             let isSupabaseReady = false;
+            let syncInterval = null;
 
             // ---------- DOM REFS ----------
+            const loadingState = document.getElementById('loadingState');
             const stepContents = document.querySelectorAll('.step-content');
             const stepDots = document.querySelectorAll('.step-dot');
             const stepLines = document.querySelectorAll('.step-line');
@@ -817,7 +747,7 @@
                 toast.textContent = msg;
                 toast.className = 'toast show' + (isError ? ' error' : '');
                 clearTimeout(toast._timer);
-                toast._timer = setTimeout(() => toast.classList.remove('show'), 2500);
+                toast._timer = setTimeout(() => toast.classList.remove('show'), 3000);
             }
 
             // ---------- RENDER TABLE ----------
@@ -954,53 +884,24 @@
                 if (val) currentItem.barcode = val;
             }
 
-            // ---------- SUPABASE FUNCTIONS ----------
-            async function initSupabase() {
+            // ---------- SUPABASE API CALLS (Direct REST) ----------
+            async function testSupabaseConnection() {
                 try {
-                    if (typeof supabaseJs === 'undefined') {
-                        console.error('Supabase library not loaded!');
-                        setSyncStatus(false, 'Library missing');
-                        return;
-                    }
-
-                    const { createClient } = supabaseJs;
-                    supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
-                    const { data, error } = await supabase
-                        .from('inventory')
-                        .select('*', { count: 'exact', head: true });
-
-                    if (error) {
-                        console.error('Supabase connection test failed:', error);
-                        setSyncStatus(false, 'Connection failed');
-                        isSupabaseReady = false;
-                        return;
-                    }
-
-                    console.log('✅ Supabase connected successfully');
-                    setSyncStatus(true, 'Synced');
-                    isSupabaseReady = true;
-
-                    await loadFromSupabase();
-                    subscribeRealtime();
-
+                    console.log('🔌 Testing Supabase connection...');
+                    const result = await supabaseGet('inventory?select=id&limit=1');
+                    console.log('✅ Supabase connection successful');
+                    return true;
                 } catch (err) {
-                    console.error('Supabase init error:', err);
-                    setSyncStatus(false, 'Error: ' + err.message);
-                    isSupabaseReady = false;
+                    console.error('❌ Supabase connection failed:', err);
+                    return false;
                 }
             }
 
             async function loadFromSupabase() {
-                if (!supabase) return;
                 try {
-                    const { data, error } = await supabase
-                        .from('inventory')
-                        .select('*')
-                        .order('created_at', { ascending: true });
-
-                    if (error) throw error;
-
+                    console.log('📥 Loading inventory from Supabase...');
+                    const data = await supabaseGet('inventory?select=*&order=created_at.asc');
+                    
                     inventory = data.map((row, idx) => ({
                         id: idx + 1,
                         uuid: row.id,
@@ -1013,88 +914,26 @@
                     nextId = inventory.length + 1;
                     renderTable();
                     console.log(`📦 Loaded ${inventory.length} items from Supabase`);
+                    return true;
                 } catch (err) {
                     console.error('Load from Supabase error:', err);
-                    showToast('Failed to load inventory from server.', true);
+                    showToast('⚠️ Failed to load inventory from server.', true);
+                    return false;
                 }
             }
 
-            function subscribeRealtime() {
-                if (!supabase) return;
-
-                const channel = supabase
-                    .channel('inventory-changes')
-                    .on('postgres_changes', {
-                        event: 'INSERT',
-                        schema: 'public',
-                        table: 'inventory'
-                    }, (payload) => {
-                        console.log('🔵 Realtime INSERT:', payload);
-                        const newRow = payload.new;
-                        const exists = inventory.some(item => item.uuid === newRow.id);
-                        if (!exists) {
-                            inventory.push({
-                                id: inventory.length + 1,
-                                uuid: newRow.id,
-                                barcode: newRow.barcode || 'N/A',
-                                name: newRow.name,
-                                mrp: parseFloat(newRow.mrp).toFixed(2),
-                                qty: newRow.qty
-                            });
-                            renderTable();
-                            showToast(`📥 New item: ${newRow.name}`, false);
-                        }
-                    })
-                    .on('postgres_changes', {
-                        event: 'DELETE',
-                        schema: 'public',
-                        table: 'inventory'
-                    }, (payload) => {
-                        console.log('🔴 Realtime DELETE:', payload);
-                        inventory = inventory.filter(item => item.uuid !== payload.old.id);
-                        inventory.forEach((item, idx) => item.id = idx + 1);
-                        nextId = inventory.length + 1;
-                        renderTable();
-                        showToast('🗑️ Item removed by another device', false);
-                    })
-                    .subscribe((status) => {
-                        if (status === 'SUBSCRIBED') {
-                            console.log('✅ Realtime subscribed');
-                        } else if (status === 'CHANNEL_ERROR') {
-                            console.error('Realtime error');
-                            setSyncStatus(false, 'Realtime error');
-                        }
-                    });
-            }
-
-            async function insertItem(item) {
-                if (!isSupabaseReady) {
-                    inventory.push({
-                        id: nextId++,
-                        uuid: null,
+            async function insertItemToSupabase(item) {
+                try {
+                    console.log('📤 Inserting item to Supabase:', item);
+                    const data = await supabasePost('inventory', {
                         barcode: item.barcode || 'N/A',
                         name: item.name,
-                        mrp: parseFloat(item.mrp).toFixed(2),
+                        mrp: parseFloat(item.mrp),
                         qty: item.qty
                     });
-                    renderTable();
-                    showToast('✅ Item added (local only)', false);
-                    return;
-                }
-
-                try {
-                    const { data, error } = await supabase
-                        .from('inventory')
-                        .insert({
-                            barcode: item.barcode || 'N/A',
-                            name: item.name,
-                            mrp: parseFloat(item.mrp),
-                            qty: item.qty
-                        })
-                        .select();
-
-                    if (error) throw error;
-
+                    console.log('✅ Item inserted successfully:', data);
+                    
+                    // Add to local inventory
                     const newRow = data[0];
                     inventory.push({
                         id: inventory.length + 1,
@@ -1106,47 +945,28 @@
                     });
                     renderTable();
                     showToast('✅ Item added and synced!', false);
+                    return true;
                 } catch (err) {
                     console.error('Insert error:', err);
-                    showToast('❌ Failed to save to server.', true);
-                    inventory.push({
-                        id: nextId++,
-                        uuid: null,
-                        barcode: item.barcode || 'N/A',
-                        name: item.name,
-                        mrp: parseFloat(item.mrp).toFixed(2),
-                        qty: item.qty
-                    });
-                    renderTable();
+                    showToast('❌ Failed to save to server: ' + err.message, true);
+                    return false;
                 }
             }
 
             async function deleteAllFromSupabase() {
-                if (!isSupabaseReady) {
-                    inventory = [];
-                    nextId = 1;
-                    renderTable();
-                    showToast('🗑️ All cleared locally.', false);
-                    return;
-                }
-
-                if (!confirm('⚠️ Delete ALL inventory items from server?')) return;
-
                 try {
-                    const { error } = await supabase
-                        .from('inventory')
-                        .delete()
-                        .neq('id', '00000000-0000-0000-0000-000000000000');
-
-                    if (error) throw error;
-
+                    console.log('🗑️ Deleting all items from Supabase...');
+                    await supabaseDelete('inventory');
+                    console.log('✅ All items deleted');
                     inventory = [];
                     nextId = 1;
                     renderTable();
                     showToast('🗑️ All items deleted from server.', false);
+                    return true;
                 } catch (err) {
                     console.error('Delete all error:', err);
-                    showToast('❌ Failed to delete all from server.', true);
+                    showToast('❌ Failed to delete all: ' + err.message, true);
+                    return false;
                 }
             }
 
@@ -1179,7 +999,21 @@
                     qty: qty
                 };
 
-                insertItem(item);
+                if (isSupabaseReady) {
+                    insertItemToSupabase(item);
+                } else {
+                    // Local fallback
+                    inventory.push({
+                        id: nextId++,
+                        uuid: null,
+                        barcode: item.barcode || 'N/A',
+                        name: item.name,
+                        mrp: parseFloat(item.mrp).toFixed(2),
+                        qty: item.qty
+                    });
+                    renderTable();
+                    showToast('✅ Item added (local only - offline)', false);
+                }
 
                 currentItem = { barcode: '', name: '', mrp: '', qty: '' };
                 manualBarcode.value = '';
@@ -1196,6 +1030,13 @@
                     showToast('📭 No data to export.', true);
                     return;
                 }
+                
+                // Check if XLSX loaded
+                if (typeof XLSX === 'undefined') {
+                    alert('Excel library not loaded. Please refresh.');
+                    return;
+                }
+
                 const data = inventory.map((item, idx) => ({
                     'S.No': idx + 1,
                     'Barcode': item.barcode,
@@ -1203,6 +1044,7 @@
                     'MRP (₹)': parseFloat(item.mrp),
                     'Quantity': item.qty
                 }));
+                
                 try {
                     const wb = XLSX.utils.book_new();
                     const ws = XLSX.utils.json_to_sheet(data);
@@ -1305,19 +1147,69 @@
             addItemBtn.addEventListener('click', addCurrentItem);
 
             exportExcelBtn.addEventListener('click', exportExcel);
-            clearAllBtn.addEventListener('click', deleteAllFromSupabase);
+            clearAllBtn.addEventListener('click', function() {
+                if (inventory.length === 0) {
+                    showToast('📭 Already empty.', true);
+                    return;
+                }
+                if (confirm('⚠️ Delete ALL inventory items from server and local?')) {
+                    if (isSupabaseReady) {
+                        deleteAllFromSupabase();
+                    } else {
+                        inventory = [];
+                        nextId = 1;
+                        renderTable();
+                        showToast('🗑️ All cleared locally.', false);
+                    }
+                    closeMenu();
+                }
+            });
 
-            // ---------- INIT ----------
-            console.log('🚀 Initializing app...');
-            setSyncStatus(false, 'Connecting...');
-            renderTable();
+            // ---------- INITIALIZATION ----------
+            async function initApp() {
+                console.log('🚀 Initializing app...');
+                setSyncStatus(false, 'Connecting...');
+                renderTable();
 
-            initSupabase().then(() => {
+                // Test Supabase connection
+                const connected = await testSupabaseConnection();
+                if (connected) {
+                    isSupabaseReady = true;
+                    setSyncStatus(true, 'Synced');
+                    await loadFromSupabase();
+                } else {
+                    isSupabaseReady = false;
+                    setSyncStatus(false, 'Offline (local only)');
+                    showToast('⚠️ Using local storage only. Supabase unavailable.', true);
+                }
+
+                // Hide loading, show step 1
+                loadingState.style.display = 'none';
+                stepContents.forEach(el => {
+                    if (parseInt(el.dataset.step) === 1) {
+                        el.style.display = 'flex';
+                    }
+                });
+
+                // Start scanner
                 setTimeout(() => {
                     startScanner();
                 }, 500);
-            });
 
+                // Check if XLSX loaded
+                if (typeof XLSX === 'undefined') {
+                    console.warn('XLSX library not loaded. Excel export will fail.');
+                }
+
+                console.log('✅ App ready!');
+                console.log(`📊 Supabase: ${isSupabaseReady ? 'Connected' : 'Offline'}`);
+                console.log(`📦 Inventory: ${inventory.length} items`);
+            }
+
+            // Start the app
+            initApp();
+
+            // Handle visibility change for camera
             document.addEventListener('visibilitychange', () => {
                 if (document.hidden) {
                     if (currentStep === 1) stopScanner();
@@ -1325,12 +1217,7 @@
                     if (currentStep === 1) startScanner();
                 }
             });
-
-            console.log('✅ App ready!');
-        }
-
-        // Start the app
-        initApp();
+        });
     </script>
 
 </body>
