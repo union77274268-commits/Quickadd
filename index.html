@@ -1,22 +1,25 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Inventory Scanner · Step by Step</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>Inventory Scanner · Supabase Sync</title>
     <!-- Libraries -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.8/html5-qrcode.min.js">
     </script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js">
     </script>
+    <!-- Supabase JS -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2">
+    </script>
     <style>
+        /* --- styles (unchanged) --- */
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
             font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
         }
-
         body {
             background: #f1f5f9;
             min-height: 100vh;
@@ -24,14 +27,11 @@
             display: flex;
             justify-content: center;
         }
-
         .app {
             max-width: 520px;
             width: 100%;
             position: relative;
         }
-
-        /* HEADER */
         .app-header {
             display: flex;
             justify-content: space-between;
@@ -42,7 +42,6 @@
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
             margin-bottom: 1rem;
         }
-
         .app-header h1 {
             font-size: 1.2rem;
             font-weight: 700;
@@ -51,7 +50,6 @@
             align-items: center;
             gap: 0.3rem;
         }
-
         .app-header h1 small {
             font-size: 0.55rem;
             background: #3b82f6;
@@ -60,13 +58,11 @@
             border-radius: 30px;
             font-weight: 500;
         }
-
         .header-actions {
             display: flex;
             align-items: center;
             gap: 0.8rem;
         }
-
         .badge-total {
             background: #eef2ff;
             color: #1e293b;
@@ -77,13 +73,10 @@
             border: 1px solid #c7d2fe;
             white-space: nowrap;
         }
-
         .badge-total span {
             font-size: 1rem;
             margin-right: 0.2rem;
         }
-
-        /* HAMBURGER BUTTON */
         .hamburger {
             background: none;
             border: none;
@@ -98,13 +91,10 @@
             align-items: center;
             justify-content: center;
         }
-
         .hamburger:active {
             transform: scale(0.88);
             background: #f1f5f9;
         }
-
-        /* STEP INDICATOR */
         .step-indicator {
             display: flex;
             justify-content: center;
@@ -112,7 +102,6 @@
             gap: 0.5rem;
             margin: 0.6rem 0 1rem;
         }
-
         .step-dot {
             width: 34px;
             height: 34px;
@@ -127,7 +116,6 @@
             transition: 0.25s;
             border: 2px solid transparent;
         }
-
         .step-dot.active {
             background: #1e293b;
             color: white;
@@ -135,13 +123,11 @@
             transform: scale(1.05);
             box-shadow: 0 4px 10px rgba(59, 130, 246, 0.2);
         }
-
         .step-dot.done {
             background: #3b82f6;
             color: white;
             border-color: #3b82f6;
         }
-
         .step-line {
             flex: 0 0 22px;
             height: 3px;
@@ -149,12 +135,9 @@
             border-radius: 4px;
             transition: 0.25s;
         }
-
         .step-line.done {
             background: #3b82f6;
         }
-
-        /* MAIN CARD */
         .step-card {
             background: white;
             border-radius: 28px;
@@ -166,7 +149,6 @@
             flex-direction: column;
             transition: 0.2s;
         }
-
         .step-title {
             font-size: 0.7rem;
             text-transform: uppercase;
@@ -175,7 +157,6 @@
             font-weight: 600;
             margin-bottom: 0.1rem;
         }
-
         .step-headline {
             font-size: 1.3rem;
             font-weight: 700;
@@ -183,18 +164,14 @@
             margin-bottom: 1.2rem;
             line-height: 1.3;
         }
-
         .step-content {
             display: none;
             flex-direction: column;
             flex: 1;
         }
-
         .step-content.active {
             display: flex;
         }
-
-        /* BIG INPUTS */
         .big-input {
             width: 100%;
             padding: 1rem 1.2rem;
@@ -208,26 +185,21 @@
             color: #0f172a;
             margin-bottom: 0.3rem;
         }
-
         .big-input:focus {
             border-color: #3b82f6;
             box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
             background: white;
         }
-
         .big-input::placeholder {
             color: #b9c3d4;
             font-weight: 400;
             font-size: 1.1rem;
         }
-
         .input-hint {
             font-size: 0.8rem;
             color: #64748b;
             margin-bottom: 0.8rem;
         }
-
-        /* CAMERA */
         #reader-container {
             width: 100%;
             background: #0f172a;
@@ -238,26 +210,22 @@
             position: relative;
             border: 2px solid #e2e8f0;
         }
-
         #reader-container video {
             border-radius: 18px;
             width: 100% !important;
             height: 100% !important;
             object-fit: cover;
         }
-
         #reader-container #reader {
             width: 100% !important;
             height: 100% !important;
         }
-
         .manual-fallback {
             display: flex;
             gap: 0.5rem;
             align-items: center;
             margin: 0.3rem 0 0.2rem;
         }
-
         .manual-fallback input {
             flex: 1;
             padding: 0.7rem 1rem;
@@ -267,19 +235,15 @@
             background: #f8fafc;
             outline: none;
         }
-
         .manual-fallback input:focus {
             border-color: #3b82f6;
         }
-
-        /* BUTTONS */
         .btn-row {
             display: flex;
             gap: 0.7rem;
             margin-top: 1.2rem;
             flex-wrap: wrap;
         }
-
         .btn-row .btn {
             flex: 1;
             min-height: 52px;
@@ -296,11 +260,9 @@
             padding: 0 1rem;
             min-width: 80px;
         }
-
         .btn-row .btn:active {
             transform: scale(0.95);
         }
-
         .btn-primary {
             background: #1e293b;
             color: white;
@@ -310,7 +272,6 @@
             cursor: not-allowed;
             transform: none;
         }
-
         .btn-success {
             background: #059669;
             color: white;
@@ -318,7 +279,6 @@
         .btn-success:hover {
             background: #047857;
         }
-
         .btn-outline {
             background: transparent;
             color: #1e293b;
@@ -327,7 +287,6 @@
         .btn-outline:hover {
             background: #f8fafc;
         }
-
         .btn-ghost {
             background: transparent;
             color: #64748b;
@@ -337,13 +296,6 @@
         .btn-ghost:hover {
             color: #1e293b;
         }
-
-        .btn-danger-soft {
-            background: #fee2e2;
-            color: #b91c1c;
-        }
-
-        /* TOAST */
         .toast {
             background: #065f46;
             color: white;
@@ -361,7 +313,6 @@
         .toast.error {
             background: #991b1b;
         }
-
         @keyframes fadeUp {
             0% {
                 opacity: 0;
@@ -372,8 +323,6 @@
                 transform: translateY(0);
             }
         }
-
-        /* ===== SIDEMENU ===== */
         .sidemenu-overlay {
             position: fixed;
             top: 0;
@@ -386,12 +335,10 @@
             pointer-events: none;
             transition: opacity 0.3s ease;
         }
-
         .sidemenu-overlay.open {
             opacity: 1;
             pointer-events: auto;
         }
-
         .sidemenu {
             position: fixed;
             top: 0;
@@ -408,11 +355,9 @@
             flex-direction: column;
             overflow: hidden;
         }
-
         .sidemenu.open {
             right: 0;
         }
-
         .sidemenu-header {
             display: flex;
             justify-content: space-between;
@@ -421,19 +366,16 @@
             border-bottom: 1px solid #edf2f7;
             flex-shrink: 0;
         }
-
         .sidemenu-header h2 {
             font-size: 1.1rem;
             color: #0f172a;
         }
-
         .sidemenu-header h2 span {
             font-size: 0.8rem;
             font-weight: 400;
             color: #64748b;
             margin-left: 0.3rem;
         }
-
         .close-menu {
             background: none;
             border: none;
@@ -446,7 +388,6 @@
         .close-menu:active {
             transform: scale(0.9);
         }
-
         .sidemenu-actions {
             display: flex;
             gap: 0.6rem;
@@ -454,7 +395,6 @@
             flex-shrink: 0;
             flex-wrap: wrap;
         }
-
         .sidemenu-actions button {
             flex: 1;
             min-height: 44px;
@@ -467,11 +407,9 @@
             transition: 0.15s;
             min-width: 70px;
         }
-
         .sidemenu-actions button:active {
             transform: scale(0.95);
         }
-
         .btn-export-sm {
             background: #dbeafe;
             color: #1d4ed8;
@@ -479,7 +417,6 @@
         .btn-export-sm:hover {
             background: #bfdbfe;
         }
-
         .btn-clear-sm {
             background: #fee2e2;
             color: #b91c1c;
@@ -487,14 +424,12 @@
         .btn-clear-sm:hover {
             background: #fecaca;
         }
-
         .sidemenu-table-wrap {
             flex: 1;
             overflow-y: auto;
             margin-top: 0.2rem;
             padding-right: 0.2rem;
         }
-
         .sidemenu-table-wrap::-webkit-scrollbar {
             width: 4px;
         }
@@ -502,13 +437,11 @@
             background: #cbd5e1;
             border-radius: 10px;
         }
-
         .sidemenu-table-wrap table {
             width: 100%;
             border-collapse: collapse;
             font-size: 0.82rem;
         }
-
         .sidemenu-table-wrap thead th {
             position: sticky;
             top: 0;
@@ -523,25 +456,20 @@
             border-bottom: 2px solid #e2e8f0;
             z-index: 2;
         }
-
         .sidemenu-table-wrap tbody td {
             padding: 0.4rem 0.4rem;
             border-bottom: 1px solid #f1f5f9;
             color: #1e293b;
         }
-
         .sidemenu-table-wrap tbody tr:last-child td {
             border-bottom: none;
         }
-
         .empty-state {
             text-align: center;
             color: #94a3b8;
             padding: 2rem 0;
             font-style: italic;
         }
-
-        /* Responsive */
         @media (max-width: 480px) {
             .step-card {
                 padding: 1rem 1rem 1.2rem;
@@ -575,6 +503,26 @@
                 padding: 1rem;
             }
         }
+        .sync-status {
+            font-size: 0.7rem;
+            color: #64748b;
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+        }
+        .sync-status .dot {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #94a3b8;
+        }
+        .sync-status .dot.online {
+            background: #22c55e;
+        }
+        .sync-status .dot.offline {
+            background: #ef4444;
+        }
     </style>
 </head>
 <body>
@@ -587,6 +535,10 @@
                 <small>v2</small>
             </h1>
             <div class="header-actions">
+                <span class="sync-status" id="syncStatus">
+                    <span class="dot" id="syncDot"></span> 
+                    <span id="syncLabel">Connecting...</span>
+                </span>
                 <div class="badge-total">
                     <span>📋</span> <strong id="totalItems">0</strong>
                 </div>
@@ -664,7 +616,7 @@
             <div class="toast" id="toast">✅ Item added!</div>
         </div>
 
-        <!-- ===== SIDEMENU ===== -->
+        <!-- SIDEMENU -->
         <div class="sidemenu-overlay" id="sidemenuOverlay"></div>
         <div class="sidemenu" id="sidemenu">
             <div class="sidemenu-header">
@@ -694,138 +646,290 @@
         </div>
     </div>
 
-<script>
-    // ================================================================
-    //  🔐  SUPABASE CONFIGURATION (YOUR CREDENTIALS ALREADY INSERTED)
-    // ================================================================
-    const SUPABASE_URL = 'https://gnfopvqzjcphvxivijbn.supabase.co';
-    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImduZm9wdnF6amNwaHZ4aXZpamJuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODc1NDI1MjQsImV4cCI6MjEwMzExODUyNH0.bFGCCX32zlNnkRlC3O_nAenmNORDzyT5Aw1uMd1VFrM';
-    // ================================================================
+    <script>
+        // ================================================================
+        //  🔐  YOUR SUPABASE CREDENTIALS (ALREADY INSERTED)
+        // ================================================================
+        const SUPABASE_URL = 'https://gnfopvqzjcphvxivijbn.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImduZm9wdnF6amNwaHZ4aXZpamJuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODc1NDI1MjQsImV4cCI6MjEwMzExODUyNH0.bFGCCX32zlNnkRlC3O_nAenmNORDzyT5Aw1uMd1VFrM';
+        // ================================================================
 
-    (function() {
-        'use strict';
+        // Wait for all libraries to load
+        document.addEventListener('DOMContentLoaded', function() {
+            'use strict';
 
-        // ---------- STATE ----------
-        let inventory = []; // local mirror
-        let nextId = 1;
-        let currentStep = 1;
-        let currentItem = { barcode: '', name: '', mrp: '', qty: '' };
-        let html5QrCode = null;
-        let isScanning = false;
+            console.log('📦 App starting...');
 
-        // Supabase client
-        let supabase = null;
-        let realtimeChannel = null;
-        let isSupabaseReady = false;
+            // ---------- STATE ----------
+            let inventory = [];
+            let nextId = 1;
+            let currentStep = 1;
+            let currentItem = { barcode: '', name: '', mrp: '', qty: '' };
+            let html5QrCode = null;
+            let isScanning = false;
+            let supabase = null;
+            let isSupabaseReady = false;
 
-        // ---------- DOM REFS ----------
-        const stepContents = document.querySelectorAll('.step-content');
-        const stepDots = document.querySelectorAll('.step-dot');
-        const stepLines = document.querySelectorAll('.step-line');
-        const totalItemsSpan = document.getElementById('totalItems');
-        const sidemenuCount = document.getElementById('sidemenuCount');
-        const tbody = document.getElementById('inventoryBody');
-        const toast = document.getElementById('toast');
-        const sidemenu = document.getElementById('sidemenu');
-        const overlay = document.getElementById('sidemenuOverlay');
-        const syncDot = document.getElementById('syncDot');
-        const syncLabel = document.getElementById('syncLabel');
+            // ---------- DOM REFS ----------
+            const stepContents = document.querySelectorAll('.step-content');
+            const stepDots = document.querySelectorAll('.step-dot');
+            const stepLines = document.querySelectorAll('.step-line');
+            const totalItemsSpan = document.getElementById('totalItems');
+            const sidemenuCount = document.getElementById('sidemenuCount');
+            const tbody = document.getElementById('inventoryBody');
+            const toast = document.getElementById('toast');
+            const sidemenu = document.getElementById('sidemenu');
+            const overlay = document.getElementById('sidemenuOverlay');
+            const syncDot = document.getElementById('syncDot');
+            const syncLabel = document.getElementById('syncLabel');
 
-        // Inputs
-        const manualBarcode = document.getElementById('manualBarcode');
-        const productName = document.getElementById('productName');
-        const productMrp = document.getElementById('productMrp');
-        const productQty = document.getElementById('productQty');
+            const manualBarcode = document.getElementById('manualBarcode');
+            const productName = document.getElementById('productName');
+            const productMrp = document.getElementById('productMrp');
+            const productQty = document.getElementById('productQty');
 
-        // Buttons
-        const hamburgerBtn = document.getElementById('hamburgerBtn');
-        const closeMenuBtn = document.getElementById('closeMenuBtn');
-        const barcodeNextBtn = document.getElementById('barcodeNextBtn');
-        const skipBarcodeBtn = document.getElementById('skipBarcodeBtn');
-        const nameBackBtn = document.getElementById('nameBackBtn');
-        const nameNextBtn = document.getElementById('nameNextBtn');
-        const mrpBackBtn = document.getElementById('mrpBackBtn');
-        const mrpNextBtn = document.getElementById('mrpNextBtn');
-        const qtyBackBtn = document.getElementById('qtyBackBtn');
-        const addItemBtn = document.getElementById('addItemBtn');
-        const exportExcelBtn = document.getElementById('exportExcelBtn');
-        const clearAllBtn = document.getElementById('clearAllBtn');
+            const hamburgerBtn = document.getElementById('hamburgerBtn');
+            const closeMenuBtn = document.getElementById('closeMenuBtn');
+            const barcodeNextBtn = document.getElementById('barcodeNextBtn');
+            const skipBarcodeBtn = document.getElementById('skipBarcodeBtn');
+            const nameBackBtn = document.getElementById('nameBackBtn');
+            const nameNextBtn = document.getElementById('nameNextBtn');
+            const mrpBackBtn = document.getElementById('mrpBackBtn');
+            const mrpNextBtn = document.getElementById('mrpNextBtn');
+            const qtyBackBtn = document.getElementById('qtyBackBtn');
+            const addItemBtn = document.getElementById('addItemBtn');
+            const exportExcelBtn = document.getElementById('exportExcelBtn');
+            const clearAllBtn = document.getElementById('clearAllBtn');
 
-        // ---------- SUPABASE INIT ----------
-        async function initSupabase() {
-            if (!SUPABASE_URL || SUPABASE_URL === 'https://your-project.supabase.co') {
-                setSyncStatus(false, 'No Supabase config');
-                console.warn('Supabase not configured. Data will be local only.');
-                return;
+            // ---------- HELPER FUNCTIONS ----------
+            function setSyncStatus(ok, label) {
+                syncDot.className = 'dot' + (ok ? ' online' : ' offline');
+                syncLabel.textContent = label;
             }
-            try {
-                const { createClient } = supabaseJs;
-                supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-                // Test connection by fetching count
-                const { count, error } = await supabase
-                    .from('inventory')
-                    .select('*', { count: 'exact', head: true });
-                if (error) throw error;
-                isSupabaseReady = true;
-                setSyncStatus(true, 'Synced');
-                // Load data
-                await loadFromSupabase();
-                // Subscribe to realtime changes
-                subscribeRealtime();
-            } catch (err) {
-                console.error('Supabase init error:', err);
-                setSyncStatus(false, 'Connection error');
-                isSupabaseReady = false;
+
+            function showToast(msg, isError) {
+                toast.textContent = msg;
+                toast.className = 'toast show' + (isError ? ' error' : '');
+                clearTimeout(toast._timer);
+                toast._timer = setTimeout(() => toast.classList.remove('show'), 2500);
             }
-        }
 
-        function setSyncStatus(ok, label) {
-            syncDot.className = 'dot' + (ok ? '' : ' off');
-            syncLabel.textContent = label;
-        }
-
-        // ---------- LOAD FROM SUPABASE ----------
-        async function loadFromSupabase() {
-            if (!supabase) return;
-            try {
-                const { data, error } = await supabase
-                    .from('inventory')
-                    .select('*')
-                    .order('created_at', { ascending: true });
-                if (error) throw error;
-                inventory = data.map((row, idx) => ({
-                    id: idx + 1,
-                    uuid: row.id,
-                    barcode: row.barcode || 'N/A',
-                    name: row.name,
-                    mrp: parseFloat(row.mrp).toFixed(2),
-                    qty: row.qty
-                }));
-                if (inventory.length > 0) {
-                    nextId = inventory.length + 1;
-                } else {
-                    nextId = 1;
+            // ---------- RENDER TABLE ----------
+            function renderTable() {
+                if (inventory.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="5" class="empty-state">📭 No items added yet.</td></tr>`;
+                    totalItemsSpan.textContent = '0';
+                    sidemenuCount.textContent = '(0)';
+                    return;
                 }
-                renderTable();
-            } catch (err) {
-                console.error('Load from Supabase error:', err);
-                showToast('Failed to load inventory from server.', true);
+                let html = '';
+                inventory.forEach((item, idx) => {
+                    html += `
+                        <tr>
+                            <td>${idx + 1}</td>
+                            <td>${item.barcode || 'N/A'}</td>
+                            <td>${item.name}</td>
+                            <td>₹${item.mrp}</td>
+                            <td>${item.qty}</td>
+                        </tr>
+                    `;
+                });
+                tbody.innerHTML = html;
+                totalItemsSpan.textContent = inventory.length;
+                sidemenuCount.textContent = `(${inventory.length})`;
             }
-        }
 
-        // ---------- REALTIME SUBSCRIPTION ----------
-        function subscribeRealtime() {
-            if (!supabase) return;
-            realtimeChannel = supabase
-                .channel('inventory-changes')
-                .on(
-                    'postgres_changes', {
+            // ---------- STEP NAV ----------
+            function goToStep(step) {
+                if (currentStep === 1 && step !== 1) stopScanner();
+                if (step === 1 && currentStep !== 1) startScanner();
+
+                currentStep = step;
+                stepContents.forEach(el => {
+                    el.classList.toggle('active', parseInt(el.dataset.step) === step);
+                });
+                stepDots.forEach(dot => {
+                    const s = parseInt(dot.dataset.step);
+                    dot.classList.remove('active', 'done');
+                    if (s === step) dot.classList.add('active');
+                    else if (s < step) dot.classList.add('done');
+                });
+                stepLines.forEach(line => {
+                    const [a, b] = line.dataset.between.split('-').map(Number);
+                    line.classList.toggle('done', b <= step);
+                });
+
+                if (step === 2) setTimeout(() => productName.focus(), 300);
+                if (step === 3) setTimeout(() => productMrp.focus(), 300);
+                if (step === 4) setTimeout(() => productQty.focus(), 300);
+                if (step === 1) updateBarcodeNextState();
+                toast.classList.remove('show');
+            }
+
+            // ---------- BARCODE SCANNER ----------
+            async function startScanner() {
+                console.log('📷 Starting camera...');
+                // Clean up old scanner
+                if (html5QrCode) {
+                    try {
+                        await html5QrCode.stop();
+                        await html5QrCode.clear();
+                    } catch (_) {}
+                    html5QrCode = null;
+                }
+
+                const readerDiv = document.getElementById('reader');
+                readerDiv.innerHTML = '';
+
+                try {
+                    // Check if Html5Qrcode is available
+                    if (typeof Html5Qrcode === 'undefined') {
+                        console.error('Html5Qrcode library not loaded!');
+                        document.getElementById('reader-container').innerHTML = `
+                            <div style="display:flex;align-items:center;justify-content:center;height:100%;color:#94a3b8;background:#0f172a;border-radius:18px;padding:1rem;text-align:center;flex-direction:column;gap:0.5rem;">
+                                <span style="font-size:2rem;">⚠️</span>
+                                <span style="font-size:0.9rem;">Scanner library failed to load.<br>Please check your internet connection.</span>
+                            </div>
+                        `;
+                        return;
+                    }
+
+                    html5QrCode = new Html5Qrcode('reader');
+                    const config = {
+                        fps: 15,
+                        qrbox: { width: 220, height: 220 },
+                        aspectRatio: 1.0
+                    };
+
+                    await html5QrCode.start({ facingMode: 'environment' }, config, onScanSuccess, onScanError);
+                    isScanning = true;
+                    console.log('✅ Camera started successfully');
+                } catch (err) {
+                    console.error('Camera start error:', err);
+                    document.getElementById('reader-container').innerHTML = `
+                        <div style="display:flex;align-items:center;justify-content:center;height:100%;color:#94a3b8;background:#0f172a;border-radius:18px;padding:1rem;text-align:center;flex-direction:column;gap:0.5rem;">
+                            <span style="font-size:2rem;">📷</span>
+                            <span style="font-size:0.9rem;">Camera unavailable.<br>Type barcode manually below.</span>
+                            <span style="font-size:0.7rem;color:#64748b;">${err.message || ''}</span>
+                        </div>
+                    `;
+                }
+            }
+
+            async function stopScanner() {
+                if (html5QrCode && isScanning) {
+                    try {
+                        await html5QrCode.stop();
+                        await html5QrCode.clear();
+                    } catch (_) {}
+                    html5QrCode = null;
+                    isScanning = false;
+                    console.log('📷 Camera stopped');
+                }
+            }
+
+            function onScanSuccess(decodedText) {
+                console.log('✅ Barcode scanned:', decodedText);
+                manualBarcode.value = decodedText;
+                currentItem.barcode = decodedText;
+                updateBarcodeNextState();
+                showToast('✅ Barcode scanned!', false);
+                setTimeout(() => {
+                    if (currentStep === 1) goToStep(2);
+                }, 400);
+            }
+
+            function onScanError(err) {
+                // ignore - keep scanning
+            }
+
+            function updateBarcodeNextState() {
+                const val = manualBarcode.value.trim();
+                barcodeNextBtn.disabled = (val === '');
+                if (val) currentItem.barcode = val;
+            }
+
+            // ---------- SUPABASE FUNCTIONS ----------
+            async function initSupabase() {
+                try {
+                    // Check if supabaseJs is available
+                    if (typeof supabaseJs === 'undefined') {
+                        console.error('Supabase library not loaded!');
+                        setSyncStatus(false, 'Library missing');
+                        return;
+                    }
+
+                    const { createClient } = supabaseJs;
+                    supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+                    // Test connection
+                    const { data, error } = await supabase
+                        .from('inventory')
+                        .select('*', { count: 'exact', head: true });
+
+                    if (error) {
+                        console.error('Supabase connection test failed:', error);
+                        setSyncStatus(false, 'Connection failed');
+                        isSupabaseReady = false;
+                        return;
+                    }
+
+                    console.log('✅ Supabase connected successfully');
+                    setSyncStatus(true, 'Synced');
+                    isSupabaseReady = true;
+
+                    // Load data
+                    await loadFromSupabase();
+
+                    // Subscribe to realtime
+                    subscribeRealtime();
+
+                } catch (err) {
+                    console.error('Supabase init error:', err);
+                    setSyncStatus(false, 'Error: ' + err.message);
+                    isSupabaseReady = false;
+                }
+            }
+
+            async function loadFromSupabase() {
+                if (!supabase) return;
+                try {
+                    const { data, error } = await supabase
+                        .from('inventory')
+                        .select('*')
+                        .order('created_at', { ascending: true });
+
+                    if (error) throw error;
+
+                    inventory = data.map((row, idx) => ({
+                        id: idx + 1,
+                        uuid: row.id,
+                        barcode: row.barcode || 'N/A',
+                        name: row.name,
+                        mrp: parseFloat(row.mrp).toFixed(2),
+                        qty: row.qty
+                    }));
+
+                    nextId = inventory.length + 1;
+                    renderTable();
+                    console.log(`📦 Loaded ${inventory.length} items from Supabase`);
+                } catch (err) {
+                    console.error('Load from Supabase error:', err);
+                    showToast('Failed to load inventory from server.', true);
+                }
+            }
+
+            function subscribeRealtime() {
+                if (!supabase) return;
+
+                const channel = supabase
+                    .channel('inventory-changes')
+                    .on('postgres_changes', {
                         event: 'INSERT',
                         schema: 'public',
                         table: 'inventory'
-                    },
-                    (payload) => {
-                        console.log('Realtime INSERT:', payload);
+                    }, (payload) => {
+                        console.log('🔵 Realtime INSERT:', payload);
                         const newRow = payload.new;
                         const exists = inventory.some(item => item.uuid === newRow.id);
                         if (!exists) {
@@ -838,398 +942,302 @@
                                 qty: newRow.qty
                             });
                             renderTable();
-                            showToast(`📥 New item added from another device: ${newRow.name}`, false);
+                            showToast(`📥 New item: ${newRow.name}`, false);
                         }
-                    }
-                )
-                .on(
-                    'postgres_changes', {
+                    })
+                    .on('postgres_changes', {
                         event: 'DELETE',
                         schema: 'public',
                         table: 'inventory'
-                    },
-                    (payload) => {
-                        console.log('Realtime DELETE:', payload);
-                        const oldId = payload.old.id;
-                        inventory = inventory.filter(item => item.uuid !== oldId);
+                    }, (payload) => {
+                        console.log('🔴 Realtime DELETE:', payload);
+                        inventory = inventory.filter(item => item.uuid !== payload.old.id);
                         inventory.forEach((item, idx) => item.id = idx + 1);
                         nextId = inventory.length + 1;
                         renderTable();
-                        showToast('🗑️ An item was removed by another device.', false);
-                    }
-                )
-                .on(
-                    'postgres_changes', {
-                        event: 'UPDATE',
-                        schema: 'public',
-                        table: 'inventory'
-                    },
-                    (payload) => {
-                        console.log('Realtime UPDATE:', payload);
-                        const updated = payload.new;
-                        const idx = inventory.findIndex(item => item.uuid === updated.id);
-                        if (idx !== -1) {
-                            inventory[idx].barcode = updated.barcode || 'N/A';
-                            inventory[idx].name = updated.name;
-                            inventory[idx].mrp = parseFloat(updated.mrp).toFixed(2);
-                            inventory[idx].qty = updated.qty;
-                            renderTable();
-                            showToast(`🔄 Item updated: ${updated.name}`, false);
+                        showToast('🗑️ Item removed by another device', false);
+                    })
+                    .subscribe((status) => {
+                        if (status === 'SUBSCRIBED') {
+                            console.log('✅ Realtime subscribed');
+                        } else if (status === 'CHANNEL_ERROR') {
+                            console.error('Realtime error');
+                            setSyncStatus(false, 'Realtime error');
                         }
-                    }
-                )
-                .subscribe((status, err) => {
-                    if (status === 'SUBSCRIBED') {
-                        console.log('Realtime subscribed');
-                    } else if (status === 'CHANNEL_ERROR') {
-                        console.error('Realtime error:', err);
-                        setSyncStatus(false, 'Realtime error');
-                    }
-                });
-        }
-
-        // ---------- INSERT INTO SUPABASE ----------
-        async function insertItem(item) {
-            if (!isSupabaseReady) {
-                inventory.push({
-                    id: nextId++,
-                    uuid: null,
-                    barcode: item.barcode || 'N/A',
-                    name: item.name,
-                    mrp: parseFloat(item.mrp).toFixed(2),
-                    qty: item.qty
-                });
-                renderTable();
-                showToast('✅ Item added (local only - no Supabase)', false);
-                return;
+                    });
             }
-            try {
-                const { data, error } = await supabase
-                    .from('inventory')
-                    .insert({
+
+            async function insertItem(item) {
+                if (!isSupabaseReady) {
+                    // Local fallback
+                    inventory.push({
+                        id: nextId++,
+                        uuid: null,
                         barcode: item.barcode || 'N/A',
                         name: item.name,
-                        mrp: parseFloat(item.mrp),
+                        mrp: parseFloat(item.mrp).toFixed(2),
                         qty: item.qty
-                    })
-                    .select();
-                if (error) throw error;
-                const newRow = data[0];
-                inventory.push({
-                    id: inventory.length + 1,
-                    uuid: newRow.id,
-                    barcode: newRow.barcode || 'N/A',
-                    name: newRow.name,
-                    mrp: parseFloat(newRow.mrp).toFixed(2),
-                    qty: newRow.qty
-                });
-                renderTable();
-                showToast('✅ Item added and synced!', false);
-            } catch (err) {
-                console.error('Insert error:', err);
-                showToast('❌ Failed to save to server. Check connection.', true);
-                inventory.push({
-                    id: nextId++,
-                    uuid: null,
-                    barcode: item.barcode || 'N/A',
-                    name: item.name,
-                    mrp: parseFloat(item.mrp).toFixed(2),
-                    qty: item.qty
-                });
-                renderTable();
-            }
-        }
+                    });
+                    renderTable();
+                    showToast('✅ Item added (local only)', false);
+                    return;
+                }
 
-        // ---------- DELETE ALL FROM SUPABASE ----------
-        async function deleteAllFromSupabase() {
-            if (!isSupabaseReady) {
-                inventory = [];
-                nextId = 1;
-                renderTable();
-                showToast('🗑️ All cleared locally.', false);
-                return;
-            }
-            try {
-                const { error } = await supabase
-                    .from('inventory')
-                    .delete()
-                    .neq('id', '00000000-0000-0000-0000-000000000000');
-                if (error) throw error;
-                inventory = [];
-                nextId = 1;
-                renderTable();
-                showToast('🗑️ All items deleted from server.', false);
-            } catch (err) {
-                console.error('Delete all error:', err);
-                showToast('❌ Failed to delete all from server.', true);
-            }
-        }
+                try {
+                    const { data, error } = await supabase
+                        .from('inventory')
+                        .insert({
+                            barcode: item.barcode || 'N/A',
+                            name: item.name,
+                            mrp: parseFloat(item.mrp),
+                            qty: item.qty
+                        })
+                        .select();
 
-        // ---------- RENDER TABLE ----------
-        function renderTable() {
-            if (inventory.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="5" class="empty-state">📭 No items added yet.</td></tr>`;
-                totalItemsSpan.textContent = '0';
-                sidemenuCount.textContent = '(0)';
-                return;
+                    if (error) throw error;
+
+                    const newRow = data[0];
+                    inventory.push({
+                        id: inventory.length + 1,
+                        uuid: newRow.id,
+                        barcode: newRow.barcode || 'N/A',
+                        name: newRow.name,
+                        mrp: parseFloat(newRow.mrp).toFixed(2),
+                        qty: newRow.qty
+                    });
+                    renderTable();
+                    showToast('✅ Item added and synced!', false);
+                } catch (err) {
+                    console.error('Insert error:', err);
+                    showToast('❌ Failed to save to server.', true);
+                    // Still add locally
+                    inventory.push({
+                        id: nextId++,
+                        uuid: null,
+                        barcode: item.barcode || 'N/A',
+                        name: item.name,
+                        mrp: parseFloat(item.mrp).toFixed(2),
+                        qty: item.qty
+                    });
+                    renderTable();
+                }
             }
-            let html = '';
-            inventory.forEach((item, idx) => {
-                html += `
-                        <tr>
-                            <td>${idx + 1}</td>
-                            <td>${item.barcode || 'N/A'}</td>
-                            <td>${item.name}</td>
-                            <td>₹${item.mrp}</td>
-                            <td>${item.qty}</td>
-                        </tr>
-                    `;
+
+            async function deleteAllFromSupabase() {
+                if (!isSupabaseReady) {
+                    inventory = [];
+                    nextId = 1;
+                    renderTable();
+                    showToast('🗑️ All cleared locally.', false);
+                    return;
+                }
+
+                if (!confirm('⚠️ Delete ALL inventory items from server?')) return;
+
+                try {
+                    const { error } = await supabase
+                        .from('inventory')
+                        .delete()
+                        .neq('id', '00000000-0000-0000-0000-000000000000');
+
+                    if (error) throw error;
+
+                    inventory = [];
+                    nextId = 1;
+                    renderTable();
+                    showToast('🗑️ All items deleted from server.', false);
+                } catch (err) {
+                    console.error('Delete all error:', err);
+                    showToast('❌ Failed to delete all from server.', true);
+                }
+            }
+
+            // ---------- ADD ITEM ----------
+            function addCurrentItem() {
+                const name = currentItem.name.trim();
+                const mrp = parseFloat(currentItem.mrp);
+                const qty = parseInt(currentItem.qty, 10);
+
+                if (!name) {
+                    showToast('❌ Please enter a Product Name.', true);
+                    goToStep(2);
+                    return;
+                }
+                if (isNaN(mrp) || mrp < 0) {
+                    showToast('❌ Enter a valid MRP.', true);
+                    goToStep(3);
+                    return;
+                }
+                if (isNaN(qty) || qty < 0) {
+                    showToast('❌ Enter a valid Quantity.', true);
+                    goToStep(4);
+                    return;
+                }
+
+                const item = {
+                    barcode: currentItem.barcode || 'N/A',
+                    name: name,
+                    mrp: mrp,
+                    qty: qty
+                };
+
+                insertItem(item);
+
+                currentItem = { barcode: '', name: '', mrp: '', qty: '' };
+                manualBarcode.value = '';
+                productName.value = '';
+                productMrp.value = '';
+                productQty.value = '';
+
+                goToStep(1);
+            }
+
+            // ---------- EXPORT EXCEL ----------
+            function exportExcel() {
+                if (inventory.length === 0) {
+                    showToast('📭 No data to export.', true);
+                    return;
+                }
+                const data = inventory.map((item, idx) => ({
+                    'S.No': idx + 1,
+                    'Barcode': item.barcode,
+                    'Product Name': item.name,
+                    'MRP (₹)': parseFloat(item.mrp),
+                    'Quantity': item.qty
+                }));
+                try {
+                    const wb = XLSX.utils.book_new();
+                    const ws = XLSX.utils.json_to_sheet(data);
+                    ws['!cols'] = [{ wch: 6 }, { wch: 18 }, { wch: 30 }, { wch: 12 }, { wch: 10 }];
+                    XLSX.utils.book_append_sheet(wb, ws, 'Inventory');
+                    XLSX.writeFile(wb, `inventory_${new Date().toISOString().slice(0, 10)}.xlsx`);
+                    showToast(`✅ Exported ${inventory.length} items!`, false);
+                    closeMenu();
+                } catch (e) {
+                    alert('Export failed: ' + e.message);
+                }
+            }
+
+            // ---------- SIDEMENU ----------
+            function openMenu() {
+                sidemenu.classList.add('open');
+                overlay.classList.add('open');
+                document.body.style.overflow = 'hidden';
+            }
+
+            function closeMenu() {
+                sidemenu.classList.remove('open');
+                overlay.classList.remove('open');
+                document.body.style.overflow = '';
+            }
+
+            // ---------- EVENT LISTENERS ----------
+            hamburgerBtn.addEventListener('click', openMenu);
+            closeMenuBtn.addEventListener('click', closeMenu);
+            overlay.addEventListener('click', closeMenu);
+
+            manualBarcode.addEventListener('input', function() {
+                currentItem.barcode = this.value.trim();
+                updateBarcodeNextState();
             });
-            tbody.innerHTML = html;
-            totalItemsSpan.textContent = inventory.length;
-            sidemenuCount.textContent = `(${inventory.length})`;
-        }
 
-        // ---------- STEP NAV ----------
-        function goToStep(step) {
-            if (currentStep === 1 && step !== 1) stopScanner();
-            if (step === 1 && currentStep !== 1) startScanner();
-
-            currentStep = step;
-            stepContents.forEach(el => {
-                el.classList.toggle('active', parseInt(el.dataset.step) === step);
-            });
-            stepDots.forEach(dot => {
-                const s = parseInt(dot.dataset.step);
-                dot.classList.remove('active', 'done');
-                if (s === step) dot.classList.add('active');
-                else if (s < step) dot.classList.add('done');
-            });
-            stepLines.forEach(line => {
-                const [a, b] = line.dataset.between.split('-').map(Number);
-                line.classList.toggle('done', b <= step);
-            });
-
-            if (step === 2) setTimeout(() => productName.focus(), 300);
-            if (step === 3) setTimeout(() => productMrp.focus(), 300);
-            if (step === 4) setTimeout(() => productQty.focus(), 300);
-            if (step === 1) updateBarcodeNextState();
-            toast.classList.remove('show');
-        }
-
-        // ---------- BARCODE SCANNER ----------
-        async function startScanner() {
-            if (html5QrCode) {
-                try { await html5QrCode.stop();
-                    await html5QrCode.clear(); } catch (_) {}
-                html5QrCode = null;
-            }
-            const readerDiv = document.getElementById('reader');
-            readerDiv.innerHTML = '';
-            try {
-                html5QrCode = new Html5Qrcode('reader');
-                await html5QrCode.start({ facingMode: 'environment' }, { fps: 15, qrbox: { width: 220,
-                        height: 220 }, aspectRatio: 1.0 }, onScanSuccess, onScanError);
-                isScanning = true;
-            } catch (err) {
-                document.getElementById('reader-container').innerHTML = `
-                        <div style="display:flex;align-items:center;justify-content:center;height:100%;color:#94a3b8;background:#0f172a;border-radius:18px;padding:1rem;text-align:center;flex-direction:column;gap:0.5rem;">
-                            <span style="font-size:2rem;">📷</span>
-                            <span style="font-size:0.9rem;">Camera unavailable.<br>Type barcode manually below.</span>
-                        </div>
-                    `;
-            }
-        }
-
-        async function stopScanner() {
-            if (html5QrCode && isScanning) {
-                try { await html5QrCode.stop();
-                    await html5QrCode.clear(); } catch (_) {}
-                html5QrCode = null;
-                isScanning = false;
-            }
-        }
-
-        function onScanSuccess(decodedText) {
-            manualBarcode.value = decodedText;
-            currentItem.barcode = decodedText;
-            updateBarcodeNextState();
-            showToast('✅ Barcode scanned!', false);
-            setTimeout(() => {
-                if (currentStep === 1) goToStep(2);
-            }, 400);
-        }
-
-        function onScanError(err) { /* ignore */ }
-
-        function updateBarcodeNextState() {
-            const val = manualBarcode.value.trim();
-            barcodeNextBtn.disabled = (val === '');
-            if (val) currentItem.barcode = val;
-        }
-
-        // ---------- ADD ITEM ----------
-        function addCurrentItem() {
-            const name = currentItem.name.trim();
-            const mrp = parseFloat(currentItem.mrp);
-            const qty = parseInt(currentItem.qty, 10);
-
-            if (!name) {
-                showToast('❌ Please enter a Product Name.', true);
+            skipBarcodeBtn.addEventListener('click', function() {
+                manualBarcode.value = '';
+                currentItem.barcode = '';
+                updateBarcodeNextState();
                 goToStep(2);
-                return;
-            }
-            if (isNaN(mrp) || mrp < 0) {
-                showToast('❌ Enter a valid MRP.', true);
+            });
+
+            barcodeNextBtn.addEventListener('click', function() {
+                if (manualBarcode.value.trim()) {
+                    currentItem.barcode = manualBarcode.value.trim();
+                    goToStep(2);
+                }
+            });
+
+            productName.addEventListener('input', function() { currentItem.name = this.value; });
+            productName.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    nameNextBtn.click();
+                }
+            });
+
+            nameBackBtn.addEventListener('click', () => goToStep(1));
+            nameNextBtn.addEventListener('click', function() {
+                const val = productName.value.trim();
+                if (!val) {
+                    showToast('❌ Enter a product name.', true);
+                    productName.focus();
+                    return;
+                }
+                currentItem.name = val;
                 goToStep(3);
-                return;
-            }
-            if (isNaN(qty) || qty < 0) {
-                showToast('❌ Enter a valid Quantity.', true);
+            });
+
+            productMrp.addEventListener('input', function() { currentItem.mrp = this.value; });
+            productMrp.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    mrpNextBtn.click();
+                }
+            });
+
+            mrpBackBtn.addEventListener('click', () => goToStep(2));
+            mrpNextBtn.addEventListener('click', function() {
+                const val = parseFloat(productMrp.value);
+                if (isNaN(val) || val < 0) {
+                    showToast('❌ Enter a valid MRP.', true);
+                    productMrp.focus();
+                    return;
+                }
+                currentItem.mrp = productMrp.value;
                 goToStep(4);
-                return;
-            }
+            });
 
-            const item = {
-                barcode: currentItem.barcode || 'N/A',
-                name: name,
-                mrp: mrp,
-                qty: qty
-            };
+            productQty.addEventListener('input', function() { currentItem.qty = this.value; });
+            productQty.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    addItemBtn.click();
+                }
+            });
 
-            insertItem(item);
+            qtyBackBtn.addEventListener('click', () => goToStep(3));
+            addItemBtn.addEventListener('click', addCurrentItem);
 
-            currentItem = { barcode: '', name: '', mrp: '', qty: '' };
-            manualBarcode.value = '';
-            productName.value = '';
-            productMrp.value = '';
-            productQty.value = '';
+            exportExcelBtn.addEventListener('click', exportExcel);
+            clearAllBtn.addEventListener('click', deleteAllFromSupabase);
 
-            goToStep(1);
-        }
+            // ---------- INIT ----------
+            console.log('🚀 Initializing app...');
 
-        function showToast(msg, isError) {
-            toast.textContent = msg;
-            toast.className = 'toast show' + (isError ? ' error' : '');
-            clearTimeout(toast._timer);
-            toast._timer = setTimeout(() => toast.classList.remove('show'), 2500);
-        }
+            // Set initial sync status
+            setSyncStatus(false, 'Connecting...');
 
-        // ---------- EXPORT EXCEL ----------
-        function exportExcel() {
-            if (inventory.length === 0) {
-                showToast('📭 No data to export.', true);
-                return;
-            }
-            const data = inventory.map((item, idx) => ({
-                'S.No': idx + 1,
-                'Barcode': item.barcode,
-                'Product Name': item.name,
-                'MRP (₹)': parseFloat(item.mrp),
-                'Quantity': item.qty
-            }));
-            try {
-                const wb = XLSX.utils.book_new();
-                const ws = XLSX.utils.json_to_sheet(data);
-                ws['!cols'] = [{ wch: 6 }, { wch: 18 }, { wch: 30 }, { wch: 12 }, { wch: 10 }];
-                XLSX.utils.book_append_sheet(wb, ws, 'Inventory');
-                XLSX.writeFile(wb, `inventory_${new Date().toISOString().slice(0, 10)}.xlsx`);
-                showToast(`✅ Exported ${inventory.length} items!`, false);
-                closeMenu();
-            } catch (e) { alert('Export failed.'); }
-        }
+            // Render empty table
+            renderTable();
 
-        // ---------- CLEAR ALL ----------
-        function clearAll() {
-            if (inventory.length === 0) { showToast('📭 Already empty.', true); return; }
-            if (confirm('⚠️ Delete ALL inventory items from server and local?')) {
-                deleteAllFromSupabase();
-                closeMenu();
-            }
-        }
+            // Initialize Supabase first
+            initSupabase().then(() => {
+                // Start camera after Supabase init (with a small delay)
+                setTimeout(() => {
+                    startScanner();
+                }, 500);
+            });
 
-        // ---------- SIDEMENU ----------
-        function openMenu() {
-            sidemenu.classList.add('open');
-            overlay.classList.add('open');
-            document.body.style.overflow = 'hidden';
-        }
+            // Handle visibility change for camera
+            document.addEventListener('visibilitychange', () => {
+                if (document.hidden) {
+                    if (currentStep === 1) stopScanner();
+                } else {
+                    if (currentStep === 1) startScanner();
+                }
+            });
 
-        function closeMenu() {
-            sidemenu.classList.remove('open');
-            overlay.classList.remove('open');
-            document.body.style.overflow = '';
-        }
-
-        hamburgerBtn.addEventListener('click', openMenu);
-        closeMenuBtn.addEventListener('click', closeMenu);
-        overlay.addEventListener('click', closeMenu);
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape' && sidemenu.classList.contains('open')) closeMenu();
+            console.log('✅ App ready!');
         });
+    </script>
 
-        // ---------- EVENT LISTENERS ----------
-        manualBarcode.addEventListener('input', function() {
-            currentItem.barcode = this.value.trim();
-            updateBarcodeNextState();
-        });
-        skipBarcodeBtn.addEventListener('click', function() {
-            manualBarcode.value = '';
-            currentItem.barcode = '';
-            updateBarcodeNextState();
-            goToStep(2);
-        });
-        barcodeNextBtn.addEventListener('click', function() {
-            if (manualBarcode.value.trim()) {
-                currentItem.barcode = manualBarcode.value.trim();
-                goToStep(2);
-            }
-        });
-
-        productName.addEventListener('input', function() { currentItem.name = this.value; });
-        productName.addEventListener('keydown', function(e) { if (e.key === 'Enter') { e.preventDefault();
-                nameNextBtn.click(); } });
-        nameBackBtn.addEventListener('click', () => goToStep(1));
-        nameNextBtn.addEventListener('click', function() {
-            const val = productName.value.trim();
-            if (!val) { showToast('❌ Enter a product name.', true);
-                productName.focus(); return; }
-            currentItem.name = val;
-            goToStep(3);
-        });
-
-        productMrp.addEventListener('input', function() { currentItem.mrp = this.value; });
-        productMrp.addEventListener('keydown', function(e) { if (e.key === 'Enter') { e.preventDefault();
-                mrpNextBtn.click(); } });
-        mrpBackBtn.addEventListener('click', () => goToStep(2));
-        mrpNextBtn.addEventListener('click', function() {
-            const val = parseFloat(productMrp.value);
-            if (isNaN(val) || val < 0) { showToast('❌ Enter a valid MRP.', true);
-                productMrp.focus(); return; }
-            currentItem.mrp = productMrp.value;
-            goToStep(3);
-        });
-
-        productQty.addEventListener('input', function() { currentItem.qty = this.value; });
-        productQty.addEventListener('keydown', function(e) { if (e.key === 'Enter') { e.preventDefault();
-                addItemBtn.click(); } });
-        qtyBackBtn.addEventListener('click', () => goToStep(3));
-        addItemBtn.addEventListener('click', addCurrentItem);
-
-        exportExcelBtn.addEventListener('click', exportExcel);
-        clearAllBtn.addEventListener('click', clearAll);
-
-        // ---------- INIT ----------
-        renderTable();
-        initSupabase().then(() => {
-            setTimeout(startScanner, 500);
-        });
-
-        document.addEventListener('visibilitychange', () => {
-            if (document.hidden) { if (currentStep === 1) stopScanner(); } else { if (currentStep === 1)
-                    startScanner(); }
-        });
-
-        console.log('📦 Inventory Flow with Supabase sync ready.');
-    })();
-</script>
+</body>
+</html>
