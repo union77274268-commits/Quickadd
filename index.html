@@ -1,0 +1,1035 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Inventory Scanner · Step by Step</title>
+    <!-- Libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.8/html5-qrcode.min.js">
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js">
+    </script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+        }
+
+        body {
+            background: #f1f5f9;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            padding: 1rem 0.8rem 2rem;
+        }
+
+        .app {
+            max-width: 520px;
+            width: 100%;
+        }
+
+        /* HEADER */
+        .app-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: white;
+            padding: 0.8rem 1.2rem;
+            border-radius: 18px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+            margin-bottom: 1.2rem;
+            flex-wrap: wrap;
+        }
+
+        .app-header h1 {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #0f172a;
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+        }
+
+        .app-header h1 small {
+            font-size: 0.6rem;
+            background: #3b82f6;
+            color: white;
+            padding: 0.1rem 0.6rem;
+            border-radius: 30px;
+            font-weight: 500;
+        }
+
+        .badge-total {
+            background: #eef2ff;
+            color: #1e293b;
+            padding: 0.3rem 1rem;
+            border-radius: 30px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            border: 1px solid #c7d2fe;
+            white-space: nowrap;
+        }
+
+        .badge-total span {
+            font-size: 1.1rem;
+            margin-right: 0.2rem;
+        }
+
+        /* STEP INDICATOR */
+        .step-indicator {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 0.6rem;
+            margin: 1rem 0 1.2rem;
+        }
+
+        .step-dot {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: #e2e8f0;
+            color: #64748b;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.85rem;
+            transition: 0.25s;
+            border: 2px solid transparent;
+        }
+
+        .step-dot.active {
+            background: #1e293b;
+            color: white;
+            border-color: #3b82f6;
+            transform: scale(1.05);
+            box-shadow: 0 4px 10px rgba(59, 130, 246, 0.25);
+        }
+
+        .step-dot.done {
+            background: #3b82f6;
+            color: white;
+            border-color: #3b82f6;
+        }
+
+        .step-line {
+            flex: 0 0 28px;
+            height: 3px;
+            background: #e2e8f0;
+            border-radius: 4px;
+            transition: 0.25s;
+        }
+
+        .step-line.done {
+            background: #3b82f6;
+        }
+
+        /* MAIN CARD */
+        .step-card {
+            background: white;
+            border-radius: 28px;
+            padding: 1.8rem 1.5rem 2rem;
+            box-shadow: 0 12px 32px rgba(0, 0, 0, 0.06);
+            border: 1px solid #e9edf4;
+            min-height: 380px;
+            display: flex;
+            flex-direction: column;
+            transition: 0.2s;
+        }
+
+        .step-title {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            color: #94a3b8;
+            font-weight: 600;
+            margin-bottom: 0.2rem;
+        }
+
+        .step-headline {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #0f172a;
+            margin-bottom: 1.5rem;
+            line-height: 1.3;
+        }
+
+        /* Step content containers */
+        .step-content {
+            display: none;
+            flex-direction: column;
+            flex: 1;
+        }
+
+        .step-content.active {
+            display: flex;
+        }
+
+        /* LARGE INPUTS (exactly what you asked for) */
+        .big-input {
+            width: 100%;
+            padding: 1.2rem 1.2rem;
+            font-size: 1.6rem;
+            font-weight: 500;
+            border: 2px solid #e2e8f0;
+            border-radius: 18px;
+            outline: none;
+            transition: 0.2s;
+            background: #fafcff;
+            color: #0f172a;
+            margin-bottom: 0.5rem;
+        }
+
+        .big-input:focus {
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.12);
+            background: white;
+        }
+
+        .big-input::placeholder {
+            color: #b9c3d4;
+            font-weight: 400;
+            font-size: 1.2rem;
+        }
+
+        .input-hint {
+            font-size: 0.85rem;
+            color: #64748b;
+            margin-bottom: 1rem;
+        }
+
+        /* CAMERA BOX */
+        #reader-container {
+            width: 100%;
+            background: #0f172a;
+            border-radius: 20px;
+            overflow: hidden;
+            margin-bottom: 1rem;
+            aspect-ratio: 4/3;
+            position: relative;
+            border: 2px solid #e2e8f0;
+        }
+
+        #reader-container video {
+            border-radius: 18px;
+            width: 100% !important;
+            height: 100% !important;
+            object-fit: cover;
+        }
+
+        #reader-container #reader {
+            width: 100% !important;
+            height: 100% !important;
+        }
+
+        .manual-fallback {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+            margin: 0.5rem 0 0.3rem;
+        }
+
+        .manual-fallback input {
+            flex: 1;
+            padding: 0.8rem 1rem;
+            border: 1.5px solid #e2e8f0;
+            border-radius: 14px;
+            font-size: 1rem;
+            background: #f8fafc;
+            outline: none;
+        }
+
+        .manual-fallback input:focus {
+            border-color: #3b82f6;
+        }
+
+        /* BUTTONS - large and thumb-friendly */
+        .btn-row {
+            display: flex;
+            gap: 0.8rem;
+            margin-top: 1.8rem;
+            flex-wrap: wrap;
+        }
+
+        .btn-row .btn {
+            flex: 1;
+            min-height: 58px;
+            border: none;
+            border-radius: 40px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            cursor: pointer;
+            transition: 0.15s;
+            padding: 0 1.2rem;
+            min-width: 100px;
+        }
+
+        .btn-row .btn:active {
+            transform: scale(0.96);
+        }
+
+        .btn-primary {
+            background: #1e293b;
+            color: white;
+        }
+        .btn-primary:hover {
+            background: #0f172a;
+        }
+        .btn-primary:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-success {
+            background: #059669;
+            color: white;
+        }
+        .btn-success:hover {
+            background: #047857;
+        }
+
+        .btn-outline {
+            background: transparent;
+            color: #1e293b;
+            border: 1.5px solid #e2e8f0;
+        }
+        .btn-outline:hover {
+            background: #f8fafc;
+        }
+
+        .btn-ghost {
+            background: transparent;
+            color: #64748b;
+            font-weight: 500;
+            flex: 0.5;
+        }
+        .btn-ghost:hover {
+            color: #1e293b;
+        }
+
+        .btn-danger-soft {
+            background: #fee2e2;
+            color: #b91c1c;
+        }
+        .btn-danger-soft:hover {
+            background: #fecaca;
+        }
+
+        /* summary step */
+        .summary-box {
+            background: #f8fafc;
+            padding: 1.2rem 1.5rem;
+            border-radius: 20px;
+            border-left: 5px solid #3b82f6;
+            margin: 0.5rem 0 1rem;
+        }
+
+        .summary-box p {
+            font-size: 1.1rem;
+            padding: 0.3rem 0;
+            display: flex;
+            justify-content: space-between;
+            border-bottom: 1px dashed #e2e8f0;
+        }
+
+        .summary-box p:last-child {
+            border-bottom: none;
+        }
+
+        .summary-box .label {
+            color: #64748b;
+            font-weight: 500;
+        }
+        .summary-box .value {
+            font-weight: 600;
+            color: #0f172a;
+            text-align: right;
+            max-width: 60%;
+            word-break: break-word;
+        }
+
+        /* TABLE / INVENTORY LIST */
+        .inventory-section {
+            margin-top: 1.8rem;
+            background: white;
+            border-radius: 20px;
+            padding: 0.2rem 0 0.5rem;
+            border: 1px solid #e9edf4;
+            overflow: hidden;
+        }
+
+        .inv-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.8rem 1.2rem;
+            border-bottom: 1px solid #edf2f7;
+            flex-wrap: wrap;
+            gap: 0.3rem;
+        }
+
+        .inv-header h3 {
+            font-size: 1rem;
+            color: #1e293b;
+        }
+
+        .inv-header .actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .inv-header .actions button {
+            background: none;
+            border: none;
+            font-weight: 600;
+            font-size: 0.8rem;
+            padding: 0.3rem 0.8rem;
+            border-radius: 30px;
+            cursor: pointer;
+            transition: 0.15s;
+        }
+
+        .btn-export {
+            background: #dbeafe;
+            color: #1d4ed8;
+        }
+        .btn-export:hover {
+            background: #bfdbfe;
+        }
+
+        .btn-clear-all {
+            background: #fee2e2;
+            color: #b91c1c;
+        }
+        .btn-clear-all:hover {
+            background: #fecaca;
+        }
+
+        .scroll-table {
+            max-height: 240px;
+            overflow-y: auto;
+            padding: 0 0.2rem 0.2rem;
+        }
+
+        .scroll-table::-webkit-scrollbar {
+            width: 4px;
+        }
+        .scroll-table::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 10px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.85rem;
+        }
+
+        thead th {
+            position: sticky;
+            top: 0;
+            background: #f8fafc;
+            color: #475569;
+            font-weight: 600;
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+            padding: 0.6rem 0.5rem;
+            text-align: left;
+            border-bottom: 2px solid #e2e8f0;
+        }
+
+        tbody td {
+            padding: 0.5rem 0.5rem;
+            border-bottom: 1px solid #f1f5f9;
+            color: #1e293b;
+        }
+
+        tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        .empty-state {
+            text-align: center;
+            color: #94a3b8;
+            padding: 1.8rem 0;
+            font-style: italic;
+        }
+
+        /* Toast */
+        .toast {
+            background: #065f46;
+            color: white;
+            padding: 0.8rem 1.2rem;
+            border-radius: 40px;
+            font-weight: 500;
+            text-align: center;
+            margin-top: 1rem;
+            display: none;
+            animation: fadeUp 0.3s ease;
+        }
+
+        .toast.show {
+            display: block;
+        }
+
+        @keyframes fadeUp {
+            0% {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* responsive tweaks */
+        @media (max-width: 480px) {
+            .step-card {
+                padding: 1.2rem 1rem 1.5rem;
+                min-height: 320px;
+            }
+            .big-input {
+                font-size: 1.4rem;
+                padding: 1rem;
+            }
+            .step-headline {
+                font-size: 1.2rem;
+            }
+            .btn-row .btn {
+                min-height: 50px;
+                font-size: 1rem;
+                min-width: 70px;
+            }
+            .app-header h1 {
+                font-size: 1.1rem;
+            }
+            .badge-total {
+                font-size: 0.75rem;
+                padding: 0.2rem 0.8rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="app">
+        <!-- Header -->
+        <div class="app-header">
+            <h1>
+                📦 Count<span style="font-weight:400;font-size:0.9rem;margin-left:0.2rem;">Flow</span>
+                <small>v2</small>
+            </h1>
+            <div class="badge-total">
+                <span>📋</span> <strong id="totalItems">0</strong>
+            </div>
+        </div>
+
+        <!-- Step Dots -->
+        <div class="step-indicator" id="stepIndicator">
+            <div class="step-dot active" data-step="1">1</div>
+            <div class="step-line" data-between="1-2"></div>
+            <div class="step-dot" data-step="2">2</div>
+            <div class="step-line" data-between="2-3"></div>
+            <div class="step-dot" data-step="3">3</div>
+            <div class="step-line" data-between="3-4"></div>
+            <div class="step-dot" data-step="4">4</div>
+        </div>
+
+        <!-- Step Card -->
+        <div class="step-card" id="stepCard">
+            <!-- STEP 1: Barcode -->
+            <div class="step-content active" data-step="1">
+                <div class="step-title">Step 1 of 4</div>
+                <div class="step-headline">📷 Scan Barcode</div>
+                <div id="reader-container">
+                    <div id="reader"></div>
+                </div>
+                <div class="manual-fallback">
+                    <input type="text" id="manualBarcode" placeholder="Or type barcode manually" autocomplete="off">
+                    <button class="btn btn-outline" id="skipBarcodeBtn" style="flex:0.4;min-height:44px;border-radius:30px;padding:0 1rem;font-size:0.9rem;">Skip</button>
+                </div>
+                <div class="input-hint">📌 Point camera at barcode. It auto‑advances.</div>
+                <div class="btn-row">
+                    <button class="btn btn-primary" id="barcodeNextBtn" disabled>Next ➜</button>
+                </div>
+            </div>
+
+            <!-- STEP 2: Product Name -->
+            <div class="step-content" data-step="2">
+                <div class="step-title">Step 2 of 4</div>
+                <div class="step-headline">✏️ Product Name</div>
+                <input type="text" class="big-input" id="productName" placeholder="e.g. Organic Cotton T‑Shirt" autocomplete="off">
+                <div class="input-hint">Be specific (colour, size, brand).</div>
+                <div class="btn-row">
+                    <button class="btn btn-ghost" id="nameBackBtn">← Back</button>
+                    <button class="btn btn-primary" id="nameNextBtn">Next ➜</button>
+                </div>
+            </div>
+
+            <!-- STEP 3: MRP -->
+            <div class="step-content" data-step="3">
+                <div class="step-title">Step 3 of 4</div>
+                <div class="step-headline">💰 MRP (₹)</div>
+                <input type="number" class="big-input" id="productMrp" placeholder="0.00" step="0.01" min="0">
+                <div class="input-hint">Maximum Retail Price in Indian Rupees.</div>
+                <div class="btn-row">
+                    <button class="btn btn-ghost" id="mrpBackBtn">← Back</button>
+                    <button class="btn btn-primary" id="mrpNextBtn">Next ➜</button>
+                </div>
+            </div>
+
+            <!-- STEP 4: Quantity -->
+            <div class="step-content" data-step="4">
+                <div class="step-title">Step 4 of 4</div>
+                <div class="step-headline">🔢 Quantity</div>
+                <input type="number" class="big-input" id="productQty" placeholder="1" step="1" min="0">
+                <div class="input-hint">Number of units you're counting.</div>
+                <div class="btn-row">
+                    <button class="btn btn-ghost" id="qtyBackBtn">← Back</button>
+                    <button class="btn btn-success" id="addItemBtn">✅ Add to List</button>
+                </div>
+            </div>
+
+            <!-- Toast notification -->
+            <div class="toast" id="toast">✅ Item added!</div>
+        </div>
+
+        <!-- Inventory List & Export -->
+        <div class="inventory-section">
+            <div class="inv-header">
+                <h3>📋 Inventory (<span id="rowCount">0</span>)</h3>
+                <div class="actions">
+                    <button class="btn-export" id="exportExcelBtn">⬇️ Excel</button>
+                    <button class="btn-clear-all" id="clearAllBtn">✖ Clear</button>
+                </div>
+            </div>
+            <div class="scroll-table">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Barcode</th>
+                            <th>Name</th>
+                            <th>MRP</th>
+                            <th>Qty</th>
+                        </tr>
+                    </thead>
+                    <tbody id="inventoryBody">
+                        <tr><td colspan="5" class="empty-state">No items added yet.</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        (function() {
+            'use strict';
+
+            // ---------- STATE ----------
+            let inventory = [];
+            let nextId = 1;
+            let currentStep = 1; // 1-4
+            let currentItem = {
+                barcode: '',
+                name: '',
+                mrp: '',
+                qty: ''
+            };
+            let html5QrCode = null;
+            let isScanning = false;
+
+            // ---------- DOM REFS ----------
+            const stepContents = document.querySelectorAll('.step-content');
+            const stepDots = document.querySelectorAll('.step-dot');
+            const stepLines = document.querySelectorAll('.step-line');
+            const totalItemsSpan = document.getElementById('totalItems');
+            const rowCountSpan = document.getElementById('rowCount');
+            const tbody = document.getElementById('inventoryBody');
+            const toast = document.getElementById('toast');
+
+            // Inputs
+            const manualBarcode = document.getElementById('manualBarcode');
+            const productName = document.getElementById('productName');
+            const productMrp = document.getElementById('productMrp');
+            const productQty = document.getElementById('productQty');
+
+            // Buttons
+            const barcodeNextBtn = document.getElementById('barcodeNextBtn');
+            const skipBarcodeBtn = document.getElementById('skipBarcodeBtn');
+            const nameBackBtn = document.getElementById('nameBackBtn');
+            const nameNextBtn = document.getElementById('nameNextBtn');
+            const mrpBackBtn = document.getElementById('mrpBackBtn');
+            const mrpNextBtn = document.getElementById('mrpNextBtn');
+            const qtyBackBtn = document.getElementById('qtyBackBtn');
+            const addItemBtn = document.getElementById('addItemBtn');
+            const exportExcelBtn = document.getElementById('exportExcelBtn');
+            const clearAllBtn = document.getElementById('clearAllBtn');
+
+            // ---------- HELPER: RENDER TABLE ----------
+            function renderTable() {
+                if (inventory.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="5" class="empty-state">📭 No items added yet.</td></tr>`;
+                    totalItemsSpan.textContent = '0';
+                    rowCountSpan.textContent = '0';
+                    return;
+                }
+                let html = '';
+                inventory.forEach((item, idx) => {
+                    html += `
+                        <tr>
+                            <td>${idx + 1}</td>
+                            <td>${item.barcode || 'N/A'}</td>
+                            <td>${item.name}</td>
+                            <td>₹${item.mrp}</td>
+                            <td>${item.qty}</td>
+                        </tr>
+                    `;
+                });
+                tbody.innerHTML = html;
+                totalItemsSpan.textContent = inventory.length;
+                rowCountSpan.textContent = inventory.length;
+            }
+
+            // ---------- STEP NAVIGATION ----------
+            function goToStep(step) {
+                // stop camera if leaving step 1
+                if (currentStep === 1 && step !== 1) {
+                    stopScanner();
+                }
+                // start camera if entering step 1
+                if (step === 1 && currentStep !== 1) {
+                    startScanner();
+                }
+
+                currentStep = step;
+
+                // Update contents
+                stepContents.forEach(el => {
+                    el.classList.toggle('active', parseInt(el.dataset.step) === step);
+                });
+
+                // Update dots & lines
+                stepDots.forEach(dot => {
+                    const s = parseInt(dot.dataset.step);
+                    dot.classList.remove('active', 'done');
+                    if (s === step) dot.classList.add('active');
+                    else if (s < step) dot.classList.add('done');
+                });
+                stepLines.forEach(line => {
+                    const [a, b] = line.dataset.between.split('-').map(Number);
+                    line.classList.toggle('done', b <= step);
+                });
+
+                // Focus logic
+                if (step === 2) setTimeout(() => productName.focus(), 300);
+                if (step === 3) setTimeout(() => productMrp.focus(), 300);
+                if (step === 4) setTimeout(() => productQty.focus(), 300);
+
+                // Update barcode next button state
+                if (step === 1) updateBarcodeNextState();
+
+                // Reset toast
+                toast.classList.remove('show');
+            }
+
+            // ---------- BARCODE SCANNER ----------
+            async function startScanner() {
+                if (html5QrCode) {
+                    try {
+                        await html5QrCode.stop();
+                        await html5QrCode.clear();
+                    } catch (_) {}
+                    html5QrCode = null;
+                }
+                const readerDiv = document.getElementById('reader');
+                readerDiv.innerHTML = ''; // clean
+                try {
+                    html5QrCode = new Html5Qrcode('reader');
+                    const config = {
+                        fps: 15,
+                        qrbox: { width: 240, height: 240 },
+                        aspectRatio: 1.0
+                    };
+                    await html5QrCode.start({ facingMode: 'environment' },
+                        config,
+                        onScanSuccess,
+                        onScanError
+                    );
+                    isScanning = true;
+                } catch (err) {
+                    console.warn('Camera start error:', err);
+                    // If camera fails, user can still type manually
+                    document.getElementById('reader-container').innerHTML = `
+                        <div style="display:flex;align-items:center;justify-content:center;height:100%;color:#94a3b8;background:#0f172a;border-radius:18px;padding:1rem;text-align:center;flex-direction:column;gap:0.5rem;">
+                            <span style="font-size:2rem;">📷</span>
+                            <span style="font-size:0.9rem;">Camera unavailable.<br>Type barcode manually below.</span>
+                        </div>
+                    `;
+                }
+            }
+
+            async function stopScanner() {
+                if (html5QrCode && isScanning) {
+                    try {
+                        await html5QrCode.stop();
+                        await html5QrCode.clear();
+                    } catch (_) {}
+                    html5QrCode = null;
+                    isScanning = false;
+                }
+                // Reset the container just in case, but keep placeholder
+                const container = document.getElementById('reader-container');
+                // If we manually overwrote it, we need to reset on next start.
+                // The startScanner recreates the reader div.
+            }
+
+            function onScanSuccess(decodedText, decodedResult) {
+                // decodedText is the barcode number
+                manualBarcode.value = decodedText;
+                currentItem.barcode = decodedText;
+                updateBarcodeNextState();
+                // auto advance to next step after a tiny delay
+                toast.textContent = '✅ Barcode scanned!';
+                toast.classList.add('show');
+                setTimeout(() => {
+                    toast.classList.remove('show');
+                    if (currentStep === 1) {
+                        goToStep(2);
+                    }
+                }, 400);
+            }
+
+            function onScanError(err) {
+                // ignore, keep scanning
+            }
+
+            function updateBarcodeNextState() {
+                const val = manualBarcode.value.trim();
+                barcodeNextBtn.disabled = (val === '');
+                if (val) currentItem.barcode = val;
+            }
+
+            // ---------- VALIDATION & ADD ITEM ----------
+            function addCurrentItem() {
+                const name = currentItem.name.trim();
+                const mrp = parseFloat(currentItem.mrp);
+                const qty = parseInt(currentItem.qty, 10);
+
+                if (!name) {
+                    toast.textContent = '❌ Please enter a Product Name.';
+                    toast.classList.add('show');
+                    setTimeout(() => toast.classList.remove('show'), 2000);
+                    goToStep(2);
+                    return;
+                }
+                if (isNaN(mrp) || mrp < 0) {
+                    toast.textContent = '❌ Enter a valid MRP.';
+                    toast.classList.add('show');
+                    setTimeout(() => toast.classList.remove('show'), 2000);
+                    goToStep(3);
+                    return;
+                }
+                if (isNaN(qty) || qty < 0) {
+                    toast.textContent = '❌ Enter a valid Quantity.';
+                    toast.classList.add('show');
+                    setTimeout(() => toast.classList.remove('show'), 2000);
+                    goToStep(4);
+                    return;
+                }
+
+                // Push to inventory
+                inventory.push({
+                    id: nextId++,
+                    barcode: currentItem.barcode || 'N/A',
+                    name: name,
+                    mrp: mrp.toFixed(2),
+                    qty: qty
+                });
+
+                renderTable();
+
+                // Reset current item
+                currentItem = { barcode: '', name: '', mrp: '', qty: '' };
+                manualBarcode.value = '';
+                productName.value = '';
+                productMrp.value = '';
+                productQty.value = '';
+
+                // Show success and go back to step 1
+                toast.textContent = '✅ Item added to list!';
+                toast.classList.add('show');
+                setTimeout(() => toast.classList.remove('show'), 1500);
+
+                goToStep(1);
+            }
+
+            // ---------- EXPORT EXCEL ----------
+            function exportExcel() {
+                if (inventory.length === 0) {
+                    toast.textContent = '📭 No data to export.';
+                    toast.classList.add('show');
+                    setTimeout(() => toast.classList.remove('show'), 2000);
+                    return;
+                }
+                const data = inventory.map((item, idx) => ({
+                    'S.No': idx + 1,
+                    'Barcode': item.barcode,
+                    'Product Name': item.name,
+                    'MRP (₹)': parseFloat(item.mrp),
+                    'Quantity': item.qty
+                }));
+                try {
+                    const wb = XLSX.utils.book_new();
+                    const ws = XLSX.utils.json_to_sheet(data);
+                    ws['!cols'] = [
+                        { wch: 6 },
+                        { wch: 18 },
+                        { wch: 30 },
+                        { wch: 12 },
+                        { wch: 10 }
+                    ];
+                    XLSX.utils.book_append_sheet(wb, ws, 'Inventory');
+                    const dateStr = new Date().toISOString().slice(0, 10);
+                    XLSX.writeFile(wb, `inventory_${dateStr}.xlsx`);
+                    toast.textContent = `✅ Exported ${inventory.length} items!`;
+                    toast.classList.add('show');
+                    setTimeout(() => toast.classList.remove('show'), 2000);
+                } catch (e) {
+                    alert('Export failed. Check library loading.');
+                }
+            }
+
+            // ---------- CLEAR ALL ----------
+            function clearAll() {
+                if (inventory.length === 0) {
+                    toast.textContent = '📭 Already empty.';
+                    toast.classList.add('show');
+                    setTimeout(() => toast.classList.remove('show'), 1500);
+                    return;
+                }
+                if (confirm('⚠️ Delete ALL inventory items?')) {
+                    inventory = [];
+                    nextId = 1;
+                    renderTable();
+                    toast.textContent = '🗑️ All cleared.';
+                    toast.classList.add('show');
+                    setTimeout(() => toast.classList.remove('show'), 1500);
+                }
+            }
+
+            // ---------- EVENT LISTENERS ----------
+            // Manual barcode input
+            manualBarcode.addEventListener('input', function() {
+                currentItem.barcode = this.value.trim();
+                updateBarcodeNextState();
+            });
+
+            // Skip barcode
+            skipBarcodeBtn.addEventListener('click', function() {
+                manualBarcode.value = '';
+                currentItem.barcode = '';
+                updateBarcodeNextState();
+                goToStep(2);
+            });
+
+            // Barcode Next
+            barcodeNextBtn.addEventListener('click', function() {
+                if (manualBarcode.value.trim()) {
+                    currentItem.barcode = manualBarcode.value.trim();
+                    goToStep(2);
+                }
+            });
+
+            // Name step
+            productName.addEventListener('input', function() { currentItem.name = this.value; });
+            productName.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter') { e.preventDefault();
+                    nameNextBtn.click(); }
+            });
+            nameBackBtn.addEventListener('click', () => goToStep(1));
+            nameNextBtn.addEventListener('click', function() {
+                const val = productName.value.trim();
+                if (!val) {
+                    toast.textContent = '❌ Please enter a product name.';
+                    toast.classList.add('show');
+                    setTimeout(() => toast.classList.remove('show'), 1500);
+                    productName.focus();
+                    return;
+                }
+                currentItem.name = val;
+                goToStep(3);
+            });
+
+            // MRP step
+            productMrp.addEventListener('input', function() { currentItem.mrp = this.value; });
+            productMrp.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter') { e.preventDefault();
+                    mrpNextBtn.click(); }
+            });
+            mrpBackBtn.addEventListener('click', () => goToStep(2));
+            mrpNextBtn.addEventListener('click', function() {
+                const val = parseFloat(productMrp.value);
+                if (isNaN(val) || val < 0) {
+                    toast.textContent = '❌ Enter a valid MRP (₹).';
+                    toast.classList.add('show');
+                    setTimeout(() => toast.classList.remove('show'), 1500);
+                    productMrp.focus();
+                    return;
+                }
+                currentItem.mrp = productMrp.value;
+                goToStep(4);
+            });
+
+            // Qty step
+            productQty.addEventListener('input', function() { currentItem.qty = this.value; });
+            productQty.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter') { e.preventDefault();
+                    addItemBtn.click(); }
+            });
+            qtyBackBtn.addEventListener('click', () => goToStep(3));
+            addItemBtn.addEventListener('click', addCurrentItem);
+
+            // Export & Clear
+            exportExcelBtn.addEventListener('click', exportExcel);
+            clearAllBtn.addEventListener('click', clearAll);
+
+            // ---------- INIT ----------
+            renderTable();
+            // Start scanner on load
+            setTimeout(() => {
+                startScanner();
+            }, 500);
+
+            // Handle page visibility to stop/start camera
+            document.addEventListener('visibilitychange', () => {
+                if (document.hidden) {
+                    if (currentStep === 1) stopScanner();
+                } else {
+                    if (currentStep === 1) startScanner();
+                }
+            });
+
+            // Prevent default form submit
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' && e.target.tagName === 'INPUT') {
+                    // handled per field
+                }
+            });
+
+            console.log('📦 Inventory Flow ready. Step by step.');
+        })();
+    </script>
+
+</body>
+</html>
