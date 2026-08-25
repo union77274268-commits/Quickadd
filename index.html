@@ -17,7 +17,7 @@
 h1{font-size:27px;line-height:1.12;margin:8px 0 8px}p{color:var(--muted);line-height:1.45;margin:0 0 20px}
 .btn{width:100%;min-height:52px;border:0;border-radius:15px;background:var(--accent);color:white;font-size:16px;font-weight:800;cursor:pointer}.btn.secondary{background:#eef2ff;color:#1d4ed8}.btn.ghost{background:#f3f4f6;color:#374151}.btn:disabled{opacity:.45;cursor:not-allowed}
 input{width:100%;height:58px;border:2px solid var(--line);border-radius:15px;padding:0 16px;font-size:20px;outline:none}input:focus{border-color:var(--accent)}
-.actions{display:grid;gap:10px;margin-top:14px}.camera{width:100%;aspect-ratio:1.35;border-radius:18px;background:#111827;overflow:hidden;position:relative}.camera video{width:100%;height:100%;object-fit:cover}.scanline{position:absolute;left:12%;right:12%;top:50%;height:2px;background:#fff;box-shadow:0 0 14px #fff}.scanbox{position:absolute;inset:22% 13%;border:2px solid #fff;border-radius:14px}
+.actions{display:grid;gap:10px;margin-top:14px}.portrait-camera{width:min(100%,360px);margin:0 auto;aspect-ratio:3/4;border-radius:22px;background:#111827;overflow:hidden;position:relative;box-shadow:0 12px 28px #11182720}.portrait-camera video{width:100%;height:100%;object-fit:cover}.portrait-guide{position:absolute;left:10%;right:10%;top:12%;bottom:12%;border:2px dashed #fff;border-radius:18px;box-shadow:0 0 0 999px #0003}.camera-label{position:absolute;bottom:14px;left:50%;transform:translateX(-50%);padding:6px 10px;border-radius:999px;background:#0009;color:#fff;font-size:10px;font-weight:800;letter-spacing:.08em}.camera.camera{width:100%;aspect-ratio:1.35;border-radius:18px;background:#111827;overflow:hidden;position:relative}.camera video{width:100%;height:100%;object-fit:cover}.scanline{position:absolute;left:12%;right:12%;top:50%;height:2px;background:#fff;box-shadow:0 0 14px #fff}.scanbox{position:absolute;inset:22% 13%;border:2px solid #fff;border-radius:14px}
 .preview{width:100%;max-height:360px;object-fit:contain;border-radius:18px;background:#f3f4f6}.photo-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
 .status{font-size:13px;margin-top:10px;color:var(--muted);min-height:20px}.ok{color:var(--ok)}.err{color:var(--danger)}
 .summary{display:grid;gap:9px;margin:15px 0}.row{display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--line)}.row span:first-child{color:var(--muted)}
@@ -44,11 +44,13 @@ input{width:100%;height:58px;border:2px solid var(--line);border-radius:15px;pad
     </div>
 
     <div class="step" data-step="1">
-      <div class="eyebrow">Step 2 of 6</div><h1>Add product photo</h1><p>Take one clear photo. The app will crop/remove the background locally when the optional AI engine is available.</p>
-      <input class="hidden" id="photoInput" type="file" accept="image/*" capture="environment">
-      <button class="btn" id="takePhoto">Take / choose photo</button>
+      <div class="eyebrow">Step 2 of 6</div><h1>Take product photo</h1>
+      <p>Camera opens in portrait mode. Keep the product centered inside the guide.</p>
+      <div class="portrait-camera" id="portraitCamera"><video id="productVideo" autoplay playsinline muted></video><div class="portrait-guide"></div><div class="camera-label">CENTER PRODUCT</div></div>
+      <canvas id="captureCanvas" class="hidden"></canvas><input class="hidden" id="photoInput" type="file" accept="image/*">
       <img id="photoPreview" class="preview hidden" alt="Product preview">
-      <div class="photo-actions hidden" id="photoActions"><button class="btn secondary" id="removeBg">Remove background</button><button class="btn ghost" id="keepPhoto">Use photo</button></div>
+      <div class="photo-actions" id="cameraActions"><button class="btn" id="capturePhoto">Capture photo</button><button class="btn secondary" id="galleryPhoto">Choose from gallery</button></div>
+      <div class="photo-actions hidden" id="photoActions"><button class="btn secondary" id="removeBg">Remove background</button><button class="btn ghost" id="retakePhoto">Retake</button></div>
       <div class="status" id="photoStatus"></div>
     </div>
 
@@ -103,7 +105,7 @@ const $=id=>document.getElementById(id);
 const steps=[...document.querySelectorAll(".step")];
 
 function progress(){ $("progress").innerHTML=steps.map((_,i)=>`<div class="dot ${i<=state.step?"on":""}"></div>`).join(""); }
-function go(n){ state.step=Math.max(0,Math.min(5,n)); steps.forEach((s,i)=>s.classList.toggle("active",i===state.step)); progress(); if(state.step===5) renderSummary(); }
+function go(n){const prev=state.step;state.step=Math.max(0,Math.min(5,n));steps.forEach((s,i)=>s.classList.toggle("active",i===state.step));progress();if(prev===1&&state.step!==1)stopProductCamera();if(state.step===1)openProductCamera();if(state.step===5)renderSummary();}
 function setStatus(id,text,cls=""){ const el=$(id); el.textContent=text; el.className="status "+cls; }
 function updateCount(){ $("count").textContent=`${state.items.length} product${state.items.length===1?"":"s"} added in this session`; }
 
@@ -140,30 +142,18 @@ async function stopScanner(){
 $("startScan").onclick=startScanner;
 $("manualBarcode").onclick=()=>{$("barcodeInput").classList.remove("hidden");$("barcodeInput").focus();};
 $("barcodeInput").addEventListener("change",()=>{const v=$("barcodeInput").value.trim();if(v){state.barcode=v;go(1);}});
-$("takePhoto").onclick=()=>$("photoInput").click();
-
-$("photoInput").onchange=async e=>{
-  const file=e.target.files?.[0]; if(!file)return;
-  if(!file.type.startsWith("image/")){setStatus("photoStatus","Please choose an image.","err");return;}
-  const reader=new FileReader(); reader.onload=()=>{state.image=reader.result;$("photoPreview").src=state.image;$("photoPreview").classList.remove("hidden");$("photoActions").classList.remove("hidden");setStatus("photoStatus","Photo ready.");}; reader.readAsDataURL(file);
-};
-
-async function clientBackgroundRemoval(dataUrl){
-  /* Optional IMG.LY browser engine. It is free to use under AGPL.
-     If the module/model cannot load, the original image remains usable. */
-  try{
-    setStatus("photoStatus","Loading local AI model… first use can take a little time.");
-    const mod=await import("https://cdn.jsdelivr.net/npm/@imgly/background-removal@1.7.0/+esm");
-    const blob=await (await fetch(dataUrl)).blob();
-    const result=await mod.removeBackground(blob);
-    const out=await blobToDataURL(result);
-    return out;
-  }catch(e){ console.warn("Background removal unavailable",e); return null; }
-}
-function blobToDataURL(blob){return new Promise((resolve,reject)=>{const r=new FileReader();r.onload=()=>resolve(r.result);r.onerror=reject;r.readAsDataURL(blob);});}
-$("removeBg").onclick=async()=>{if(!state.image)return; $("removeBg").disabled=true; const out=await clientBackgroundRemoval(state.image); $("removeBg").disabled=false; if(out){state.image=out;$("photoPreview").src=out;setStatus("photoStatus","Background removed locally.","ok");}else setStatus("photoStatus","AI engine unavailable. The original photo is still usable.","err");};
-$("keepPhoto").onclick=()=>go(2);
-
+let cameraStream=null,bgRemovalModule=null,bgRemovalConfig=null,bgRemovalPromise=null,bgRemovalReady=false;
+async function openProductCamera(){if(!navigator.mediaDevices?.getUserMedia){setStatus("photoStatus","Camera unavailable here. Use gallery.","err");return}try{stopProductCamera();cameraStream=await navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:"environment"},width:{ideal:1080},height:{ideal:1440},aspectRatio:{ideal:.75}},audio:false});$("productVideo").srcObject=cameraStream;await $("productVideo").play();setStatus("photoStatus","Camera ready. Keep the product centered.");warmBackgroundRemoval()}catch(e){setStatus("photoStatus","Camera permission failed. Use gallery.","err");warmBackgroundRemoval()}}
+function stopProductCamera(){if(cameraStream){cameraStream.getTracks().forEach(t=>t.stop());cameraStream=null}if($("productVideo"))$("productVideo").srcObject=null}
+$("capturePhoto").onclick=()=>{const v=$("productVideo"),c=$("captureCanvas");if(!v.videoWidth){setStatus("photoStatus","Camera is not ready yet.","err");return}const W=900,H=1200,tr=W/H,sr=v.videoWidth/v.videoHeight;let sx=0,sy=0,sw=v.videoWidth,sh=v.videoHeight;if(sr>tr){sw=Math.round(v.videoHeight*tr);sx=Math.round((v.videoWidth-sw)/2)}else{sh=Math.round(v.videoWidth/tr);sy=Math.round((v.videoHeight-sh)/2)}c.width=W;c.height=H;c.getContext("2d").drawImage(v,sx,sy,sw,sh,0,0,W,H);state.image=c.toDataURL("image/jpeg",.9);$("photoPreview").src=state.image;$("photoPreview").classList.remove("hidden");$("portraitCamera").classList.add("hidden");$("cameraActions").classList.add("hidden");$("photoActions").classList.remove("hidden");stopProductCamera();setStatus("photoStatus","Photo captured. Remove background or retake.")};
+$("galleryPhoto").onclick=()=>$("photoInput").click();
+$("retakePhoto").onclick=()=>{state.image="";$("photoPreview").classList.add("hidden");$("photoActions").classList.add("hidden");$("cameraActions").classList.remove("hidden");$("portraitCamera").classList.remove("hidden");openProductCamera()};
+$("photoInput").onchange=e=>{const file=e.target.files?.[0];if(!file)return;if(!file.type.startsWith("image/")){setStatus("photoStatus","Please choose an image.","err");return}const r=new FileReader();r.onload=()=>{state.image=r.result;$("photoPreview").src=state.image;$("photoPreview").classList.remove("hidden");$("portraitCamera").classList.add("hidden");$("cameraActions").classList.add("hidden");$("photoActions").classList.remove("hidden");stopProductCamera();setStatus("photoStatus","Photo ready. Remove background or retake.")};r.readAsDataURL(file)};
+async function warmBackgroundRemoval(){if(bgRemovalReady)return;if(bgRemovalPromise)return bgRemovalPromise;bgRemovalPromise=(async()=>{try{setStatus("photoStatus","Preparing background remover in background…");bgRemovalModule=await import("https://cdn.jsdelivr.net/npm/@imgly/background-removal@1.7.0/+esm");bgRemovalConfig={model:"isnet_fp16",proxyToWorker:true,output:{format:"image/png",quality:.9}};if(bgRemovalModule.preload)await bgRemovalModule.preload(bgRemovalConfig);bgRemovalReady=true;if(state.step===1)setStatus("photoStatus","Camera ready. Background remover is ready.")}catch(e){console.warn(e);bgRemovalPromise=null}})();return bgRemovalPromise}
+async function clientBackgroundRemoval(dataUrl){try{if(!bgRemovalReady)await warmBackgroundRemoval();const blob=await(await fetch(dataUrl)).blob();return await blobToDataURL(await bgRemovalModule.removeBackground(blob,bgRemovalConfig))}catch(e){console.warn(e);return null}}
+async function placeOnWhiteBackground(dataUrl){return new Promise((resolve,reject)=>{const img=new Image();img.onload=()=>{const W=900,H=1200,pad=90,c=document.createElement("canvas");c.width=W;c.height=H;const x=c.getContext("2d");x.fillStyle="#fff";x.fillRect(0,0,W,H);const s=Math.min((W-pad*2)/img.width,(H-pad*2)/img.height),w=img.width*s,h=img.height*s;x.drawImage(img,(W-w)/2,(H-h)/2,w,h);resolve(c.toDataURL("image/jpeg",.92))};img.onerror=reject;img.src=dataUrl})}
+function blobToDataURL(blob){return new Promise((resolve,reject)=>{const r=new FileReader();r.onload=()=>resolve(r.result);r.onerror=reject;r.readAsDataURL(blob)})}
+$("removeBg").onclick=async()=>{if(!state.image)return;$("removeBg").disabled=true;setStatus("photoStatus","Removing background…");const out=await clientBackgroundRemoval(state.image);if(out){state.image=await placeOnWhiteBackground(out);$("photoPreview").src=state.image;setStatus("photoStatus","Background removed and product centered on white.","ok")}else setStatus("photoStatus","Background removal failed. You can retake the photo.","err");$("removeBg").disabled=false};
 function validText(id,label){const v=$(id).value.trim();if(!v){alert("Enter "+label+".");$(id).focus();return null;}return v;}
 $("nameNext").onclick=()=>{const v=validText("nameInput","product name");if(v){state.name=v;go(3);}};
 $("mrpNext").onclick=()=>{const v=Number($("mrpInput").value);if(!Number.isFinite(v)||v<0){alert("Enter a valid MRP.");return;}state.mrp=v;go(4);};
@@ -204,7 +194,7 @@ $("saveProduct").onclick=async()=>{
   $("saveProduct").disabled=false;
 };
 $("editProduct").onclick=()=>go(2);
-function resetForNext(){state.barcode="";state.name="";state.mrp="";state.qty="";state.image="";$("barcodeInput").value="";$("nameInput").value="";$("mrpInput").value="";$("qtyInput").value="";$("photoInput").value="";$("photoPreview").src="";$("photoPreview").classList.add("hidden");$("photoActions").classList.add("hidden");go(0);}
+function resetForNext(){stopProductCamera();state.barcode="";state.name="";state.mrp="";state.qty="";state.image="";$("barcodeInput").value="";$("nameInput").value="";$("mrpInput").value="";$("qtyInput").value="";$("photoInput").value="";$("photoPreview").src="";$("photoPreview").classList.add("hidden");$("photoActions").classList.add("hidden");$("cameraActions").classList.remove("hidden");$("portraitCamera").classList.remove("hidden");go(0);}
 
 async function fetchSupabaseItems(){
   if(!SUPABASE_URL||!SUPABASE_ANON_KEY)return [];
