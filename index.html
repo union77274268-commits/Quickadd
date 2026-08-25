@@ -24,7 +24,7 @@ input{width:100%;height:58px;border:2px solid var(--line);border-radius:15px;pad
 .small{font-size:12px;color:var(--muted);margin-top:12px}.link{color:var(--accent);font-weight:700;cursor:pointer}.hidden{display:none!important}
 .toolbar{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:14px}.toolbar button{min-height:45px;border-radius:13px;border:1px solid var(--line);background:#fff;font-weight:700}
 .count{font-size:13px;color:var(--muted);margin-top:15px;text-align:center}
-</style>
+.hamburger{position:fixed;top:14px;left:14px;z-index:50;width:46px;height:46px;border:1px solid var(--line);border-radius:14px;background:#fff;color:#111827;font-size:23px;box-shadow:0 8px 20px #11182712}.drawer-backdrop{position:fixed;inset:0;background:#0005;z-index:60}.drawer{position:fixed;top:0;left:0;bottom:0;width:min(310px,86vw);background:#fff;z-index:70;padding:20px 16px;box-shadow:18px 0 40px #11182725;transform:translateX(-105%);transition:transform .2s ease}.drawer.open{transform:translateX(0)}.drawer-head{display:flex;align-items:center;justify-content:space-between;font-size:20px;margin-bottom:20px}.drawer-close{border:0;background:#f3f4f6;border-radius:12px;width:42px;height:42px;font-size:25px}.drawer-item{width:100%;text-align:left;padding:15px;border:1px solid var(--line);background:#fff;border-radius:14px;margin-bottom:10px;font-size:15px;font-weight:750}.drawer-note{font-size:12px;color:var(--muted);line-height:1.45;margin-top:18px}.bg-job{font-size:12px;color:#1d4ed8;background:#eff6ff;border-radius:12px;padding:10px;margin-top:10px}.hidden{display:none!important}@media(max-width:600px){.app{padding-top:70px}}</style>
 </head>
 <body>
 <main class="app" id="app">
@@ -38,7 +38,7 @@ input{width:100%;height:58px;border:2px solid var(--line);border-radius:15px;pad
     <div class="step active" data-step="0">
       <div class="eyebrow">Step 1 of 6</div><h1>Scan barcode</h1><p>Point the camera at the product barcode. You can also enter it manually.</p>
       <div class="camera" id="cameraBox"><video id="video" playsinline muted></video><div class="scanbox"></div><div class="scanline"></div></div>
-      <div class="actions"><button class="btn" id="startScan">Start scanner</button><button class="btn secondary" id="manualBarcode">Enter barcode manually</button></div>
+      <div class="actions"><button class="btn" id="startScan">Start scanner</button><button class="btn secondary" id="manualBarcode">Enter barcode manually</button><button class="btn ghost" id="skipBarcode">Skip barcode</button></div>
       <input class="hidden" id="barcodeInput" inputmode="numeric" placeholder="Barcode number">
       <div class="status" id="scanStatus"></div>
     </div>
@@ -80,10 +80,14 @@ input{width:100%;height:58px;border:2px solid var(--line);border-radius:15px;pad
     </div>
   </section>
 
-  <div class="toolbar">
-    <button id="exportBtn">Export Excel</button>
-    <button id="settingsBtn">Supabase settings</button>
-  </div>
+  <button class="hamburger" id="menuBtn" type="button" aria-label="Open menu">☰</button>
+  <div class="drawer-backdrop hidden" id="drawerBackdrop"></div>
+  <aside class="drawer" id="drawer" aria-label="Quick Add menu">
+    <div class="drawer-head"><strong>Menu</strong><button class="drawer-close" id="drawerClose" type="button">×</button></div>
+    <button class="drawer-item" id="exportBtn" type="button">📊 Export Excel</button>
+    <button class="drawer-item" id="settingsBtn" type="button">⚙️ Supabase settings</button>
+    <div class="drawer-note">Background-removal jobs are processed in the background.</div>
+  </aside>
   <div class="count" id="count"></div>
   <div class="small">Background removal is designed to run client-side without per-image API charges. The included AI engine is optional and downloads its model on first use. For production/commercial deployment, check the engine's license requirements.</div>
 </main>
@@ -149,11 +153,94 @@ $("capturePhoto").onclick=()=>{const v=$("productVideo"),c=$("captureCanvas");if
 $("galleryPhoto").onclick=()=>$("photoInput").click();
 $("retakePhoto").onclick=()=>{state.image="";$("photoPreview").classList.add("hidden");$("photoActions").classList.add("hidden");$("cameraActions").classList.remove("hidden");$("portraitCamera").classList.remove("hidden");openProductCamera()};
 $("photoInput").onchange=e=>{const file=e.target.files?.[0];if(!file)return;if(!file.type.startsWith("image/")){setStatus("photoStatus","Please choose an image.","err");return}const r=new FileReader();r.onload=()=>{state.image=r.result;$("photoPreview").src=state.image;$("photoPreview").classList.remove("hidden");$("portraitCamera").classList.add("hidden");$("cameraActions").classList.add("hidden");$("photoActions").classList.remove("hidden");stopProductCamera();setStatus("photoStatus","Photo ready. Remove background or retake.")};r.readAsDataURL(file)};
-async function warmBackgroundRemoval(){if(bgRemovalReady)return;if(bgRemovalPromise)return bgRemovalPromise;bgRemovalPromise=(async()=>{try{setStatus("photoStatus","Preparing background remover in background…");bgRemovalModule=await import("https://cdn.jsdelivr.net/npm/@imgly/background-removal@1.7.0/+esm");bgRemovalConfig={model:"isnet_fp16",proxyToWorker:true,output:{format:"image/png",quality:.9}};if(bgRemovalModule.preload)await bgRemovalModule.preload(bgRemovalConfig);bgRemovalReady=true;if(state.step===1)setStatus("photoStatus","Camera ready. Background remover is ready.")}catch(e){console.warn(e);bgRemovalPromise=null}})();return bgRemovalPromise}
-async function clientBackgroundRemoval(dataUrl){try{if(!bgRemovalReady)await warmBackgroundRemoval();const blob=await(await fetch(dataUrl)).blob();return await blobToDataURL(await bgRemovalModule.removeBackground(blob,bgRemovalConfig))}catch(e){console.warn(e);return null}}
-async function placeOnWhiteBackground(dataUrl){return new Promise((resolve,reject)=>{const img=new Image();img.onload=()=>{const W=900,H=1200,pad=90,c=document.createElement("canvas");c.width=W;c.height=H;const x=c.getContext("2d");x.fillStyle="#fff";x.fillRect(0,0,W,H);const s=Math.min((W-pad*2)/img.width,(H-pad*2)/img.height),w=img.width*s,h=img.height*s;x.drawImage(img,(W-w)/2,(H-h)/2,w,h);resolve(c.toDataURL("image/jpeg",.92))};img.onerror=reject;img.src=dataUrl})}
+let backgroundQueue=[];
+let backgroundJobRunning=false;
+
+async function warmBackgroundRemoval(){
+  if(bgRemovalReady)return;
+  if(bgRemovalPromise)return bgRemovalPromise;
+  bgRemovalPromise=(async()=>{
+    try{
+      bgRemovalModule=await import("https://cdn.jsdelivr.net/npm/@imgly/background-removal@1.7.0/+esm");
+      bgRemovalConfig={model:"isnet_fp16",proxyToWorker:true,output:{format:"image/png",quality:.9}};
+      if(bgRemovalModule.preload)await bgRemovalModule.preload(bgRemovalConfig);
+      bgRemovalReady=true;
+    }catch(e){console.warn("Background remover preload failed",e);bgRemovalPromise=null}
+  })();
+  return bgRemovalPromise;
+}
+async function clientBackgroundRemoval(dataUrl){
+  try{
+    if(!bgRemovalReady)await warmBackgroundRemoval();
+    const blob=await(await fetch(dataUrl)).blob();
+    return await blobToDataURL(await bgRemovalModule.removeBackground(blob,bgRemovalConfig));
+  }catch(e){console.warn("Background removal unavailable",e);return null}
+}
+async function placeOnWhiteBackground(dataUrl){
+  return new Promise((resolve,reject)=>{
+    const img=new Image();img.onload=()=>{
+      const W=900,H=1200,pad=90,c=document.createElement("canvas");c.width=W;c.height=H;
+      const x=c.getContext("2d");x.fillStyle="#fff";x.fillRect(0,0,W,H);
+      const s=Math.min((W-pad*2)/img.width,(H-pad*2)/img.height),w=img.width*s,h=img.height*s;
+      x.drawImage(img,(W-w)/2,(H-h)/2,w,h);resolve(c.toDataURL("image/jpeg",.92))
+    };img.onerror=reject;img.src=dataUrl
+  })
+}
 function blobToDataURL(blob){return new Promise((resolve,reject)=>{const r=new FileReader();r.onload=()=>resolve(r.result);r.onerror=reject;r.readAsDataURL(blob)})}
-$("removeBg").onclick=async()=>{if(!state.image)return;$("removeBg").disabled=true;setStatus("photoStatus","Removing background…");const out=await clientBackgroundRemoval(state.image);if(out){state.image=await placeOnWhiteBackground(out);$("photoPreview").src=state.image;setStatus("photoStatus","Background removed and product centered on white.","ok")}else setStatus("photoStatus","Background removal failed. You can retake the photo.","err");$("removeBg").disabled=false};
+
+function showJobStatus(text){
+  let el=$("bgJobStatus");
+  if(!el){el=document.createElement("div");el.id="bgJobStatus";el.className="bg-job";$("photoStatus").after(el)}
+  el.textContent=text;
+}
+async function processBackgroundQueue(){
+  if(backgroundJobRunning||!backgroundQueue.length)return;
+  backgroundJobRunning=true;
+  while(backgroundQueue.length){
+    const job=backgroundQueue.shift();
+    showJobStatus(`Background removal queued • ${backgroundQueue.length} remaining`);
+    const out=await clientBackgroundRemoval(job.source);
+    if(out){
+      try{
+        const white=await placeOnWhiteBackground(out);
+        job.item.image_data=white;
+        /* Attach generated image to the already-created product. */
+        await updateSupabaseImage(job.item.barcode,job.item.name,white);
+        const local=state.items.find(x=>x.created_at===job.item.created_at);
+        if(local)local.image_data=white;
+        saveLocal();
+        showJobStatus("✓ Product photo processed and attached.");
+      }catch(e){showJobStatus("Photo generated, but attachment failed: "+e.message)}
+    }else showJobStatus("Background removal failed; original photo remains attached.");
+  }
+  backgroundJobRunning=false;
+}
+async function updateSupabaseImage(barcode,name,image){
+  if(!SUPABASE_URL||!SUPABASE_ANON_KEY)return;
+  const filter=barcode?`barcode=eq.${encodeURIComponent(barcode)}`:`name=eq.${encodeURIComponent(name)}`;
+  const r=await fetch(`${SUPABASE_URL}/rest/v1/${TABLE}?${filter}`,{
+    method:"PATCH",
+    headers:{"apikey":SUPABASE_ANON_KEY,"Authorization":"Bearer "+SUPABASE_ANON_KEY,"Content-Type":"application/json","Prefer":"return=minimal"},
+    body:JSON.stringify({image_data:image})
+  });
+  if(!r.ok)throw new Error(await r.text());
+}
+$("removeBg").onclick=async()=>{
+  if(!state.image)return;
+  const item={
+    barcode:state.barcode,name:state.name,mrp:Number(state.mrp),qty:Number(state.qty),
+    image_data:state.image,created_at:new Date().toISOString()
+  };
+  /* Save the product immediately with the original image, then queue the
+     expensive operation so the user can continue to the next product. */
+  $("removeBg").disabled=true;
+  backgroundQueue.push({source:state.image,item});
+  showJobStatus("✓ Background removal queued. You can continue.");
+  state.image=item.image_data;
+  $("removeBg").disabled=false;
+  go(2);
+  processBackgroundQueue();
+};
 function validText(id,label){const v=$(id).value.trim();if(!v){alert("Enter "+label+".");$(id).focus();return null;}return v;}
 $("nameNext").onclick=()=>{const v=validText("nameInput","product name");if(v){state.name=v;go(3);}};
 $("mrpNext").onclick=()=>{const v=Number($("mrpInput").value);if(!Number.isFinite(v)||v<0){alert("Enter a valid MRP.");return;}state.mrp=v;go(4);};
@@ -223,6 +310,25 @@ async function testSupabase(){
     else{$("syncBadge").textContent="Schema needed";}
   }catch(e){$("syncBadge").textContent="Offline";}
 }
+
+$("menuBtn").onclick=()=>{$("drawer").classList.add("open");$("drawerBackdrop").classList.remove("hidden")};
+$("drawerClose").onclick=closeMenu;
+$("drawerBackdrop").onclick=closeMenu;
+function closeMenu(){$("drawer").classList.remove("open");$("drawerBackdrop").classList.add("hidden")}
+
+$("skipBarcode").onclick=()=>{state.barcode="";go(1)};
+
+/* Enter advances the current single-field step. */
+document.addEventListener("keydown",e=>{
+  if(e.key!=="Enter")return;
+  const tag=(e.target.tagName||"").toLowerCase();
+  if(tag==="button"||tag==="textarea")return;
+  if(state.step===0){
+    if(e.target.id==="barcodeInput"){e.preventDefault();const v=e.target.value.trim();if(v){state.barcode=v;go(1)}}
+  }else if(state.step===2){e.preventDefault();$("nameNext").click()}
+  else if(state.step===3){e.preventDefault();$("mrpNext").click()}
+  else if(state.step===4){e.preventDefault();$("qtyNext").click()}
+},true);
 loadLocal();progress();testSupabase();
 </script>
 </body>
