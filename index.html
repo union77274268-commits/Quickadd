@@ -147,6 +147,28 @@ async function loadScanner(){
     s.onload=()=>resolve(true); s.onerror=()=>resolve(false); document.head.appendChild(s);
   });
 }
+async function barcodeAlreadyExists(barcode){
+  const code=String(barcode||'').trim();
+  if(!code)return false;
+  if(SUPABASE_URL&&SUPABASE_ANON_KEY){
+    const r=await fetch(`${SUPABASE_URL}/rest/v1/${TABLE}?barcode=eq.${encodeURIComponent(code)}&select=id,name,barcode&limit=1`,{headers:{"apikey":SUPABASE_ANON_KEY,"Authorization":"Bearer "+SUPABASE_ANON_KEY}});
+    if(!r.ok)throw new Error(await r.text());
+    const rows=await r.json();
+    if(rows.length)return {exists:true,name:rows[0].name||''};
+  }
+  const local=state.items.find(x=>String(x.barcode||'').trim()===code);
+  return local?{exists:true,name:local.name||''}:{exists:false};
+}
+async function handleBarcode(code){
+  const value=String(code||'').trim(); if(!value)return false;
+  try{
+    setStatus('scanStatus','Checking barcode…');
+    const result=await barcodeAlreadyExists(value);
+    if(result.exists){state.barcode='';setStatus('scanStatus',`Product already exists${result.name?': '+result.name:''}. This barcode cannot be added again.`,'err');return false;}
+    state.barcode=value; await stopScanner(); go(1); focusField('nameInput'); return true;
+  }catch(e){console.error(e);setStatus('scanStatus',"Couldn't verify this barcode. Product was not added.",'err');return false;}
+}
+
 async function startScanner(){
   setStatus("scanStatus","Loading scanner…");
   const ok=await loadScanner(); if(!ok){setStatus("scanStatus","Scanner library could not load. Use manual barcode entry.","err");return;}
@@ -154,7 +176,7 @@ async function startScanner(){
   state.scanner=new Html5Qrcode("cameraBox");
   try{
     await state.scanner.start({facingMode:"environment"},{fps:10,qrbox:{width:230,height:110}},
-      async code=>{state.barcode=String(code).trim(); $("scanStatus").textContent="Barcode captured: "+state.barcode; await stopScanner(); go(1); focusField("nameInput");},
+      async code=>{await handleBarcode(code);},
       ()=>{});
     $("startScan").textContent="Scanner active";$("startScan").disabled=true;
     setStatus("scanStatus","Point at the barcode…");
@@ -165,7 +187,7 @@ async function stopScanner(){
 }
 $("startScan").onclick=startScanner;
 $("manualBarcode").onclick=()=>{$("barcodeInput").classList.remove("hidden");$("barcodeInput").focus();};
-$("barcodeInput").addEventListener("change",()=>{const v=$("barcodeInput").value.trim();if(v){state.barcode=v;go(1);}});
+$("barcodeInput").addEventListener("change",async()=>{const v=$("barcodeInput").value.trim();if(v)await handleBarcode(v);});
 function validText(id,label){const v=$(id).value.trim();if(!v){alert("Enter "+label+".");$(id).focus();return null;}return v;}
 $("nameNext").onclick=()=>{const v=validText("nameInput","product name");if(v){state.name=v;go(2);focusField("mrpInput");}};
 $("mrpNext").onclick=()=>{const v=Number($("mrpInput").value);if(!Number.isFinite(v)||v<0){alert("Enter a valid MRP.");return;}state.mrp=v;go(3);focusField("qtyInput");};
@@ -199,6 +221,10 @@ $("saveProduct").onclick=async()=>{
   };
 
   try{
+    if(item.barcode){
+      const duplicate=await barcodeAlreadyExists(item.barcode);
+      if(duplicate.exists){setStatus("saveStatus",`Product already exists${duplicate.name?": "+duplicate.name:""}. It was not added again.`,"err");btn.disabled=false;return;}
+    }
     const result=await supabaseInsert(item);
 
     if(result.configured){
@@ -206,22 +232,10 @@ $("saveProduct").onclick=async()=>{
       $("syncBadge").style.background="#ecfdf5";
       $("syncBadge").style.color="#15803d";
 
-      if(result.updated && item.barcode){
-        const existingLocal=state.items.find(x=>x.barcode===item.barcode);
-        if(existingLocal){
-          existingLocal.name=item.name;
-          existingLocal.mrp=item.mrp;
-          existingLocal.qty=Number(existingLocal.qty||0)+Number(item.qty||0);
-          if(item.image_data)existingLocal.image_data=item.image_data;
-        }else{
-          state.items.push({...item});
-        }
-        setStatus("saveStatus","Existing product updated and quantity added.","ok");
-      }else{
-        state.items.push({...item});
-        setStatus("saveStatus","Product saved and synced to Supabase.","ok");
-      }
-    }else{
+      state.items.push({...item});
+      setStatus("saveStatus","Product saved and synced to Supabase.","ok");
+    }
+    else{
       state.items.push({...item});
       setStatus("saveStatus","Saved locally. Supabase is not configured.","ok");
     }
@@ -267,33 +281,11 @@ async function supabaseInsert(item){
     return {configured:true,data:text?JSON.parse(text):[]};
   }
 
-  /* Existing barcode: update the existing inventory record instead of
-     throwing a duplicate-key error. Quantity is increased by the newly
-     entered quantity. */
-  const lookup=await fetch(
-    `${SUPABASE_URL}/rest/v1/${TABLE}?barcode=eq.${encodeURIComponent(item.barcode)}&select=id,barcode,name,mrp,qty,image_data`,
-    {headers}
-  );
+  /* Never overwrite an existing barcode. */
+  const lookup=await fetch(`${SUPABASE_URL}/rest/v1/${TABLE}?barcode=eq.${encodeURIComponent(item.barcode)}&select=id,name,barcode&limit=1`,{headers});
   if(!lookup.ok)throw new Error(parseSupabaseError(await lookup.text()));
   const existing=await lookup.json();
-
-  if(existing.length){
-    const row=existing[0];
-    const updated={
-      name:item.name,
-      mrp:item.mrp,
-      qty:Number(row.qty||0)+Number(item.qty||0)
-    };
-    if(item.image_data)updated.image_data=item.image_data;
-
-    const r=await fetch(
-      `${SUPABASE_URL}/rest/v1/${TABLE}?id=eq.${encodeURIComponent(row.id)}`,
-      {method:"PATCH",headers:{...headers,"Prefer":"return=representation"},body:JSON.stringify(updated)}
-    );
-    const text=await r.text();
-    if(!r.ok)throw new Error(parseSupabaseError(text));
-    return {configured:true,updated:true,data:text?JSON.parse(text):[]};
-  }
+  if(existing.length)throw new Error(`Product already exists${existing[0].name?": "+existing[0].name:""}.`);
 
   const r=await fetch(`${SUPABASE_URL}/rest/v1/${TABLE}`,{
     method:"POST",headers:{...headers,"Prefer":"return=representation"},body:JSON.stringify(item)
@@ -306,7 +298,7 @@ async function supabaseInsert(item){
 function parseSupabaseError(text){
   try{
     const j=JSON.parse(text);
-    if(j.code==="23505")return "This barcode already exists in inventory.";
+    if(j.code==="23505")return "Product already exists. This barcode cannot be added again.";
     return j.message||j.details||j.hint||text;
   }catch(e){return text||"Unknown Supabase error";}
 }
@@ -401,20 +393,13 @@ function closeMenu(){$("drawer").classList.remove("open");$("drawerBackdrop").cl
 $("skipBarcode").onclick=async()=>{state.barcode="";await stopScanner();go(1);focusField("nameInput")};
 
 /* Enter advances the current single-field step. */
-document.addEventListener("keydown",function(e){
+document.addEventListener("keydown",async function(e){
   if(e.key!=="Enter")return;
-  const id=e.target && e.target.id;
-  if(id==="barcodeInput"){
-    e.preventDefault();
-    const v=e.target.value.trim();
-    if(v){state.barcode=v;stopScanner();go(1);}
-  }else if(id==="nameInput"){
-    e.preventDefault();$("nameNext").click();
-  }else if(id==="mrpInput"){
-    e.preventDefault();$("mrpNext").click();
-  }else if(id==="qtyInput"){
-    e.preventDefault();$("qtyNext").click();
-  }
+  const id=e.target&&e.target.id;
+  if(id==="barcodeInput"){e.preventDefault();const v=e.target.value.trim();if(v)await handleBarcode(v);}
+  else if(id==="nameInput"){e.preventDefault();$("nameNext").click();}
+  else if(id==="mrpInput"){e.preventDefault();$("mrpNext").click();}
+  else if(id==="qtyInput"){e.preventDefault();$("qtyNext").click();}
 },true);
 
 $("nameNext").addEventListener("click",function(){setTimeout(function(){focusField("mrpInput")},120)});
