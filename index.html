@@ -474,8 +474,8 @@ create policy "anon upload images" on storage.objects
 (function(){
   // Fill these in before deploying to auto-connect every device that opens this page.
   // The Supabase "anon public" key is safe to expose client-side — never put the service_role key here.
-  const DEFAULT_SUPABASE_URL = '';
-  const DEFAULT_SUPABASE_KEY = '';
+  const DEFAULT_SUPABASE_URL = 'https://gnfopvqzjcphvxivijbn.supabase.co';
+  const DEFAULT_SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImduZm9wdnF6amNwaHZ4aXZpamJuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODc1NDI1MjQsImV4cCI6MjEwMzExODUyNH0.bFGCCX32zlNnkRlC3O_nAenmNORDzyT5Aw1uMd1VFrM';
 
   const STORAGE_KEY = 'inventory-ledger-items';
   const $ = id => document.getElementById(id);
