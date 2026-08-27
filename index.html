@@ -424,7 +424,7 @@
   </div>
   <div class="overlay-list" style="padding:16px 18px;">
     <div class="step-sub" style="margin-bottom:14px;">
-      Connect your project so every saved product — and its photo link — is pushed to your own Supabase table, not just this browser.
+      Connect your project so every saved product — and its photo link — is pushed to your own Supabase table, not just this browser. Local saves stay on this device/browser only, so this is also your cross-device backup.
     </div>
     <label style="display:block;font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:#9aa79f;margin-bottom:5px;font-weight:600;">Project URL</label>
     <input type="text" class="big-field mono" id="sbUrl" placeholder="https://xxxx.supabase.co" style="font-size:14px;padding:12px 14px;margin-bottom:12px;">
@@ -472,6 +472,11 @@ create policy "anon upload images" on storage.objects
 
 <script>
 (function(){
+  // Fill these in before deploying to auto-connect every device that opens this page.
+  // The Supabase "anon public" key is safe to expose client-side — never put the service_role key here.
+  const DEFAULT_SUPABASE_URL = '';
+  const DEFAULT_SUPABASE_KEY = '';
+
   const STORAGE_KEY = 'inventory-ledger-items';
   const $ = id => document.getElementById(id);
   let items = [];
@@ -493,12 +498,33 @@ create policy "anon upload images" on storage.objects
   // ---- Supabase state ----
   let sbConfig = null; // {url, key}
   async function loadSbConfig(){
-    try{
-      const res = await window.storage.get('supabase-config', false);
-      sbConfig = res && res.value ? JSON.parse(res.value) : null;
-    }catch(e){ sbConfig = null; }
+    let stored = null;
+    try{ const raw = storeGet('supabase-config'); stored = raw ? JSON.parse(raw) : null; }catch(e){}
+    if (stored && stored.disabled){
+      sbConfig = null;
+    } else if (stored && stored.url && stored.key){
+      sbConfig = stored;
+    } else if (DEFAULT_SUPABASE_URL && DEFAULT_SUPABASE_KEY){
+      sbConfig = { url: DEFAULT_SUPABASE_URL, key: DEFAULT_SUPABASE_KEY };
+    } else {
+      sbConfig = null;
+    }
     updateSyncDot();
     if (sbConfig){ $('sbUrl').value = sbConfig.url; $('sbKey').value = sbConfig.key; }
+  }
+  async function pullFromSupabase(){
+    if (!sbConfig) return;
+    try{
+      const res = await fetch(sbConfig.url + '/rest/v1/products?select=*&order=updated_at.desc', { headers: sbHeaders() });
+      if (!res.ok) return;
+      const remote = await res.json();
+      const remoteItems = remote.map(r => ({ id:r.id, barcode:r.barcode||'', name:r.name||'', mrp:r.mrp||0, qty:r.qty||0, image:r.image_url||null }));
+      const remoteIds = new Set(remoteItems.map(r=>r.id));
+      const localOnly = items.filter(it => !remoteIds.has(it.id)); // not-yet-synced local items, kept
+      items = [...localOnly, ...remoteItems];
+      await persist();
+      renderLedgerStats();
+    }catch(e){ /* offline — keep whatever's cached locally */ }
   }
   function updateSyncDot(){
     $('syncDot').classList.toggle('on', !!sbConfig);
@@ -556,17 +582,23 @@ create policy "anon upload images" on storage.objects
   function fmtMoney(n){ return '₹' + Number(n||0).toLocaleString('en-IN', {maximumFractionDigits:2}); }
   function escapeHtml(s){ return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
 
-  // ---------- Persistence ----------
+  // ---------- Persistence (browser local storage — this file runs standalone) ----------
+  function storeGet(key){
+    try{ return localStorage.getItem(key); }catch(e){ return null; }
+  }
+  function storeSet(key, value){
+    try{ localStorage.setItem(key, value); return true; }catch(e){ return false; }
+  }
   async function loadItems(){
     try{
-      const res = await window.storage.get(STORAGE_KEY, false);
-      items = res && res.value ? JSON.parse(res.value) : [];
+      const raw = storeGet(STORAGE_KEY);
+      items = raw ? JSON.parse(raw) : [];
     }catch(e){ items = []; }
     renderLedgerStats();
   }
   async function persist(){
-    try{ await window.storage.set(STORAGE_KEY, JSON.stringify(items), false); }
-    catch(e){ showToast('Could not save — storage error'); }
+    const ok = storeSet(STORAGE_KEY, JSON.stringify(items));
+    if (!ok) showToast('Could not save — browser storage unavailable');
   }
 
   // ---------- Step navigation ----------
@@ -811,10 +843,12 @@ create policy "anon upload images" on storage.objects
   }
 
   // ---------- Ledger overlay ----------
-  $('openLedger').addEventListener('click', ()=>{
+  $('openLedger').addEventListener('click', async ()=>{
     stopBarcodeScan(); stopPhotoCamera();
     renderLedgerList();
     $('ledgerOverlay').classList.add('show');
+    await pullFromSupabase();
+    renderLedgerList();
   });
   $('closeLedger').addEventListener('click', ()=>{
     $('ledgerOverlay').classList.remove('show');
@@ -922,7 +956,7 @@ create policy "anon upload images" on storage.objects
         throw new Error('HTTP ' + res.status + (body ? ' — ' + body : ''));
       }
       sbConfig = { url, key };
-      await window.storage.set('supabase-config', JSON.stringify(sbConfig), false);
+      storeSet('supabase-config', JSON.stringify(sbConfig));
       updateSyncDot();
       showToast('Connected to Supabase');
     }catch(e){
@@ -931,7 +965,7 @@ create policy "anon upload images" on storage.objects
   });
   $('sbDisconnect').addEventListener('click', async ()=>{
     sbConfig = null;
-    try{ await window.storage.set('supabase-config', JSON.stringify(null), 'new'); }catch(e){}
+    storeSet('supabase-config', JSON.stringify({disabled:true}));
     $('sbUrl').value = ''; $('sbKey').value = '';
     updateSyncDot();
     showToast('Disconnected');
@@ -969,8 +1003,7 @@ create policy "anon upload images" on storage.objects
 
   // ---------- Init ----------
   initScanner();
-  loadItems();
-  loadSbConfig();
+  loadItems().then(loadSbConfig).then(pullFromSupabase);
   goToStep(0);
 })();
 </script>
