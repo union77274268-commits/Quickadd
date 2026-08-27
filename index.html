@@ -193,12 +193,6 @@
   .prefix-wrap input{padding-left:34px;}
 
   .qty-row{display:flex;align-items:center;gap:10px;margin-top:6px;}
-  .step-btn{
-    width:54px;height:58px;flex-shrink:0;
-    border-radius:10px;border:2px solid var(--paper-line);
-    background:var(--paper);font-size:24px;font-weight:600;color:var(--ink);
-    cursor:pointer;
-  }
   .qty-row input{text-align:center;}
 
   /* Nav buttons pinned to bottom of step */
@@ -380,10 +374,8 @@
     <div class="step" data-step="4">
       <div class="step-title">Quantity in stock</div>
       <div class="step-sub">How many do you have right now?</div>
-      <div class="qty-row">
-        <button class="step-btn" id="qtyMinus">−</button>
-        <input type="number" class="big-field" id="qtyInput" inputmode="numeric" value="1">
-        <button class="step-btn" id="qtyPlus">+</button>
+      <div class="big-field-wrap">
+        <input type="number" class="big-field" id="qtyInput" inputmode="numeric" placeholder="0">
       </div>
       <div class="nav-row">
         <button class="btn btn-ghost" id="backQty">Back</button>
@@ -474,8 +466,8 @@ create policy "anon upload images" on storage.objects
 (function(){
   // Fill these in before deploying to auto-connect every device that opens this page.
   // The Supabase "anon public" key is safe to expose client-side — never put the service_role key here.
-  const DEFAULT_SUPABASE_URL = 'https://gnfopvqzjcphvxivijbn.supabase.co';
-  const DEFAULT_SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImduZm9wdnF6amNwaHZ4aXZpamJuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODc1NDI1MjQsImV4cCI6MjEwMzExODUyNH0.bFGCCX32zlNnkRlC3O_nAenmNORDzyT5Aw1uMd1VFrM';
+  const DEFAULT_SUPABASE_URL = '';
+  const DEFAULT_SUPABASE_KEY = '';
 
   const STORAGE_KEY = 'inventory-ledger-items';
   const $ = id => document.getElementById(id);
@@ -490,6 +482,7 @@ create policy "anon upload images" on storage.objects
   // ---- barcode scanner state ----
   let html5QrCode = null;
   let scannerRunning = false;
+  let lastHandledBarcode = null;
 
   // ---- photo camera state ----
   let camStream = null;
@@ -646,6 +639,7 @@ create policy "anon upload images" on storage.objects
   function startBarcodeScan(){
     if (!html5QrCode) return;
     if (scannerRunning) return;
+    lastHandledBarcode = null;
     $('scanStatus').textContent = 'Scanning…';
     $('scanStatus').classList.remove('err');
     html5QrCode.start(
@@ -666,18 +660,24 @@ create policy "anon upload images" on storage.objects
     }
   }
   function onScanSuccess(decodedText){
-    currentBarcode = decodedText;
-    $('scanStatus').textContent = 'Captured: ' + decodedText;
-    if (navigator.vibrate) navigator.vibrate(70);
+    if (decodedText === lastHandledBarcode) return; // debounce repeat frames of the same code
     const existing = items.find(it => it.barcode === decodedText);
-    stopBarcodeScan();
-    if (existing && editingId === null){
-      showToast('Already in ledger — opening it to edit');
-      loadIntoForm(existing);
-      openLedgerFalseAndGoto(2);
-    } else {
-      setTimeout(()=>goToStep(1), 350);
+    if (existing){
+      lastHandledBarcode = decodedText;
+      $('scanStatus').textContent = 'Already in ledger — move to a different product';
+      $('scanStatus').classList.add('err');
+      showToast('Already scanned — this one\'s already saved');
+      if (navigator.vibrate) navigator.vibrate([40,40,40]);
+      setTimeout(()=>{ if (lastHandledBarcode === decodedText) lastHandledBarcode = null; }, 2500);
+      return; // keep the camera scanning, don't advance or prefill anything
     }
+    currentBarcode = decodedText;
+    lastHandledBarcode = decodedText;
+    $('scanStatus').textContent = 'Captured: ' + decodedText;
+    $('scanStatus').classList.remove('err');
+    if (navigator.vibrate) navigator.vibrate(70);
+    stopBarcodeScan();
+    setTimeout(()=>goToStep(1), 350);
   }
   $('manualToggle').addEventListener('click', ()=>{
     $('manualWrap').classList.toggle('show');
@@ -688,7 +688,11 @@ create policy "anon upload images" on storage.objects
   });
   $('nextBarcode').addEventListener('click', ()=>{
     const manual = $('manualBarcode').value.trim();
-    if (manual) currentBarcode = manual;
+    if (manual){
+      const existing = items.find(it => it.barcode === manual);
+      if (existing){ showToast('That barcode is already in the ledger'); return; }
+      currentBarcode = manual;
+    }
     goToStep(1);
   });
 
@@ -780,13 +784,8 @@ create policy "anon upload images" on storage.objects
   $('backMrp').addEventListener('click', ()=> goToStep(2));
 
   // ---------- Qty step ----------
-  $('qtyMinus').addEventListener('click', ()=>{
-    $('qtyInput').value = Math.max(0, (parseInt($('qtyInput').value)||0) - 1);
-  });
-  $('qtyPlus').addEventListener('click', ()=>{
-    $('qtyInput').value = (parseInt($('qtyInput').value)||0) + 1;
-  });
   $('backQty').addEventListener('click', ()=> goToStep(3));
+  $('qtyInput').addEventListener('keydown', e=>{ if (e.key==='Enter'){ e.preventDefault(); $('saveBtn').click(); } });
 
   $('saveBtn').addEventListener('click', async ()=>{
     const name = $('nameInput').value.trim();
@@ -824,7 +823,7 @@ create policy "anon upload images" on storage.objects
     $('manualWrap').classList.remove('show');
     $('nameInput').value = '';
     $('mrpInput').value = '';
-    $('qtyInput').value = 1;
+    $('qtyInput').value = '';
     $('imgLinkInput').value = '';
     $('imgLinkWrap').classList.remove('show');
   }
@@ -835,11 +834,7 @@ create policy "anon upload images" on storage.objects
     currentImage = item.image || null;
     $('nameInput').value = item.name || '';
     $('mrpInput').value = item.mrp || '';
-    $('qtyInput').value = item.qty || 0;
-  }
-  function openLedgerFalseAndGoto(step){
-    $('ledgerOverlay').classList.remove('show');
-    goToStep(step);
+    $('qtyInput').value = item.qty || '';
   }
 
   // ---------- Ledger overlay ----------
