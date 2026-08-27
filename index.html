@@ -908,7 +908,7 @@ create policy "anon upload images" on storage.objects
     if (currentStep === 1) startPhotoCamera();
   });
   $('sbSave').addEventListener('click', async ()=>{
-    const url = $('sbUrl').value.trim().replace(/\/$/,'');
+    const url = $('sbUrl').value.trim().replace(/\/+$/,'');
     const key = $('sbKey').value.trim();
     if (!url || !key){ showToast('Enter both URL and key'); return; }
     $('sbStatus').textContent = 'Checking connection…';
@@ -916,13 +916,17 @@ create policy "anon upload images" on storage.objects
       const res = await fetch(url + '/rest/v1/products?select=id&limit=1', {
         headers: { apikey: key, 'Authorization': 'Bearer ' + key }
       });
-      if (!res.ok) throw new Error('bad response');
+      if (!res.ok){
+        let body = '';
+        try{ body = (await res.text()).slice(0,150); }catch(e){}
+        throw new Error('HTTP ' + res.status + (body ? ' — ' + body : ''));
+      }
       sbConfig = { url, key };
       await window.storage.set('supabase-config', JSON.stringify(sbConfig), false);
       updateSyncDot();
       showToast('Connected to Supabase');
     }catch(e){
-      $('sbStatus').textContent = 'Could not reach that table — check the URL/key and that you ran the SQL setup below.';
+      $('sbStatus').textContent = 'Connection failed: ' + (e.message || 'network/CORS error') + '. Check the URL has no trailing slash/path, and that you copied the "anon public" key.';
     }
   });
   $('sbDisconnect').addEventListener('click', async ()=>{
