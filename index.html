@@ -1,452 +1,973 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#111827">
-<title>Meraki Quick Add</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Inventory Ledger</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Zilla+Slab:wght@500;600;700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.8/html5-qrcode.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <style>
-:root{--bg:#f6f7fb;--card:#fff;--text:#111827;--muted:#6b7280;--line:#e5e7eb;--accent:#2563eb;--ok:#15803d;--danger:#dc2626}
-*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
-.app{max-width:520px;margin:auto;min-height:100vh;padding:54px 8px 6px}.top{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px}
-.brand{font-weight:800;font-size:21px}.sub{font-size:12px;color:var(--muted);margin-top:2px}
-.badge{font-size:11px;padding:7px 10px;border-radius:999px;background:#eef2ff;color:#3730a3;font-weight:700}
-.progress{display:flex;gap:5px;margin:10px 0 24px}.dot{height:4px;flex:1;background:var(--line);border-radius:99px}.dot.on{background:var(--accent)}
-.card{background:var(--card);border:1px solid var(--line);border-radius:22px;padding:10px;box-shadow:0 4px 14px #1118270b}
-.step{display:none}.step.active{display:block}.eyebrow{font-size:12px;text-transform:uppercase;letter-spacing:.08em;color:var(--accent);font-weight:800}
-h1{font-size:20px;line-height:1.12;margin:8px 0 8px}p{color:var(--muted);line-height:1.3;margin:0 0 7px;font-size:12px}
-.btn{width:100%;min-height:44px;border:0;border-radius:15px;background:var(--accent);color:white;font-size:16px;font-weight:800;cursor:pointer}.btn.secondary{background:#eef2ff;color:#1d4ed8}.btn.ghost{background:#f3f4f6;color:#374151}.btn:disabled{opacity:.45;cursor:not-allowed}
-input{width:100%;height:44px;border:2px solid var(--line);border-radius:15px;padding:0 16px;font-size:20px;outline:none}input:focus{border-color:var(--accent)}
-.actions{display:grid;gap:10px;margin-top:14px}.portrait-camera{width:min(100%,360px);margin:0 auto;aspect-ratio:3/4;border-radius:22px;background:#111827;overflow:hidden;position:relative;box-shadow:0 12px 28px #11182720}.portrait-camera video{width:100%;height:100%;object-fit:cover}.portrait-guide{position:absolute;left:10%;right:10%;top:12%;bottom:12%;border:2px dashed #fff;border-radius:18px;box-shadow:0 0 0 999px #0003}.camera-label{position:absolute;bottom:14px;left:50%;transform:translateX(-50%);padding:6px 10px;border-radius:999px;background:#0009;color:#fff;font-size:10px;font-weight:800;letter-spacing:.08em}.camera.camera{width:100%;aspect-ratio:1.35;border-radius:18px;background:#111827;overflow:hidden;position:relative}.camera video{width:100%;height:100%;object-fit:cover}.scanline{position:absolute;left:12%;right:12%;top:50%;height:2px;background:#fff;box-shadow:0 0 14px #fff}.scanbox{position:absolute;inset:22% 13%;border:2px solid #fff;border-radius:14px}
-.preview{width:100%;max-height:420px;object-fit:contain;border-radius:18px;background:#f3f4f6}.photo-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
-.status{font-size:13px;margin-top:10px;color:var(--muted);min-height:20px}.ok{color:var(--ok)}.err{color:var(--danger)}
-.summary{display:grid;gap:9px;margin:15px 0}.row{display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--line)}.row span:first-child{color:var(--muted)}
-.small{font-size:12px;color:var(--muted);margin-top:12px}.link{color:var(--accent);font-weight:700;cursor:pointer}.hidden{display:none!important}
-.toolbar{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:14px}.toolbar button{min-height:45px;border-radius:13px;border:1px solid var(--line);background:#fff;font-weight:700}
-.count{font-size:13px;color:var(--muted);margin-top:15px;text-align:center}
-.hamburger{position:fixed;top:14px;right:14px;left:auto;z-index:50;width:46px;height:46px;border:1px solid var(--line);border-radius:14px;background:#fff;color:#111827;font-size:23px;box-shadow:0 8px 20px #11182712}.drawer-backdrop{position:fixed;inset:0;background:#0005;z-index:60}.drawer{position:fixed;top:0;left:0;bottom:0;width:min(310px,86vw);background:#fff;z-index:70;padding:20px 16px;box-shadow:18px 0 40px #11182725;transform:translateX(-105%);transition:transform .2s ease}.drawer.open{transform:translateX(0)}.drawer-head{display:flex;align-items:center;justify-content:space-between;font-size:20px;margin-bottom:20px}.drawer-close{border:0;background:#f3f4f6;border-radius:12px;width:42px;height:42px;font-size:25px}.drawer-item{width:100%;text-align:left;padding:15px;border:1px solid var(--line);background:#fff;border-radius:14px;margin-bottom:10px;font-size:15px;font-weight:750}.drawer-note{font-size:12px;color:var(--muted);line-height:1.45;margin-top:18px}.bg-job{font-size:12px;color:#1d4ed8;background:#eff6ff;border-radius:12px;padding:10px;margin-top:10px}.hidden{display:none!important}@media(max-width:600px){.app{padding-top:70px}}
-.shutter-wrap{display:flex;justify-content:center;align-items:center;margin:14px 0 4px}
-.shutter{width:60px;height:60px;border-radius:50%;border:5px solid #fff;background:#fff;box-shadow:0 4px 18px #11182730;display:grid;place-items:center;padding:4px;cursor:pointer}
-.shutter span{display:block;width:42px;height:42px;border-radius:50%;background:#111827;border:3px solid #fff}
-.shutter:active{transform:scale(.94)}
-.shutter:focus-visible{outline:3px solid var(--accent);outline-offset:3px}
-.compact-camera{width:min(100%,260px);aspect-ratio:3/4;margin:4px auto 6px}.compact-btn{min-height:40px;font-size:14px}.drawer-section-title{font-size:11px;font-weight:800;letter-spacing:.08em;color:#6b7280;margin:18px 4px 8px}.recent-list{display:grid;gap:7px;max-height:52vh;overflow:auto}.recent-item{display:flex;gap:9px;align-items:center;padding:8px;border:1px solid #e5e7eb;border-radius:11px}.recent-item img{width:38px;height:38px;border-radius:8px;object-fit:cover;background:#f3f4f6}.recent-meta{min-width:0}.recent-name{font-size:13px;font-weight:750;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.recent-sub{font-size:11px;color:#6b7280}.recent-empty{font-size:12px;color:#6b7280;padding:8px 4px}</style>
-<link rel="manifest" href="/manifest.webmanifest">
-<meta name="theme-color" content="#111827">
-<meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="Meraki Quick Add">
+  :root{
+    --ink:#141d19;
+    --ink-soft:#33413a;
+    --paper:#efe7d3;
+    --paper-line:#d9cba3;
+    --brass:#c4972a;
+    --brass-dark:#9c7620;
+    --brick:#a8402f;
+    --sage:#5f7d5e;
+    --cream-text:#f3ede1;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--ink);
+    min-height:100vh;
+    font-family:'Inter',sans-serif;
+    color:var(--cream-text);
+    display:flex;
+    justify-content:center;
+  }
+  .app{
+    width:100%;
+    max-width:480px;
+    min-height:100vh;
+    background:var(--ink);
+    display:flex;
+    flex-direction:column;
+  }
+
+  /* ---------- Header ---------- */
+  header{
+    padding:16px 18px 14px;
+    border-bottom:1px solid var(--ink-soft);
+    position:relative;
+    overflow:hidden;
+  }
+  header::before{
+    content:"";
+    position:absolute; inset:0;
+    background:repeating-linear-gradient(90deg,
+      var(--cream-text) 0 2px, transparent 2px 4px,
+      var(--cream-text) 4px 5px, transparent 5px 9px,
+      var(--cream-text) 9px 12px, transparent 12px 14px);
+    opacity:0.05;
+  }
+  .top-row{display:flex;align-items:center;justify-content:space-between;position:relative;}
+  .brand{
+    font-family:'Zilla Slab',serif;
+    font-weight:700;
+    font-size:19px;
+  }
+  .ledger-btn{
+    background:rgba(239,231,211,0.1);
+    border:1px solid var(--ink-soft);
+    color:var(--cream-text);
+    border-radius:20px;
+    padding:7px 14px;
+    font-size:12px;
+    font-weight:600;
+    cursor:pointer;
+    font-family:'IBM Plex Mono',monospace;
+  }
+  #syncDot{display:inline-block;width:7px;height:7px;border-radius:50%;background:#77685a;margin-left:2px;}
+  #syncDot.on{background:var(--sage);}
+  .dots{display:flex;gap:6px;margin-top:12px;position:relative;}
+  .dot{
+    flex:1;
+    height:4px;
+    border-radius:3px;
+    background:var(--ink-soft);
+  }
+  .dot.done{background:var(--sage);}
+  .dot.active{background:var(--brass);}
+  .step-label{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:10.5px;
+    letter-spacing:.1em;
+    text-transform:uppercase;
+    color:#9aa79f;
+    margin-top:8px;
+    position:relative;
+  }
+
+  /* ---------- Steps ---------- */
+  main{
+    flex:1;
+    display:flex;
+    flex-direction:column;
+    padding:18px 16px 24px;
+  }
+  .step{display:none; flex:1; flex-direction:column;}
+  .step.active{display:flex;}
+
+  .step-title{
+    font-family:'Zilla Slab',serif;
+    font-weight:700;
+    font-size:22px;
+    margin:2px 0 4px;
+  }
+  .step-sub{font-size:13px;color:#9aa79f;margin-bottom:16px;}
+
+  /* Barcode step */
+  #reader{
+    width:100%;
+    border-radius:12px;
+    overflow:hidden;
+    border:2px solid var(--ink-soft);
+    background:#000;
+    min-height:220px;
+  }
+  .scan-status{
+    text-align:center;
+    font-family:'IBM Plex Mono',monospace;
+    font-size:12.5px;
+    color:var(--brass);
+    margin-top:10px;
+    min-height:16px;
+  }
+  .scan-status.err{color:var(--brick);}
+  .manual-toggle{
+    text-align:center;
+    margin-top:14px;
+    font-size:12.5px;
+    color:#9aa79f;
+    text-decoration:underline;
+    cursor:pointer;
+  }
+  .manual-wrap{display:none;margin-top:12px;}
+  .manual-wrap.show{display:block;}
+
+  /* Photo step */
+  .cam-wrap{
+    position:relative;
+    width:100%;
+    aspect-ratio:3/4;
+    border-radius:14px;
+    overflow:hidden;
+    background:#000;
+    border:2px solid var(--ink-soft);
+  }
+  .cam-wrap video, .cam-wrap img.captured{
+    width:100%;height:100%;object-fit:cover;display:block;
+  }
+  .shutter-row{
+    display:flex;
+    justify-content:center;
+    margin-top:16px;
+  }
+  .shutter{
+    width:68px;height:68px;border-radius:50%;
+    background:var(--cream-text);
+    border:4px solid var(--brass);
+    cursor:pointer;
+  }
+  .retake-row{display:none;gap:10px;margin-top:14px;}
+  .retake-row.show{display:flex;}
+  .retake-row button{flex:1;padding:12px;border-radius:8px;font-weight:700;font-size:14px;border:none;cursor:pointer;}
+  .btn-retake{background:var(--ink-soft);color:var(--cream-text);}
+  .btn-use{background:var(--brass);color:#241a05;}
+
+  /* Text/number field steps */
+  .big-field-wrap{margin-top:6px;}
+  input.big-field{
+    width:100%;
+    border:2px solid var(--paper-line);
+    background:var(--paper);
+    color:var(--ink);
+    border-radius:10px;
+    padding:18px 16px;
+    font-size:22px;
+    font-family:'Inter',sans-serif;
+    font-weight:600;
+    outline:none;
+  }
+  input.big-field:focus{border-color:var(--brass);}
+  .prefix-wrap{position:relative;}
+  .prefix-wrap .rupee{
+    position:absolute;left:16px;top:50%;transform:translateY(-50%);
+    font-size:22px;font-weight:600;color:var(--ink-soft);
+  }
+  .prefix-wrap input{padding-left:34px;}
+
+  .qty-row{display:flex;align-items:center;gap:10px;margin-top:6px;}
+  .step-btn{
+    width:54px;height:58px;flex-shrink:0;
+    border-radius:10px;border:2px solid var(--paper-line);
+    background:var(--paper);font-size:24px;font-weight:600;color:var(--ink);
+    cursor:pointer;
+  }
+  .qty-row input{text-align:center;}
+
+  /* Nav buttons pinned to bottom of step */
+  .nav-row{
+    display:flex;
+    gap:10px;
+    margin-top:auto;
+    padding-top:18px;
+  }
+  .btn{
+    flex:1;
+    border:none;
+    border-radius:10px;
+    padding:15px;
+    font-size:15px;
+    font-weight:700;
+    cursor:pointer;
+  }
+  .btn-primary{background:var(--brass);color:#241a05;}
+  .btn-primary:active{background:var(--brass-dark);}
+  .btn-ghost{background:rgba(239,231,211,0.08);color:var(--cream-text);border:1px solid var(--ink-soft);flex:0 0 92px;}
+  .btn-skip{background:transparent;color:#9aa79f;border:1.5px dashed var(--ink-soft);}
+
+  /* ---------- Ledger overlay ---------- */
+  .overlay{
+    position:fixed;inset:0;
+    background:var(--ink);
+    display:none;
+    flex-direction:column;
+    z-index:40;
+  }
+  .overlay.show{display:flex;}
+  .overlay-header{
+    padding:16px 18px;
+    border-bottom:1px solid var(--ink-soft);
+    display:flex;align-items:center;justify-content:space-between;
+  }
+  .overlay-header h2{font-family:'Zilla Slab',serif;font-size:19px;margin:0;}
+  .close-btn{background:none;border:none;color:var(--cream-text);font-size:20px;cursor:pointer;}
+  .overlay-stats{display:flex;gap:10px;padding:14px 18px 0;}
+  .stat{
+    flex:1;background:rgba(239,231,211,0.07);border:1px solid var(--ink-soft);
+    border-radius:6px;padding:9px 10px;
+  }
+  .stat .n{font-family:'IBM Plex Mono',monospace;font-size:17px;font-weight:600;display:block;}
+  .stat .l{font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:#9aa79f;}
+  .overlay-list{flex:1;overflow-y:auto;padding:14px 18px;}
+  .ledger-empty{text-align:center;padding:40px 10px;color:#8b988f;font-size:13px;}
+  .item-row{
+    display:flex;align-items:center;gap:11px;
+    background:var(--paper);color:var(--ink);
+    border-radius:10px;padding:10px;margin-bottom:9px;
+  }
+  .thumb{width:46px;height:46px;border-radius:6px;flex-shrink:0;object-fit:cover;background:var(--ink);}
+  .thumb-placeholder{
+    width:46px;height:46px;border-radius:6px;flex-shrink:0;
+    background:repeating-linear-gradient(90deg, var(--ink) 0 2px, #6b7a70 2px 3px, var(--ink) 3px 5px);
+  }
+  .item-info{flex:1;min-width:0;}
+  .item-name{font-weight:600;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .item-code{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--ink-soft);}
+  .item-nums{text-align:right;flex-shrink:0;}
+  .item-mrp{font-size:13px;font-weight:600;}
+  .item-qty{font-size:11px;color:var(--sage);font-weight:600;}
+  .item-actions{display:flex;flex-direction:column;gap:4px;}
+  .item-actions button{background:none;border:none;cursor:pointer;font-size:14px;padding:2px 4px;color:var(--ink-soft);}
+  .item-actions button.del{color:var(--brick);}
+  .export-row{display:flex;gap:8px;padding:0 18px 18px;}
+  .export-row button{
+    flex:1;background:transparent;border:1.5px solid var(--ink-soft);color:var(--cream-text);
+    border-radius:7px;padding:11px;font-size:12px;font-weight:600;cursor:pointer;
+  }
+
+  .toast{
+    position:fixed;bottom:18px;left:50%;
+    transform:translateX(-50%) translateY(20px);
+    background:var(--paper);color:var(--ink);
+    padding:10px 18px;border-radius:20px;font-size:13px;font-weight:700;
+    box-shadow:0 6px 16px rgba(0,0,0,.4);
+    opacity:0;transition:opacity .25s, transform .25s;
+    pointer-events:none;z-index:50;
+  }
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+</style>
 </head>
 <body>
-<main class="app" id="app">
-  <header class="top">
-    <div><div class="brand">Meraki Quick Add</div><div class="sub">One detail at a time</div></div>
-    <div class="badge" id="syncBadge">Not connected</div>
+<div class="app">
+
+  <header>
+    <div class="top-row">
+      <div class="brand">Inventory Ledger</div>
+      <div style="display:flex;gap:8px;">
+        <button class="ledger-btn" id="openSettings" title="Supabase settings">⚙ <span id="syncDot"></span></button>
+        <button class="ledger-btn" id="openLedger">Ledger · <span id="ledgerCount">0</span></button>
+      </div>
+    </div>
+    <div class="dots">
+      <div class="dot" data-dot="0"></div>
+      <div class="dot" data-dot="1"></div>
+      <div class="dot" data-dot="2"></div>
+      <div class="dot" data-dot="3"></div>
+      <div class="dot" data-dot="4"></div>
+    </div>
+    <div class="step-label" id="stepLabel">Step 1 of 5 · Barcode</div>
   </header>
-  <div class="progress" id="progress"></div>
 
-  <section class="card">
+  <main>
+
+    <!-- Step 0: Barcode -->
     <div class="step active" data-step="0">
-      <div class="eyebrow">Step 1 of 5</div><h1>Scan barcode</h1><p>Point the camera at the product barcode. You can also enter it manually.</p>
-      <div class="camera" id="cameraBox"><video id="video" playsinline muted></video><div class="scanbox"></div><div class="scanline"></div></div>
-      <div class="actions"><button class="btn" id="startScan" type="button">Scanner active</button><button class="btn secondary" id="manualBarcode" type="button">Enter barcode manually</button><button class="btn ghost" id="skipBarcode" type="button">Skip barcode</button></div>
-      <input class="hidden" id="barcodeInput" inputmode="numeric" placeholder="Barcode number">
-      <div class="status" id="scanStatus"></div>
+      <div class="step-title">Scan the barcode</div>
+      <div class="step-sub">Hold it steady in front of the camera — it captures automatically.</div>
+      <div id="reader"></div>
+      <div class="scan-status" id="scanStatus">Starting camera…</div>
+      <div class="manual-toggle" id="manualToggle">Type the barcode instead</div>
+      <div class="manual-wrap" id="manualWrap">
+        <input type="text" class="big-field mono" id="manualBarcode" placeholder="Enter barcode" style="font-size:17px;">
+      </div>
+      <div class="nav-row">
+        <button class="btn btn-skip" id="skipBarcode">No barcode — Skip</button>
+        <button class="btn btn-primary" id="nextBarcode" style="flex:0 0 92px;">Next</button>
+      </div>
     </div>
 
+    <!-- Step 1: Photo -->
     <div class="step" data-step="1">
-      <div class="eyebrow">Step 2 of 5</div><h1>Product name</h1><p>Enter the name exactly as you want it to appear in inventory.</p>
-      <input id="nameInput" autocomplete="off" placeholder="e.g. Classmate Notebook A5">
-      <div class="actions"><button class="btn" id="nameNext" type="button">Continue</button></div>
+      <div class="step-title">Add a photo</div>
+      <div class="step-sub">Capture it now for unbranded items, or skip and add a photo link later.</div>
+      <div class="cam-wrap" id="camWrap">
+        <video id="camVideo" autoplay playsinline muted></video>
+      </div>
+      <canvas id="camCanvas" style="display:none;"></canvas>
+      <div class="shutter-row" id="shutterRow">
+        <div class="shutter" id="shutterBtn"></div>
+      </div>
+      <div class="retake-row" id="retakeRow">
+        <button class="btn-retake" id="retakeBtn">Retake</button>
+        <button class="btn-use" id="usePhotoBtn">Use photo</button>
+      </div>
+      <div class="manual-toggle" id="imgLinkToggle">Or paste an image link instead</div>
+      <div class="manual-wrap" id="imgLinkWrap">
+        <input type="text" class="big-field mono" id="imgLinkInput" placeholder="https://…product-photo.jpg" style="font-size:14px;padding:12px 14px;">
+        <button class="btn btn-primary" id="useLinkBtn" style="margin-top:10px;">Use this link</button>
+      </div>
+      <div class="nav-row">
+        <button class="btn btn-ghost" id="backPhoto">Back</button>
+        <button class="btn btn-skip" id="skipPhoto">Skip photo</button>
+      </div>
     </div>
 
+    <!-- Step 2: Name -->
     <div class="step" data-step="2">
-      <div class="eyebrow">Step 3 of 5</div><h1>MRP</h1><p>Enter the printed maximum retail price.</p>
-      <input id="mrpInput" inputmode="decimal" type="number" min="0" step="0.01" placeholder="₹ 0.00">
-      <div class="actions"><button class="btn" id="mrpNext" type="button">Continue</button></div>
+      <div class="step-title">Product name</div>
+      <div class="step-sub">What's it called on the shelf?</div>
+      <div class="big-field-wrap">
+        <input type="text" class="big-field" id="nameInput" placeholder="e.g. Parle-G 100g">
+      </div>
+      <div class="nav-row">
+        <button class="btn btn-ghost" id="backName">Back</button>
+        <button class="btn btn-primary" id="nextName">Next</button>
+      </div>
     </div>
 
+    <!-- Step 3: MRP -->
     <div class="step" data-step="3">
-      <div class="eyebrow">Step 4 of 5</div><h1>Quantity</h1><p>Enter how many units you are adding to inventory.</p>
-      <input id="qtyInput" inputmode="numeric" type="number" min="1" step="1" placeholder="0">
-      <div class="actions"><button class="btn" id="qtyNext" type="button">Continue</button></div>
+      <div class="step-title">MRP</div>
+      <div class="step-sub">The printed maximum retail price.</div>
+      <div class="big-field-wrap prefix-wrap">
+        <span class="rupee">₹</span>
+        <input type="number" class="big-field" id="mrpInput" inputmode="decimal" placeholder="0.00">
+      </div>
+      <div class="nav-row">
+        <button class="btn btn-ghost" id="backMrp">Back</button>
+        <button class="btn btn-primary" id="nextMrp">Next</button>
+      </div>
     </div>
 
+    <!-- Step 4: Qty -->
     <div class="step" data-step="4">
-      <div class="eyebrow">Step 5 of 5</div><h1>Save product</h1><p>Review the product once. Saving sends it to Supabase when configured.</p>
-      <div class="summary" id="summary"></div>
-      <div class="actions"><button class="btn" id="saveProduct">Save product</button><button class="btn secondary" id="editProduct">Edit</button></div>
-      <div class="status" id="saveStatus"></div>
+      <div class="step-title">Quantity in stock</div>
+      <div class="step-sub">How many do you have right now?</div>
+      <div class="qty-row">
+        <button class="step-btn" id="qtyMinus">−</button>
+        <input type="number" class="big-field" id="qtyInput" inputmode="numeric" value="1">
+        <button class="step-btn" id="qtyPlus">+</button>
+      </div>
+      <div class="nav-row">
+        <button class="btn btn-ghost" id="backQty">Back</button>
+        <button class="btn btn-primary" id="saveBtn">Save &amp; next product</button>
+      </div>
     </div>
-  </section>
 
-  <button class="hamburger" id="menuBtn" type="button" aria-label="Open menu">☰</button>
-  <div class="drawer-backdrop hidden" id="drawerBackdrop"></div>
-  <aside class="drawer" id="drawer" aria-label="Quick Add menu">
-    <div class="drawer-head"><strong>Menu</strong><button class="drawer-close" id="drawerClose" type="button">×</button></div>
-    <button class="drawer-item" id="installAppBtn" type="button">📲 Install app</button>
-    <button class="drawer-item" id="exportBtn" type="button">📊 Export Excel</button>
-    <button class="drawer-item" id="settingsBtn" type="button">⚙️ Supabase settings</button>
-    <div class="drawer-section-title">RECENTS</div>
-    <div id="recentList" class="recent-list"></div>
-    <div class="drawer-note">Recently saved products.</div>
-  </aside>
-  <div class="count" id="count"></div>
-  <div class="small">Quick Add saves products directly to Supabase.</div>
-</main>
+  </main>
+</div>
 
-<script>
-/* =========================
-   MERAKI QUICK ADD
-   1) Put your Supabase URL + anon key below.
-   2) Your table should contain:
-      barcode, name, mrp, qty, image_data, created_at
-   3) Image data is kept as a data URL for simplicity.
-   ========================= */
-const SUPABASE_URL = "https://gnfopvqzjcphvxivijbn.supabase.co";
-const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImduZm9wdnF6amNwaHZ4aXZpamJuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODc1NDI1MjQsImV4cCI6MjEwMzExODUyNH0.bFGCCX32zlNnkRlC3O_nAenmNORDzyT5Aw1uMd1VFrM";
-const TABLE = "products";
+<!-- Ledger overlay -->
+<div class="overlay" id="ledgerOverlay">
+  <div class="overlay-header">
+    <h2>Ledger</h2>
+    <button class="close-btn" id="closeLedger">✕</button>
+  </div>
+  <div class="overlay-stats">
+    <div class="stat"><span class="n" id="statCount">0</span><span class="l">Items</span></div>
+    <div class="stat"><span class="n" id="statQty">0</span><span class="l">Units</span></div>
+    <div class="stat"><span class="n" id="statValue">₹0</span><span class="l">Stock value</span></div>
+  </div>
+  <div class="overlay-list" id="ledgerList"></div>
+  <div class="export-row">
+    <button id="exportCsv">CSV</button>
+    <button id="exportExcel">Excel</button>
+    <button id="exportJson">JSON (w/ photos)</button>
+  </div>
+  <div class="export-row" style="padding-top:0;">
+    <button id="syncAllBtn">↻ Sync all to Supabase</button>
+  </div>
+</div>
 
-const state={step:0,barcode:"",name:"",mrp:"",qty:"",image:"",items:[],stream:null,scanner:null};
-const $=id=>document.getElementById(id);
-const steps=[...document.querySelectorAll(".step")];
+<!-- Settings overlay -->
+<div class="overlay" id="settingsOverlay">
+  <div class="overlay-header">
+    <h2>Supabase sync</h2>
+    <button class="close-btn" id="closeSettings">✕</button>
+  </div>
+  <div class="overlay-list" style="padding:16px 18px;">
+    <div class="step-sub" style="margin-bottom:14px;">
+      Connect your project so every saved product — and its photo link — is pushed to your own Supabase table, not just this browser.
+    </div>
+    <label style="display:block;font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:#9aa79f;margin-bottom:5px;font-weight:600;">Project URL</label>
+    <input type="text" class="big-field mono" id="sbUrl" placeholder="https://xxxx.supabase.co" style="font-size:14px;padding:12px 14px;margin-bottom:12px;">
+    <label style="display:block;font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:#9aa79f;margin-bottom:5px;font-weight:600;">Anon public key</label>
+    <input type="text" class="big-field mono" id="sbKey" placeholder="eyJhbGciOi…" style="font-size:13px;padding:12px 14px;margin-bottom:14px;">
+    <div style="display:flex;gap:10px;margin-bottom:8px;">
+      <button class="btn btn-primary" id="sbSave" style="flex:1;">Save &amp; connect</button>
+      <button class="btn btn-ghost" id="sbDisconnect" style="flex:0 0 110px;">Disconnect</button>
+    </div>
+    <div class="scan-status" id="sbStatus" style="text-align:left;margin-top:4px;"></div>
 
-function focusField(id){
-  const el=document.getElementById(id);
-  if(!el)return;
-  el.removeAttribute("disabled");
-  el.removeAttribute("readonly");
-  setTimeout(function(){
-    try{el.focus({preventScroll:true})}catch(e){el.focus()}
-    try{el.select()}catch(e){}
-  },80);
-}
-function progress(){ $("progress").innerHTML=steps.map((_,i)=>`<div class="dot ${i<=state.step?"on":""}"></div>`).join(""); }
-function go(n){
-  state.step=Math.max(0,Math.min(4,n));
-  steps.forEach((s,i)=>s.classList.toggle("active",i===state.step));
-  progress();
-  if(state.step===1)focusField("nameInput");
-  else if(state.step===2)focusField("mrpInput");
-  else if(state.step===3)focusField("qtyInput");
-  else if(state.step===4)renderSummary();
-}
-function setStatus(id,text,cls=""){ const el=$(id); el.textContent=text; el.className="status "+cls; }
-function updateCount(){ $("count").textContent=`${state.items.length} product${state.items.length===1?"":"s"} added in this session`; }
-function renderRecents(){
- const el=$("recentList");if(!el)return;
- const rows=state.items.slice(-10).reverse();
- el.innerHTML=rows.length?rows.map(x=>`<div class="recent-item">${x.image_data?`<img src="${x.image_data}" alt="">`:`<div style="width:38px;height:38px;border-radius:8px;background:#f3f4f6"></div>`}<div class="recent-meta"><div class="recent-name">${escapeHtml(x.name||"Unnamed")}</div><div class="recent-sub">${x.barcode||"No barcode"} • ₹${Number(x.mrp||0).toFixed(2)} • Qty ${x.qty||0}</div></div></div>`).join(""):'<div class="recent-empty">No recent products.</div>';
-}
+    <div style="margin-top:22px;border-top:1px solid var(--ink-soft);padding-top:16px;">
+      <div class="step-sub" style="margin-bottom:8px;">Run this once in your Supabase SQL editor to set up the table and photo bucket:</div>
+      <pre id="sqlSnippet" style="background:#0e1613;border:1px solid var(--ink-soft);border-radius:8px;padding:12px;font-size:11px;line-height:1.5;color:#cfe0d4;overflow-x:auto;white-space:pre;font-family:'IBM Plex Mono',monospace;">create table if not exists products (
+  id text primary key,
+  barcode text,
+  name text not null,
+  mrp numeric default 0,
+  qty integer default 0,
+  image_url text,
+  updated_at timestamptz default now()
+);
+alter table products enable row level security;
+create policy "anon select" on products for select using (true);
+create policy "anon insert" on products for insert with check (true);
+create policy "anon update" on products for update using (true);
+create policy "anon delete" on products for delete using (true);
 
-async function loadLocal(){
-  try{ const raw=localStorage.getItem("meraki_quick_add_items"); if(raw) state.items=JSON.parse(raw)||[]; }catch(e){}
-  updateCount();
-}
-function saveLocal(){ try{localStorage.setItem("meraki_quick_add_items",JSON.stringify(state.items));}catch(e){} }
+insert into storage.buckets (id, name, public)
+values ('product-images','product-images', true)
+on conflict (id) do nothing;
+create policy "public read images" on storage.objects
+  for select using (bucket_id = 'product-images');
+create policy "anon upload images" on storage.objects
+  for insert with check (bucket_id = 'product-images');</pre>
+      <button class="btn btn-ghost" id="copySql" style="margin-top:10px;width:100%;">Copy SQL</button>
+      <div class="step-sub" style="margin-top:10px;font-size:11.5px;">
+        Note: this opens the table and photo bucket to anyone holding your anon key, which is fine for a single-shop tool but worth knowing.
+      </div>
+    </div>
+  </div>
+</div>
 
-async function loadScanner(){
-  if(window.Html5Qrcode) return true;
-  return new Promise(resolve=>{
-    const s=document.createElement("script");
-    s.src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js";
-    s.onload=()=>resolve(true); s.onerror=()=>resolve(false); document.head.appendChild(s);
-  });
-}
-async function barcodeAlreadyExists(barcode){
-  const code=String(barcode||'').trim();
-  if(!code)return false;
-  if(SUPABASE_URL&&SUPABASE_ANON_KEY){
-    const r=await fetch(`${SUPABASE_URL}/rest/v1/${TABLE}?barcode=eq.${encodeURIComponent(code)}&select=id,name,barcode&limit=1`,{headers:{"apikey":SUPABASE_ANON_KEY,"Authorization":"Bearer "+SUPABASE_ANON_KEY}});
-    if(!r.ok)throw new Error(await r.text());
-    const rows=await r.json();
-    if(rows.length)return {exists:true,name:rows[0].name||''};
-  }
-  const local=state.items.find(x=>String(x.barcode||'').trim()===code);
-  return local?{exists:true,name:local.name||''}:{exists:false};
-}
-async function handleBarcode(code){
-  const value=String(code||'').trim(); if(!value)return false;
-  try{
-    setStatus('scanStatus','Checking barcode…');
-    const result=await barcodeAlreadyExists(value);
-    if(result.exists){state.barcode='';setStatus('scanStatus',`Product already exists${result.name?': '+result.name:''}. This barcode cannot be added again.`,'err');return false;}
-    state.barcode=value; await stopScanner(); go(1); focusField('nameInput'); return true;
-  }catch(e){console.error(e);setStatus('scanStatus',"Couldn't verify this barcode. Product was not added.",'err');return false;}
-}
-
-async function startScanner(){
-  setStatus("scanStatus","Loading scanner…");
-  const ok=await loadScanner(); if(!ok){setStatus("scanStatus","Scanner library could not load. Use manual barcode entry.","err");return;}
-  if(state.scanner) return;
-  state.scanner=new Html5Qrcode("cameraBox");
-  try{
-    await state.scanner.start({facingMode:"environment"},{fps:10,qrbox:{width:230,height:110}},
-      async code=>{await handleBarcode(code);},
-      ()=>{});
-    $("startScan").textContent="Scanner active";$("startScan").disabled=true;
-    setStatus("scanStatus","Point at the barcode…");
-  }catch(e){state.scanner=null;setStatus("scanStatus","Camera access failed. Use manual entry.","err");}
-}
-async function stopScanner(){
-  if(state.scanner){try{await state.scanner.stop();}catch(e){} try{state.scanner.clear();}catch(e){} state.scanner=null;}
-}
-$("startScan").onclick=startScanner;
-$("manualBarcode").onclick=()=>{$("barcodeInput").classList.remove("hidden");$("barcodeInput").focus();};
-$("barcodeInput").addEventListener("change",async()=>{const v=$("barcodeInput").value.trim();if(v)await handleBarcode(v);});
-function validText(id,label){const v=$(id).value.trim();if(!v){alert("Enter "+label+".");$(id).focus();return null;}return v;}
-$("nameNext").onclick=()=>{const v=validText("nameInput","product name");if(v){state.name=v;go(2);focusField("mrpInput");}};
-$("mrpNext").onclick=()=>{const v=Number($("mrpInput").value);if(!Number.isFinite(v)||v<0){alert("Enter a valid MRP.");return;}state.mrp=v;go(3);focusField("qtyInput");};
-$("qtyNext").onclick=()=>{const v=Number($("qtyInput").value);if(!Number.isInteger(v)||v<1){alert("Enter a whole quantity of at least 1.");return;}state.qty=v;go(4);};
-
-function resetForNext(){
-  state.step=0;state.barcode="";state.name="";state.mrp="";state.qty="";state.image="";
-  $("barcodeInput").value="";
-  $("nameInput").value="";
-  $("mrpInput").value="";
-  $("qtyInput").value="";
-  $("barcodeInput").classList.add("hidden");
-  $("saveStatus").textContent="";
-  go(0);
-  setTimeout(()=>startScanner(),200);
-}
-
-$("saveProduct").onclick=async()=>{
-  const btn=$("saveProduct");
-  if(btn.disabled)return;
-  btn.disabled=true;
-  setStatus("saveStatus","Saving…");
-
-  const item={
-    barcode:(state.barcode||"").trim()||null,
-    name:state.name.trim(),
-    mrp:Number(state.mrp),
-    qty:Number(state.qty),
-    image_data:state.image||null,
-    created_at:new Date().toISOString()
-  };
-
-  try{
-    if(item.barcode){
-      const duplicate=await barcodeAlreadyExists(item.barcode);
-      if(duplicate.exists){setStatus("saveStatus",`Product already exists${duplicate.name?": "+duplicate.name:""}. It was not added again.`,"err");btn.disabled=false;return;}
-    }
-    const result=await supabaseInsert(item);
-
-    if(result.configured){
-      $("syncBadge").textContent="Supabase connected";
-      $("syncBadge").style.background="#ecfdf5";
-      $("syncBadge").style.color="#15803d";
-
-      state.items.push({...item});
-      setStatus("saveStatus","Product saved and synced to Supabase.","ok");
-    }
-    else{
-      state.items.push({...item});
-      setStatus("saveStatus","Saved locally. Supabase is not configured.","ok");
-    }
-
-    saveLocal();updateCount();renderRecents();
-
-    setTimeout(()=>resetForNext(),500);
-  }catch(e){
-    console.error("Supabase save failed:",e);
-    const msg=String(e.message||e);
-    setStatus("saveStatus",msg.toLowerCase().includes("row-level security")
-      ?"Save blocked by Supabase RLS. Run the supplied RLS SQL once."
-      :"Save failed: "+msg,"err");
-  }finally{
-    btn.disabled=false;
-  }
-};
-
-$("editProduct").onclick=()=>{
-  go(1);
-  focusField("nameInput");
-};
-
-function renderSummary(){$("summary").innerHTML=[["Barcode",state.barcode],["Name",state.name],["MRP","₹"+Number(state.mrp).toFixed(2)],["Quantity",state.qty],["Photo",state.image?"Added":"None"]].map(r=>`<div class="row"><span>${r[0]}</span><strong>${escapeHtml(String(r[1]))}</strong></div>`).join("");}
-function escapeHtml(s){return s.replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[c]));}
-
-async function supabaseInsert(item){
-  if(!SUPABASE_URL||!SUPABASE_ANON_KEY) return {configured:false};
-
-  const headers={
-    "apikey":SUPABASE_ANON_KEY,
-    "Authorization":"Bearer "+SUPABASE_ANON_KEY,
-    "Content-Type":"application/json"
-  };
-
-  /* No barcode: normal insert. NULL is intentionally used instead of "". */
-  if(!item.barcode){
-    const r=await fetch(`${SUPABASE_URL}/rest/v1/${TABLE}`,{
-      method:"POST",headers:{...headers,"Prefer":"return=representation"},body:JSON.stringify(item)
-    });
-    const text=await r.text();
-    if(!r.ok)throw new Error(parseSupabaseError(text));
-    return {configured:true,data:text?JSON.parse(text):[]};
-  }
-
-  /* Never overwrite an existing barcode. */
-  const lookup=await fetch(`${SUPABASE_URL}/rest/v1/${TABLE}?barcode=eq.${encodeURIComponent(item.barcode)}&select=id,name,barcode&limit=1`,{headers});
-  if(!lookup.ok)throw new Error(parseSupabaseError(await lookup.text()));
-  const existing=await lookup.json();
-  if(existing.length)throw new Error(`Product already exists${existing[0].name?": "+existing[0].name:""}.`);
-
-  const r=await fetch(`${SUPABASE_URL}/rest/v1/${TABLE}`,{
-    method:"POST",headers:{...headers,"Prefer":"return=representation"},body:JSON.stringify(item)
-  });
-  const text=await r.text();
-  if(!r.ok)throw new Error(parseSupabaseError(text));
-  return {configured:true,data:text?JSON.parse(text):[]};
-}
-
-function parseSupabaseError(text){
-  try{
-    const j=JSON.parse(text);
-    if(j.code==="23505")return "Product already exists. This barcode cannot be added again.";
-    return j.message||j.details||j.hint||text;
-  }catch(e){return text||"Unknown Supabase error";}
-}
-
-async function fetchSupabaseItems(){
-  if(!SUPABASE_URL||!SUPABASE_ANON_KEY)return [];
-  const r=await fetch(`${SUPABASE_URL}/rest/v1/${TABLE}?select=barcode,name,mrp,qty,created_at&order=created_at.desc`,{headers:{"apikey":SUPABASE_ANON_KEY,"Authorization":"Bearer "+SUPABASE_ANON_KEY}});
-  if(!r.ok)throw new Error(await r.text()); return await r.json();
-}
-function downloadBlob(blob,name){const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000);}
-async function exportExcel(){
-  let rows=state.items;
-  try{const remote=await fetchSupabaseItems();if(remote.length)rows=remote;}catch(e){console.warn(e);}
-  if(!rows.length){alert("No products to export yet.");return;}
-  if(!window.XLSX){const s=document.createElement("script");s.src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js";document.head.appendChild(s);await new Promise((res,rej)=>{s.onload=res;s.onerror=rej});}
-  const clean=rows.map(x=>({Barcode:x.barcode||"",Name:x.name||"",MRP:x.mrp??"",Quantity:x.qty??"",Created:x.created_at||""}));
-  const ws=XLSX.utils.json_to_sheet(clean),wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,"Products");XLSX.writeFile(wb,"Meraki_Products.xlsx");
-}
-$("exportBtn").onclick=exportExcel;
-$("settingsBtn").onclick=async()=>{
-  const ok=await testSupabase();
-  alert(ok
-    ?"Supabase is connected and the products table is reachable."
-    :"Supabase is not reachable right now. The app will keep retrying automatically.");
-};
-
-async function testSupabase(){
-  const badge=$("syncBadge");
-  if(!SUPABASE_URL||!SUPABASE_ANON_KEY){
-    badge.textContent="Supabase not configured";
-    badge.style.background="#fef2f2";badge.style.color="#b91c1c";
-    return false;
-  }
-  badge.textContent="Checking Supabase…";
-  badge.style.background="#fff7ed";badge.style.color="#c2410c";
-  try{
-    const controller=new AbortController();
-    const timer=setTimeout(()=>controller.abort(),7000);
-    const r=await fetch(`${SUPABASE_URL}/rest/v1/${TABLE}?select=id&limit=1`,{
-      method:"GET",
-      headers:{
-        "apikey":SUPABASE_ANON_KEY,
-        "Authorization":"Bearer "+SUPABASE_ANON_KEY
-      },
-      signal:controller.signal
-    });
-    clearTimeout(timer);
-
-    if(r.ok){
-      badge.textContent="Supabase connected";
-      badge.style.background="#ecfdf5";badge.style.color="#15803d";
-      return true;
-    }
-
-    if(r.status===401||r.status===403){
-      badge.textContent="Supabase RLS";
-      badge.style.background="#fef2f2";badge.style.color="#b91c1c";
-    }else if(r.status===404){
-      badge.textContent="Supabase schema";
-      badge.style.background="#fff7ed";badge.style.color="#c2410c";
-    }else{
-      badge.textContent="Supabase error";
-      badge.style.background="#fef2f2";badge.style.color="#b91c1c";
-    }
-    return false;
-  }catch(e){
-    badge.textContent=navigator.onLine?"Retrying Supabase…":"Offline";
-    badge.style.background="#fff7ed";badge.style.color="#c2410c";
-    return false;
-  }
-}
-
-let supabaseRetryTimer=null;
-async function keepSupabaseConnected(){
-  const ok=await testSupabase();
-  if(!ok){
-    clearTimeout(supabaseRetryTimer);
-    supabaseRetryTimer=setTimeout(keepSupabaseConnected,5000);
-  }else{
-    clearTimeout(supabaseRetryTimer);
-    supabaseRetryTimer=setTimeout(keepSupabaseConnected,60000);
-  }
-}
-window.addEventListener("online",()=>keepSupabaseConnected());
-window.addEventListener("offline",()=>testSupabase());
-
-$("menuBtn").onclick=()=>{$("drawer").classList.add("open");$("drawerBackdrop").classList.remove("hidden")};
-$("drawerClose").onclick=closeMenu;
-$("drawerBackdrop").onclick=closeMenu;
-function closeMenu(){$("drawer").classList.remove("open");$("drawerBackdrop").classList.add("hidden")}
-
-$("skipBarcode").onclick=async()=>{state.barcode="";await stopScanner();go(1);focusField("nameInput")};
-
-/* Enter advances the current single-field step. */
-document.addEventListener("keydown",async function(e){
-  if(e.key!=="Enter")return;
-  const id=e.target&&e.target.id;
-  if(id==="barcodeInput"){e.preventDefault();const v=e.target.value.trim();if(v)await handleBarcode(v);}
-  else if(id==="nameInput"){e.preventDefault();$("nameNext").click();}
-  else if(id==="mrpInput"){e.preventDefault();$("mrpNext").click();}
-  else if(id==="qtyInput"){e.preventDefault();$("qtyNext").click();}
-},true);
-
-$("nameNext").addEventListener("click",function(){setTimeout(function(){focusField("mrpInput")},120)});
-$("mrpNext").addEventListener("click",function(){setTimeout(function(){focusField("qtyInput")},120)});
-</script>
+<div class="toast" id="toast"></div>
 
 <script>
 (function(){
-  if ("serviceWorker" in navigator) {
-    window.addEventListener("load", function(){
-      navigator.serviceWorker.register("/sw.js", {scope:"/"})
-        .catch(function(err){ console.warn("Service worker registration failed:", err); });
-    });
+  const STORAGE_KEY = 'inventory-ledger-items';
+  const $ = id => document.getElementById(id);
+  let items = [];
+  let editingId = null;
+  let currentImage = null;
+  let currentBarcode = '';
+  let currentStep = 0;
+  const TOTAL_STEPS = 5;
+  const stepLabels = ['Barcode','Photo','Name','MRP','Quantity'];
+
+  // ---- barcode scanner state ----
+  let html5QrCode = null;
+  let scannerRunning = false;
+
+  // ---- photo camera state ----
+  let camStream = null;
+  let photoCaptured = false;
+
+  // ---- Supabase state ----
+  let sbConfig = null; // {url, key}
+  async function loadSbConfig(){
+    try{
+      const res = await window.storage.get('supabase-config', false);
+      sbConfig = res && res.value ? JSON.parse(res.value) : null;
+    }catch(e){ sbConfig = null; }
+    updateSyncDot();
+    if (sbConfig){ $('sbUrl').value = sbConfig.url; $('sbKey').value = sbConfig.key; }
+  }
+  function updateSyncDot(){
+    $('syncDot').classList.toggle('on', !!sbConfig);
+    $('sbStatus').textContent = sbConfig ? 'Connected to ' + sbConfig.url : 'Not connected — saving to this device only.';
+  }
+  function sbHeaders(extra){
+    return Object.assign({ apikey: sbConfig.key, 'Authorization': 'Bearer ' + sbConfig.key, 'Content-Type': 'application/json' }, extra||{});
+  }
+  async function uploadImageToSupabase(dataUrl, id){
+    if (!sbConfig || !dataUrl || !dataUrl.startsWith('data:')) return dataUrl;
+    try{
+      const blob = await (await fetch(dataUrl)).blob();
+      const filename = id + '.jpg';
+      const res = await fetch(sbConfig.url + '/storage/v1/object/product-images/' + filename, {
+        method: 'POST',
+        headers: { apikey: sbConfig.key, 'Authorization': 'Bearer ' + sbConfig.key, 'Content-Type': 'image/jpeg', 'x-upsert': 'true' },
+        body: blob
+      });
+      if (!res.ok) throw new Error('upload failed');
+      return sbConfig.url + '/storage/v1/object/public/product-images/' + filename;
+    }catch(e){
+      showToast('Photo upload failed — kept locally only');
+      return dataUrl;
+    }
+  }
+  async function upsertToSupabase(item){
+    if (!sbConfig) return;
+    try{
+      const imageUrl = item.image && item.image.startsWith('http') ? item.image : null;
+      await fetch(sbConfig.url + '/rest/v1/products?on_conflict=id', {
+        method: 'POST',
+        headers: sbHeaders({ Prefer: 'resolution=merge-duplicates,return=minimal' }),
+        body: JSON.stringify([{ id: item.id, barcode: item.barcode||'', name: item.name, mrp: item.mrp||0, qty: item.qty||0, image_url: imageUrl }])
+      });
+    }catch(e){
+      showToast('Saved locally — Supabase sync failed');
+    }
+  }
+  async function deleteFromSupabase(id){
+    if (!sbConfig) return;
+    try{
+      await fetch(sbConfig.url + '/rest/v1/products?id=eq.' + encodeURIComponent(id), {
+        method: 'DELETE', headers: sbHeaders()
+      });
+    }catch(e){}
   }
 
-  let deferredPrompt = null;
-  window.addEventListener("beforeinstallprompt", function(e){
-    e.preventDefault();
-    deferredPrompt = e;
-    const btn=document.getElementById("installAppBtn");
-    if(btn) btn.classList.remove("hidden");
-  });
+  function showToast(msg){
+    const t = $('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    clearTimeout(showToast._t);
+    showToast._t = setTimeout(()=>t.classList.remove('show'), 1700);
+  }
+  function fmtMoney(n){ return '₹' + Number(n||0).toLocaleString('en-IN', {maximumFractionDigits:2}); }
+  function escapeHtml(s){ return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
 
-  window.addEventListener("appinstalled", function(){
-    deferredPrompt=null;
-    const btn=document.getElementById("installAppBtn");
-    if(btn){ btn.textContent="✓ App installed"; btn.disabled=true; }
-  });
+  // ---------- Persistence ----------
+  async function loadItems(){
+    try{
+      const res = await window.storage.get(STORAGE_KEY, false);
+      items = res && res.value ? JSON.parse(res.value) : [];
+    }catch(e){ items = []; }
+    renderLedgerStats();
+  }
+  async function persist(){
+    try{ await window.storage.set(STORAGE_KEY, JSON.stringify(items), false); }
+    catch(e){ showToast('Could not save — storage error'); }
+  }
 
-  document.addEventListener("click", async function(e){
-    const btn=e.target.closest && e.target.closest("#installAppBtn");
-    if(!btn) return;
-    if(deferredPrompt){
-      deferredPrompt.prompt();
-      try{ await deferredPrompt.userChoice; }catch(_){}
-      deferredPrompt=null;
+  // ---------- Step navigation ----------
+  function goToStep(n){
+    document.querySelectorAll('.step').forEach(el=>el.classList.remove('active'));
+    document.querySelector('.step[data-step="'+n+'"]').classList.add('active');
+    document.querySelectorAll('.dot').forEach(d=>{
+      const idx = parseInt(d.getAttribute('data-dot'));
+      d.classList.remove('active','done');
+      if (idx < n) d.classList.add('done');
+      if (idx === n) d.classList.add('active');
+    });
+    $('stepLabel').textContent = 'Step ' + (n+1) + ' of ' + TOTAL_STEPS + ' · ' + stepLabels[n];
+
+    // side effects: manage cameras
+    if (currentStep === 0 && n !== 0) stopBarcodeScan();
+    if (currentStep === 1 && n !== 1) stopPhotoCamera();
+
+    currentStep = n;
+
+    if (n === 0) startBarcodeScan();
+    if (n === 1) startPhotoCamera();
+    if (n === 2) setTimeout(()=>$('nameInput').focus(), 150);
+    if (n === 3) setTimeout(()=>$('mrpInput').focus(), 150);
+    if (n === 4) setTimeout(()=>$('qtyInput').focus(), 150);
+  }
+
+  // ---------- Barcode step ----------
+  function initScanner(){
+    if (typeof Html5Qrcode === 'undefined'){
+      $('scanStatus').textContent = 'Scanner failed to load — type the barcode instead.';
+      $('scanStatus').classList.add('err');
+      return;
+    }
+    html5QrCode = new Html5Qrcode('reader', {
+      formatsToSupport: [
+        Html5QrcodeSupportedFormats.EAN_13, Html5QrcodeSupportedFormats.EAN_8,
+        Html5QrcodeSupportedFormats.UPC_A, Html5QrcodeSupportedFormats.UPC_E,
+        Html5QrcodeSupportedFormats.CODE_128, Html5QrcodeSupportedFormats.CODE_39,
+        Html5QrcodeSupportedFormats.ITF, Html5QrcodeSupportedFormats.QR_CODE
+      ],
+      verbose:false
+    });
+  }
+  function startBarcodeScan(){
+    if (!html5QrCode) return;
+    if (scannerRunning) return;
+    $('scanStatus').textContent = 'Scanning…';
+    $('scanStatus').classList.remove('err');
+    html5QrCode.start(
+      { facingMode: 'environment' },
+      { fps: 10, qrbox: { width: 250, height: 150 } },
+      onScanSuccess,
+      ()=>{}
+    ).then(()=>{ scannerRunning = true; })
+     .catch(()=>{
+        $('scanStatus').textContent = 'Camera unavailable — type the barcode below.';
+        $('scanStatus').classList.add('err');
+        $('manualWrap').classList.add('show');
+     });
+  }
+  function stopBarcodeScan(){
+    if (html5QrCode && scannerRunning){
+      html5QrCode.stop().then(()=>{ scannerRunning = false; }).catch(()=>{ scannerRunning = false; });
+    }
+  }
+  function onScanSuccess(decodedText){
+    currentBarcode = decodedText;
+    $('scanStatus').textContent = 'Captured: ' + decodedText;
+    if (navigator.vibrate) navigator.vibrate(70);
+    const existing = items.find(it => it.barcode === decodedText);
+    stopBarcodeScan();
+    if (existing && editingId === null){
+      showToast('Already in ledger — opening it to edit');
+      loadIntoForm(existing);
+      openLedgerFalseAndGoto(2);
     } else {
-      alert("Open Chrome menu and choose Install app / Add to Home screen.");
+      setTimeout(()=>goToStep(1), 350);
+    }
+  }
+  $('manualToggle').addEventListener('click', ()=>{
+    $('manualWrap').classList.toggle('show');
+  });
+  $('skipBarcode').addEventListener('click', ()=>{
+    currentBarcode = '';
+    goToStep(1);
+  });
+  $('nextBarcode').addEventListener('click', ()=>{
+    const manual = $('manualBarcode').value.trim();
+    if (manual) currentBarcode = manual;
+    goToStep(1);
+  });
+
+  // ---------- Photo step ----------
+  const camVideo = $('camVideo');
+  const camCanvas = $('camCanvas');
+  function startPhotoCamera(){
+    photoCaptured = false;
+    $('camWrap').querySelectorAll('img.captured').forEach(el=>el.remove());
+    camVideo.style.display = 'block';
+    $('shutterRow').style.display = 'flex';
+    $('retakeRow').classList.remove('show');
+    navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment', width:{ideal:720}, height:{ideal:960} } })
+      .then(stream=>{
+        camStream = stream;
+        camVideo.srcObject = stream;
+      })
+      .catch(()=>{
+        showToast('Camera unavailable — you can skip this photo');
+      });
+  }
+  function stopPhotoCamera(){
+    if (camStream){
+      camStream.getTracks().forEach(t=>t.stop());
+      camStream = null;
+    }
+  }
+  $('shutterBtn').addEventListener('click', ()=>{
+    if (!camStream) return;
+    const vw = camVideo.videoWidth, vh = camVideo.videoHeight;
+    if (!vw) return;
+    // crop to portrait 3:4 from center
+    const targetRatio = 3/4;
+    let cw = vw, ch = vw/targetRatio;
+    if (ch > vh){ ch = vh; cw = vh*targetRatio; }
+    const sx = (vw-cw)/2, sy = (vh-ch)/2;
+    const maxOut = 480;
+    const outW = maxOut, outH = maxOut/targetRatio;
+    camCanvas.width = outW; camCanvas.height = outH;
+    camCanvas.getContext('2d').drawImage(camVideo, sx, sy, cw, ch, 0, 0, outW, outH);
+    currentImage = camCanvas.toDataURL('image/jpeg', 0.7);
+
+    const img = document.createElement('img');
+    img.className = 'captured';
+    img.src = currentImage;
+    $('camWrap').appendChild(img);
+    camVideo.style.display = 'none';
+    $('shutterRow').style.display = 'none';
+    $('retakeRow').classList.add('show');
+    photoCaptured = true;
+  });
+  $('retakeBtn').addEventListener('click', ()=>{
+    currentImage = null;
+    startPhotoCamera();
+  });
+  $('usePhotoBtn').addEventListener('click', async ()=>{
+    if (sbConfig && currentImage && currentImage.startsWith('data:')){
+      $('usePhotoBtn').textContent = 'Uploading…';
+      const tempId = editingId || ('tmp-' + Date.now());
+      currentImage = await uploadImageToSupabase(currentImage, tempId);
+      $('usePhotoBtn').textContent = 'Use photo';
+    }
+    goToStep(2);
+  });
+  $('skipPhoto').addEventListener('click', ()=>{
+    currentImage = null;
+    goToStep(2);
+  });
+  $('backPhoto').addEventListener('click', ()=> goToStep(0));
+  $('imgLinkToggle').addEventListener('click', ()=> $('imgLinkWrap').classList.toggle('show'));
+  $('useLinkBtn').addEventListener('click', ()=>{
+    const url = $('imgLinkInput').value.trim();
+    if (!url){ showToast('Paste a link first'); return; }
+    currentImage = url;
+    goToStep(2);
+  });
+
+  // ---------- Name step ----------
+  $('nameInput').addEventListener('keydown', e=>{ if (e.key==='Enter') $('nextName').click(); });
+  $('nextName').addEventListener('click', ()=>{
+    if (!$('nameInput').value.trim()){ showToast('Enter a product name'); return; }
+    goToStep(3);
+  });
+  $('backName').addEventListener('click', ()=> goToStep(1));
+
+  // ---------- MRP step ----------
+  $('mrpInput').addEventListener('keydown', e=>{ if (e.key==='Enter') $('nextMrp').click(); });
+  $('nextMrp').addEventListener('click', ()=> goToStep(4));
+  $('backMrp').addEventListener('click', ()=> goToStep(2));
+
+  // ---------- Qty step ----------
+  $('qtyMinus').addEventListener('click', ()=>{
+    $('qtyInput').value = Math.max(0, (parseInt($('qtyInput').value)||0) - 1);
+  });
+  $('qtyPlus').addEventListener('click', ()=>{
+    $('qtyInput').value = (parseInt($('qtyInput').value)||0) + 1;
+  });
+  $('backQty').addEventListener('click', ()=> goToStep(3));
+
+  $('saveBtn').addEventListener('click', async ()=>{
+    const name = $('nameInput').value.trim();
+    if (!name){ showToast('Enter a product name'); goToStep(2); return; }
+    const mrp = parseFloat($('mrpInput').value) || 0;
+    const qty = parseInt($('qtyInput').value) || 0;
+
+    let savedItem;
+    if (editingId){
+      const idx = items.findIndex(it=>it.id === editingId);
+      if (idx > -1){
+        items[idx] = {...items[idx], barcode: currentBarcode, name, mrp, qty, image: currentImage};
+        savedItem = items[idx];
+      }
+    } else {
+      savedItem = {
+        id: Date.now() + '-' + Math.random().toString(36).slice(2,7),
+        barcode: currentBarcode, name, mrp, qty, image: currentImage
+      };
+      items.unshift(savedItem);
+    }
+    await persist();
+    renderLedgerStats();
+    showToast(sbConfig ? 'Saved & syncing…' : 'Saved');
+    if (savedItem) upsertToSupabase(savedItem);
+    resetForm();
+    goToStep(0);
+  });
+
+  function resetForm(){
+    editingId = null;
+    currentImage = null;
+    currentBarcode = '';
+    $('manualBarcode').value = '';
+    $('manualWrap').classList.remove('show');
+    $('nameInput').value = '';
+    $('mrpInput').value = '';
+    $('qtyInput').value = 1;
+    $('imgLinkInput').value = '';
+    $('imgLinkWrap').classList.remove('show');
+  }
+
+  function loadIntoForm(item){
+    editingId = item.id;
+    currentBarcode = item.barcode || '';
+    currentImage = item.image || null;
+    $('nameInput').value = item.name || '';
+    $('mrpInput').value = item.mrp || '';
+    $('qtyInput').value = item.qty || 0;
+  }
+  function openLedgerFalseAndGoto(step){
+    $('ledgerOverlay').classList.remove('show');
+    goToStep(step);
+  }
+
+  // ---------- Ledger overlay ----------
+  $('openLedger').addEventListener('click', ()=>{
+    stopBarcodeScan(); stopPhotoCamera();
+    renderLedgerList();
+    $('ledgerOverlay').classList.add('show');
+  });
+  $('closeLedger').addEventListener('click', ()=>{
+    $('ledgerOverlay').classList.remove('show');
+    if (currentStep === 0) startBarcodeScan();
+    if (currentStep === 1) startPhotoCamera();
+  });
+
+  function renderLedgerStats(){
+    $('ledgerCount').textContent = items.length;
+    $('statCount').textContent = items.length;
+    $('statQty').textContent = items.reduce((s,i)=>s+(i.qty||0),0);
+    $('statValue').textContent = fmtMoney(items.reduce((s,i)=>s+(i.mrp||0)*(i.qty||0),0));
+  }
+  function renderLedgerList(){
+    renderLedgerStats();
+    const list = $('ledgerList');
+    if (!items.length){
+      list.innerHTML = '<div class="ledger-empty">No products yet — scan your first item to start the ledger.</div>';
+      return;
+    }
+    list.innerHTML = items.map(it => `
+      <div class="item-row" data-id="${it.id}">
+        ${it.image ? `<img class="thumb" src="${it.image}">` : `<div class="thumb-placeholder"></div>`}
+        <div class="item-info">
+          <div class="item-name">${escapeHtml(it.name)}</div>
+          <div class="item-code">${escapeHtml(it.barcode || 'no barcode')}</div>
+        </div>
+        <div class="item-nums">
+          <div class="item-mrp">${fmtMoney(it.mrp)}</div>
+          <div class="item-qty">${it.qty} in stock</div>
+        </div>
+        <div class="item-actions">
+          <button class="edit" title="Edit">✎</button>
+          <button class="del" title="Delete">✕</button>
+        </div>
+      </div>
+    `).join('');
+  }
+  $('ledgerList').addEventListener('click', async (e)=>{
+    const row = e.target.closest('.item-row');
+    if (!row) return;
+    const id = row.getAttribute('data-id');
+    const item = items.find(i=>i.id === id);
+    if (!item) return;
+    if (e.target.classList.contains('del')){
+      if (confirm('Delete "' + item.name + '" from the ledger?')){
+        items = items.filter(i=>i.id !== id);
+        await persist();
+        renderLedgerList();
+        showToast('Deleted');
+        deleteFromSupabase(id);
+      }
+    } else if (e.target.classList.contains('edit')){
+      loadIntoForm(item);
+      $('ledgerOverlay').classList.remove('show');
+      goToStep(2);
     }
   });
+
+  // ---------- Export ----------
+  function download(filename, content, mime){
+    const blob = new Blob([content], {type: mime});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = filename;
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  }
+  $('exportCsv').addEventListener('click', ()=>{
+    if (!items.length){ showToast('Ledger is empty'); return; }
+    const rows = [['Barcode','Product Name','MRP','Qty','Stock Value','Image URL']];
+    items.forEach(it => rows.push([it.barcode||'', it.name||'', it.mrp||0, it.qty||0, ((it.mrp||0)*(it.qty||0)).toFixed(2), it.image ? (it.image.startsWith('http') ? it.image : 'Saved locally only') : '']));
+    const csv = rows.map(r => r.map(v => `"${String(v).replace(/"/g,'""')}"`).join(',')).join('\n');
+    download('inventory-ledger.csv', csv, 'text/csv');
+    showToast('CSV downloaded');
+  });
+  $('exportJson').addEventListener('click', ()=>{
+    if (!items.length){ showToast('Ledger is empty'); return; }
+    download('inventory-ledger.json', JSON.stringify(items, null, 2), 'application/json');
+    showToast('JSON downloaded');
+  });
+
+  // ---------- Settings overlay ----------
+  $('openSettings').addEventListener('click', ()=>{
+    stopBarcodeScan(); stopPhotoCamera();
+    $('settingsOverlay').classList.add('show');
+  });
+  $('closeSettings').addEventListener('click', ()=>{
+    $('settingsOverlay').classList.remove('show');
+    if (currentStep === 0) startBarcodeScan();
+    if (currentStep === 1) startPhotoCamera();
+  });
+  $('sbSave').addEventListener('click', async ()=>{
+    const url = $('sbUrl').value.trim().replace(/\/$/,'');
+    const key = $('sbKey').value.trim();
+    if (!url || !key){ showToast('Enter both URL and key'); return; }
+    $('sbStatus').textContent = 'Checking connection…';
+    try{
+      const res = await fetch(url + '/rest/v1/products?select=id&limit=1', {
+        headers: { apikey: key, 'Authorization': 'Bearer ' + key }
+      });
+      if (!res.ok) throw new Error('bad response');
+      sbConfig = { url, key };
+      await window.storage.set('supabase-config', JSON.stringify(sbConfig), false);
+      updateSyncDot();
+      showToast('Connected to Supabase');
+    }catch(e){
+      $('sbStatus').textContent = 'Could not reach that table — check the URL/key and that you ran the SQL setup below.';
+    }
+  });
+  $('sbDisconnect').addEventListener('click', async ()=>{
+    sbConfig = null;
+    try{ await window.storage.set('supabase-config', JSON.stringify(null), 'new'); }catch(e){}
+    $('sbUrl').value = ''; $('sbKey').value = '';
+    updateSyncDot();
+    showToast('Disconnected');
+  });
+  $('copySql').addEventListener('click', ()=>{
+    const text = $('sqlSnippet').textContent;
+    if (navigator.clipboard) navigator.clipboard.writeText(text).then(()=>showToast('SQL copied'));
+  });
+  $('syncAllBtn').addEventListener('click', async ()=>{
+    if (!sbConfig){ showToast('Connect Supabase first'); return; }
+    if (!items.length){ showToast('Ledger is empty'); return; }
+    showToast('Syncing ' + items.length + ' items…');
+    for (const it of items){ await upsertToSupabase(it); }
+    showToast('Sync complete');
+  });
+
+  // ---------- Excel export ----------
+  $('exportExcel').addEventListener('click', ()=>{
+    if (!items.length){ showToast('Ledger is empty'); return; }
+    const rows = items.map(it => ({
+      Barcode: it.barcode||'',
+      'Product Name': it.name||'',
+      MRP: it.mrp||0,
+      Qty: it.qty||0,
+      'Stock Value': +(((it.mrp||0)*(it.qty||0)).toFixed(2)),
+      'Image URL': it.image ? (it.image.startsWith('http') ? it.image : 'Saved locally only — connect Supabase for a link') : ''
+    }));
+    const ws = XLSX.utils.json_to_sheet(rows);
+    ws['!cols'] = [{wch:16},{wch:28},{wch:10},{wch:8},{wch:12},{wch:38}];
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Inventory');
+    XLSX.writeFile(wb, 'inventory-ledger.xlsx');
+    showToast('Excel downloaded');
+  });
+
+  // ---------- Init ----------
+  initScanner();
+  loadItems();
+  loadSbConfig();
+  goToStep(0);
 })();
 </script>
 </body>
