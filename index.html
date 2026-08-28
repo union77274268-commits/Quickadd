@@ -347,6 +347,7 @@
     <div class="step" data-step="2">
       <div class="step-title">Product name</div>
       <div class="step-sub">What's it called on the shelf?</div>
+      <div class="scan-status" id="photoStatusNote" style="text-align:left;margin-top:-8px;margin-bottom:10px;"></div>
       <div class="big-field-wrap">
         <input type="text" class="big-field" id="nameInput" placeholder="e.g. Parle-G 100g">
       </div>
@@ -511,7 +512,13 @@ create policy "anon upload images" on storage.objects
       const res = await fetch(sbConfig.url + '/rest/v1/products?select=*&order=updated_at.desc', { headers: sbHeaders() });
       if (!res.ok) return;
       const remote = await res.json();
-      const remoteItems = remote.map(r => ({ id:r.id, barcode:r.barcode||'', name:r.name||'', mrp:r.mrp||0, qty:r.qty||0, image:r.image_url||null }));
+      const localById = new Map(items.map(it => [it.id, it]));
+      const remoteItems = remote.map(r => {
+        const local = localById.get(r.id);
+        // never let an empty remote photo wipe out a photo we already have locally
+        const image = r.image_url || (local ? local.image : null) || null;
+        return { id:r.id, barcode:r.barcode||'', name:r.name||'', mrp:r.mrp||0, qty:r.qty||0, image };
+      });
       const remoteIds = new Set(remoteItems.map(r=>r.id));
       const localOnly = items.filter(it => !remoteIds.has(it.id)); // not-yet-synced local items, kept
       items = [...localOnly, ...remoteItems];
@@ -613,8 +620,16 @@ create policy "anon upload images" on storage.objects
     currentStep = n;
 
     if (n === 0) startBarcodeScan();
-    if (n === 1) startPhotoCamera();
-    if (n === 2) setTimeout(()=>$('nameInput').focus(), 150);
+    if (n === 1){
+      if (currentImage){ showCapturedPhotoUI(); } else { startPhotoCamera(); }
+    }
+    if (n === 2){
+      setTimeout(()=>$('nameInput').focus(), 150);
+      const note = $('photoStatusNote');
+      if (!currentImage){ note.textContent = 'No photo attached'; note.classList.remove('err'); }
+      else if (currentImage.startsWith('http')){ note.textContent = '📷 Photo attached — synced to Supabase'; note.classList.remove('err'); }
+      else { note.textContent = '📷 Photo attached — saved on this device only (not yet synced)'; note.classList.add('err'); }
+    }
     if (n === 3) setTimeout(()=>$('mrpInput').focus(), 150);
     if (n === 4) setTimeout(()=>$('qtyInput').focus(), 150);
   }
@@ -719,6 +734,17 @@ create policy "anon upload images" on storage.objects
       camStream.getTracks().forEach(t=>t.stop());
       camStream = null;
     }
+  }
+  function showCapturedPhotoUI(){
+    stopPhotoCamera();
+    $('camWrap').querySelectorAll('img.captured').forEach(el=>el.remove());
+    camVideo.style.display = 'none';
+    const img = document.createElement('img');
+    img.className = 'captured';
+    img.src = currentImage;
+    $('camWrap').appendChild(img);
+    $('shutterRow').style.display = 'none';
+    $('retakeRow').classList.add('show');
   }
   $('shutterBtn').addEventListener('click', ()=>{
     if (!camStream) return;
