@@ -1,0 +1,1294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>DiaryBook — Job & Payment Tracker</title>
+<meta name="theme-color" content="#2B2A3D">
+<link rel="manifest" href="data:application/manifest+json,{%22name%22:%22DiaryBook%22,%22short_name%22:%22DiaryBook%22,%22start_url%22:%22.%22,%22display%22:%22standalone%22,%22background_color%22:%22%23F4F1F8%22,%22theme_color%22:%22%232B2A3D%22}">
+<style>
+  :root{
+    --ink:#252436;
+    --ink-soft:#6B6980;
+    --ink-faint:#9997AC;
+    --thread-red:#D65D6E;
+    --thread-teal:#2FA891;
+    --thread-mustard:#E0A93E;
+    --glass-bg:rgba(255,255,255,0.46);
+    --glass-bg-strong:rgba(255,255,255,0.68);
+    --glass-border:rgba(255,255,255,0.6);
+    --glass-shadow:0 8px 28px rgba(60,50,90,0.12);
+    --radius:18px;
+    --radius-sm:13px;
+    --header-h:58px;
+    --nav-h:68px;
+    --ff:'SF Pro Display','Segoe UI',system-ui,-apple-system,'Inter',sans-serif;
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  html{-webkit-text-size-adjust:100%;}
+  body{
+    margin:0;
+    font-family:var(--ff);
+    color:var(--ink);
+    line-height:1.5;
+    min-height:100vh;
+    font-size:15px;
+    letter-spacing:-0.01em;
+    background:
+      radial-gradient(circle at 15% 8%, rgba(214,93,110,0.20), transparent 42%),
+      radial-gradient(circle at 88% 10%, rgba(47,168,145,0.18), transparent 46%),
+      radial-gradient(circle at 25% 92%, rgba(224,169,62,0.16), transparent 42%),
+      #F4F1F8;
+  }
+  h1,h2,h3{font-family:var(--ff);}
+
+  /* ===== STICKY HEADER ===== */
+  header.appbar{
+    position:sticky; top:0; z-index:35;
+    display:flex; align-items:center; justify-content:space-between;
+    height:var(--header-h);
+    padding:0 16px;
+    padding-top:env(safe-area-inset-top);
+    background:rgba(244,241,248,0.78);
+    backdrop-filter:blur(18px) saturate(160%);
+    -webkit-backdrop-filter:blur(18px) saturate(160%);
+    border-bottom:1px solid rgba(43,42,61,0.06);
+  }
+  header.appbar .brand{display:flex;align-items:center;gap:9px;min-width:0;}
+  header.appbar h1{font-size:18px;margin:0;font-weight:800;letter-spacing:-0.4px;white-space:nowrap;}
+  header.appbar h1 span{color:var(--thread-red);}
+  header.appbar .role-chip{
+    font-size:10px;font-weight:700;padding:3px 9px;border-radius:999px;
+    background:var(--glass-bg-strong);border:1px solid var(--glass-border);color:var(--ink-soft);
+    text-transform:uppercase;letter-spacing:0.4px;flex-shrink:0;
+  }
+  header.appbar .right-actions{display:flex;align-items:center;gap:6px;flex-shrink:0;}
+  .icon-btn{
+    width:36px;height:36px;border-radius:50%;border:1px solid rgba(43,42,61,0.1);
+    background:rgba(255,255,255,0.5);display:flex;align-items:center;justify-content:center;
+    color:var(--ink-soft);flex-shrink:0;
+  }
+  .icon-btn svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:2;}
+  .icon-btn:active{transform:scale(0.92);}
+
+  .app{max-width:720px;margin:0 auto;padding:16px 14px calc(var(--nav-h) + 28px);}
+  .app.no-nav{padding-bottom:28px;}
+
+  section.view{display:none;}
+  section.view.active{display:block;animation:fadeIn 0.22s ease;}
+  @keyframes fadeIn{ from{opacity:0; transform:translateY(5px);} to{opacity:1; transform:translateY(0);} }
+
+  .summary-strip{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:22px;}
+  .sum-card{
+    padding:14px 15px;position:relative;overflow:hidden;
+    background:var(--glass-bg);backdrop-filter:blur(18px) saturate(160%);-webkit-backdrop-filter:blur(18px) saturate(160%);
+    border:1px solid var(--glass-border);box-shadow:var(--glass-shadow);border-radius:var(--radius);
+  }
+  .sum-card.deadline{grid-column:1 / -1;display:flex;justify-content:space-between;align-items:center;}
+  .sum-card::before{content:"";position:absolute;inset:0;opacity:0.5;}
+  .sum-card.receivable::before{background:linear-gradient(135deg, rgba(47,168,145,0.15), transparent 60%);}
+  .sum-card.payable::before{background:linear-gradient(135deg, rgba(214,93,110,0.15), transparent 60%);}
+  .sum-card.deadline::before{background:linear-gradient(135deg, rgba(224,169,62,0.15), transparent 60%);}
+  .sum-card > *{position:relative;}
+  .sum-card .label{font-size:10.5px;color:var(--ink-soft);font-weight:700;text-transform:uppercase;letter-spacing:0.3px;}
+  .sum-card .value{font-size:20px;font-weight:800;margin-top:4px;letter-spacing:-0.4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .sum-card .sub{font-size:11.5px;color:var(--ink-soft);margin-top:2px;font-weight:500;}
+
+  h2.section-title{
+    font-size:15.5px;font-weight:800;margin:24px 2px 12px;
+    display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;letter-spacing:-0.2px;
+  }
+  h2.section-title:first-of-type{margin-top:0;}
+  h2.section-title .actions{display:flex;gap:8px;}
+
+  button{cursor:pointer;font-family:var(--ff);}
+  .btn{
+    border:none;background:var(--ink);color:#fff;padding:10px 17px;font-size:13.5px;font-weight:700;
+    border-radius:999px;transition:transform 0.12s ease, opacity 0.12s ease;letter-spacing:-0.1px;
+  }
+  .btn:active{transform:scale(0.96);}
+  .btn.secondary{background:var(--glass-bg-strong);backdrop-filter:blur(14px);color:var(--ink);border:1px solid var(--glass-border);}
+  .btn.small{padding:7px 13px;font-size:12.5px;}
+  .btn.danger{background:rgba(214,93,110,0.13);color:var(--thread-red);border:1px solid rgba(214,93,110,0.28);}
+  .btn.ok{background:rgba(47,168,145,0.13);color:var(--thread-teal);border:1px solid rgba(47,168,145,0.28);}
+  .btn.wide{width:100%;text-align:center;padding:13px;font-size:14.5px;}
+  .btn:disabled{opacity:0.5;pointer-events:none;}
+
+  .list{display:flex;flex-direction:column;gap:11px;}
+  .card{
+    padding:16px 16px;background:var(--glass-bg);backdrop-filter:blur(18px) saturate(160%);-webkit-backdrop-filter:blur(18px) saturate(160%);
+    border:1px solid var(--glass-border);box-shadow:var(--glass-shadow);border-radius:var(--radius);
+  }
+  .card.tap{transition:transform 0.12s ease;}
+  .card.tap:active{transform:scale(0.985);}
+  .card .row{display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:10px;}
+  .card h3{margin:0 0 4px;font-size:15px;font-weight:700;letter-spacing:-0.15px;overflow-wrap:anywhere;line-height:1.35;}
+  .card .meta{font-size:12.5px;color:var(--ink-soft);margin-top:3px;overflow-wrap:anywhere;line-height:1.5;}
+  .card .row > div:first-child{min-width:0;flex:1 1 200px;}
+  .card .row > div:last-child{flex-shrink:0;}
+  .pill{display:inline-block;font-size:10.5px;font-weight:700;padding:4px 11px;border-radius:999px;letter-spacing:0.1px;}
+  .pill.open{color:#8A6110;background:rgba(224,169,62,0.16);}
+  .pill.done{color:#1D7A68;background:rgba(47,168,145,0.16);}
+  .pill.overdue{color:#B03A4A;background:rgba(214,93,110,0.16);}
+  .empty{padding:38px 20px;text-align:center;color:var(--ink-faint);font-size:13.5px;font-weight:500;}
+  .err-box{
+    background:rgba(214,93,110,0.1);border:1px solid rgba(214,93,110,0.3);color:#9E3648;
+    padding:10px 13px;border-radius:12px;font-size:13px;margin-bottom:14px;display:none;font-weight:500;
+  }
+  .err-box.active{display:block;}
+  .chev{color:var(--ink-faint);flex-shrink:0;}
+  .chev svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2.2;}
+
+  .modal-backdrop{
+    display:none;position:fixed;inset:0;background:rgba(25,20,42,0.4);backdrop-filter:blur(3px);
+    z-index:60;align-items:flex-end;justify-content:center;overflow-y:auto;
+  }
+  .modal-backdrop.active{display:flex;}
+  .modal{
+    background:rgba(250,248,255,0.94);backdrop-filter:blur(30px) saturate(160%);-webkit-backdrop-filter:blur(30px) saturate(160%);
+    border:1px solid rgba(255,255,255,0.65);border-bottom:none;border-radius:24px 24px 0 0;
+    max-width:520px;width:100%;padding:22px 20px calc(24px + env(safe-area-inset-bottom));max-height:88vh;overflow-y:auto;
+    animation:sheetUp 0.22s ease;
+  }
+  @keyframes sheetUp{ from{transform:translateY(24px); opacity:0.6;} to{transform:translateY(0); opacity:1;} }
+  .modal h3{margin:0 0 4px;font-size:17px;font-weight:800;letter-spacing:-0.3px;}
+  .modal .modal-sub{font-size:12.5px;color:var(--ink-soft);margin-bottom:16px;}
+  .modal::before{content:"";display:block;width:36px;height:4px;background:rgba(43,42,61,0.16);border-radius:4px;margin:0 auto 16px;}
+  .field{margin-bottom:14px;}
+  .field label{display:block;font-size:11.5px;color:var(--ink-soft);margin-bottom:6px;font-weight:700;letter-spacing:0.1px;}
+  .field input,.field select,.field textarea{
+    width:100%;font-family:var(--ff);font-size:16px;padding:11px 13px;border:1px solid rgba(43,42,61,0.13);
+    border-radius:var(--radius-sm);background:rgba(255,255,255,0.6);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);color:var(--ink);
+  }
+  #paymentTypeFilter{
+    background:var(--glass-bg-strong);backdrop-filter:blur(18px) saturate(160%);-webkit-backdrop-filter:blur(18px) saturate(160%);
+    border:1px solid var(--glass-border);box-shadow:var(--glass-shadow);border-radius:999px;padding:12px 16px;
+  }
+  .field input:focus,.field select:focus,.field textarea:focus{outline:2px solid rgba(47,168,145,0.45);outline-offset:1px;}
+  .field-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+  @media (max-width:400px){.field-row{grid-template-columns:1fr;}}
+  .modal .modal-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:20px;}
+  .modal .modal-actions .btn{flex:1;text-align:center;}
+  .rate-note{
+    font-size:12px;color:var(--ink-soft);background:rgba(224,169,62,0.1);border:1px solid rgba(224,169,62,0.25);
+    padding:9px 12px;border-radius:11px;margin-bottom:14px;font-weight:500;
+  }
+
+  table{width:100%;border-collapse:collapse;font-size:13px;table-layout:fixed;}
+  table th,table td{text-align:left;padding:9px 6px;border-bottom:1px solid rgba(43,42,61,0.07);overflow-wrap:anywhere;}
+  table th{color:var(--ink-soft);font-weight:700;font-size:10px;text-transform:uppercase;letter-spacing:0.4px;}
+  table tr:last-child td{border-bottom:none;}
+
+  .assign-tiles{margin-top:14px;display:flex;flex-direction:column;gap:8px;}
+  .assign-tile{background:rgba(255,255,255,0.5);border:1px solid rgba(43,42,61,0.07);border-radius:13px;padding:11px 12px;}
+  .assign-tile-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:9px;gap:8px;}
+  .assign-name{font-weight:700;font-size:14px;overflow-wrap:anywhere;}
+  .assign-tile-top .btn.small{padding:5px 9px;flex-shrink:0;}
+  .assign-tile-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:9px;}
+  .assign-tile-grid.owner-grid{grid-template-columns:repeat(5,1fr);}
+  .assign-tile-grid > div{display:flex;flex-direction:column;gap:2px;min-width:0;}
+  .assign-tile-grid .al{font-size:9px;font-weight:700;color:var(--ink-soft);text-transform:uppercase;letter-spacing:0.3px;}
+  .assign-tile-grid .av{font-size:13.5px;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .assign-tile-grid .av.owed{color:var(--thread-red);}
+  .assign-tile-grid .av.crate{color:var(--thread-teal);}
+  .assign-tile-grid input[type=number]{
+    width:100%;font-size:16px;padding:6px 6px;border:1px solid rgba(43,42,61,0.15);border-radius:8px;
+    background:rgba(255,255,255,0.85);font-weight:700;
+  }
+  @media (max-width:400px){
+    .assign-tile-grid,.assign-tile-grid.owner-grid{grid-template-columns:repeat(2,1fr);row-gap:10px;}
+  }
+
+  .tiny{font-size:12px;color:var(--ink-soft);}
+  .progress-bar{height:7px;background:rgba(43,42,61,0.07);border-radius:99px;overflow:hidden;margin-top:9px;}
+  .progress-bar > div{height:100%;background:linear-gradient(90deg,var(--thread-teal),#57D8BE);border-radius:99px;}
+
+  /* ===== STICKY FOOTER (site footer, not nav) ===== */
+  footer.appfooter{
+    text-align:center;padding:14px 16px calc(14px + env(safe-area-inset-bottom));
+    font-size:11px;color:var(--ink-faint);font-weight:500;
+  }
+
+  /* ===== STICKY BOTTOM NAV (owner only) ===== */
+  nav.bottomnav{
+    position:sticky; bottom:0; z-index:35;
+    display:flex; gap:2px; padding:8px 10px;
+    padding-bottom:calc(8px + env(safe-area-inset-bottom));
+    background:rgba(244,241,248,0.85);
+    backdrop-filter:blur(20px) saturate(170%);-webkit-backdrop-filter:blur(20px) saturate(170%);
+    border-top:1px solid rgba(43,42,61,0.06);
+    justify-content:center;
+  }
+  nav.bottomnav button{
+    border:none;background:transparent;color:var(--ink-soft);display:flex;flex-direction:column;align-items:center;gap:3px;
+    padding:7px 16px;border-radius:14px;font-size:10px;font-weight:700;white-space:nowrap;flex:1;max-width:110px;
+    transition:background 0.16s ease, color 0.16s ease, transform 0.12s ease;
+  }
+  nav.bottomnav button:active{transform:scale(0.94);}
+  nav.bottomnav button svg{width:19px;height:19px;stroke:currentColor;fill:none;stroke-width:2;}
+  nav.bottomnav button.active{background:rgba(37,36,54,0.08);color:var(--ink);}
+  nav.bottomnav button.active svg{stroke:var(--ink);}
+
+  /* ===== GATE / LOGIN SCREEN ===== */
+  .gate-wrap{min-height:100vh;display:flex;flex-direction:column;justify-content:center;align-items:center;padding:24px;}
+  .gate-card{
+    max-width:380px;width:100%;background:var(--glass-bg-strong);backdrop-filter:blur(24px) saturate(160%);-webkit-backdrop-filter:blur(24px) saturate(160%);
+    border:1px solid var(--glass-border);box-shadow:var(--glass-shadow);border-radius:26px;padding:32px 26px 26px;
+  }
+  .gate-card h1{font-size:25px;font-weight:800;margin:0 0 6px;text-align:center;letter-spacing:-0.5px;}
+  .gate-card h1 span{color:var(--thread-red);}
+  .gate-card .sub{font-size:13px;color:var(--ink-soft);text-align:center;margin-bottom:22px;}
+  .role-toggle{display:flex;justify-content:center;gap:18px;margin-bottom:22px;}
+  .role-toggle button{
+    background:none;border:none;font-size:12.5px;font-weight:700;color:var(--ink-faint);
+    padding:4px 2px;border-bottom:2px solid transparent;
+  }
+  .role-toggle button.active{color:var(--ink);border-bottom-color:var(--thread-red);}
+  .pin-dots{display:flex;justify-content:center;gap:11px;margin:18px 0;}
+  .pin-dots .dot{width:13px;height:13px;border-radius:50%;border:1.5px solid rgba(43,42,61,0.28);}
+  .pin-dots .dot.filled{background:var(--ink);border-color:var(--ink);}
+  .keypad{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;}
+  .keypad button{
+    padding:16px 0;font-size:19px;font-weight:700;border-radius:14px;background:rgba(255,255,255,0.55);
+    border:1px solid rgba(43,42,61,0.07);color:var(--ink);
+  }
+  .keypad button:active{background:rgba(43,42,61,0.12);}
+  .keypad button.wide-key{font-size:13px;font-weight:600;color:var(--ink-soft);}
+
+  @media (min-width:760px){
+    .summary-strip{grid-template-columns:repeat(3,1fr);}
+    .sum-card.deadline{grid-column:auto;display:block;}
+    .modal-backdrop{align-items:center;padding:40px 16px;}
+    .modal{border-radius:22px;border-bottom:1px solid rgba(255,255,255,0.6);max-height:none;}
+    .modal::before{display:none;}
+  }
+</style>
+</head>
+<body>
+
+<!-- ====== GATE / LOGIN SCREEN ====== -->
+<div class="gate-wrap" id="gateWrap">
+  <div class="gate-card">
+    <h1>Diary<span>Book</span></h1>
+    <div class="sub">Job &amp; payment tracker</div>
+
+    <div class="role-toggle" id="roleToggle">
+      <button class="role-toggle-btn active" data-role="owner">Login as Owner</button>
+      <button class="role-toggle-btn" data-role="party">Login as Client / Lady</button>
+    </div>
+
+    <div id="partySubToggle" style="display:none;margin:-10px 0 18px;text-align:center;">
+      <div class="role-toggle" style="margin-bottom:0;">
+        <button class="party-sub-btn active" data-sub="client">Client</button>
+        <button class="party-sub-btn" data-sub="lady">Lady</button>
+      </div>
+    </div>
+
+    <div id="pinArea">
+      <div class="pin-dots" id="pinDots"></div>
+      <div class="err-box" id="loginErr"></div>
+      <div class="keypad" id="keypad"></div>
+    </div>
+
+    <div id="ownerSetupArea" style="display:none;">
+      <p class="tiny" style="text-align:center;margin-bottom:14px;">No owner PIN set up yet. Choose a 4-digit PIN to protect owner access.</p>
+      <div class="pin-dots" id="setupPinDots"></div>
+      <div class="err-box" id="setupErr"></div>
+      <div class="keypad" id="setupKeypad"></div>
+    </div>
+  </div>
+  <div class="tiny" style="margin-top:18px;">Synced securely &middot; each person sees only their own data</div>
+</div>
+
+<!-- ====== OWNER APP ====== -->
+<div id="ownerRoot" style="display:none;">
+  <header class="appbar">
+    <div class="brand">
+      <h1>Diary<span>Book</span></h1>
+      <span class="role-chip">Owner</span>
+    </div>
+    <div class="right-actions">
+      <button class="icon-btn" onclick="openInstallModal()" aria-label="Install app">
+        <svg viewBox="0 0 24 24"><path d="M12 3v13M7 11l5 5 5-5"/><path d="M4 19h16"/></svg>
+      </button>
+      <button class="icon-btn" onclick="logout()" aria-label="Sign out">
+        <svg viewBox="0 0 24 24"><path d="M15 4H6a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h9"/><path d="M10 12h11m0 0-3.5-3.5M21 12l-3.5 3.5"/></svg>
+      </button>
+    </div>
+  </header>
+
+  <div class="app" id="ownerApp">
+    <section class="view active" id="view-dashboard">
+      <div class="summary-strip" id="summaryStrip"></div>
+      <h2 class="section-title">Deadlines coming up</h2>
+      <div class="list" id="upcomingDeadlines"></div>
+      <h2 class="section-title">Open batches</h2>
+      <div class="list" id="dashboardOpenBatches"></div>
+    </section>
+
+    <section class="view" id="view-clients">
+      <h2 class="section-title">Clients<span class="actions"><button class="btn" id="newClientBtn">+ Add client</button></span></h2>
+      <div class="list" id="clientList"></div>
+    </section>
+
+    <section class="view" id="view-client-detail">
+      <button class="btn secondary small" style="margin-bottom:14px;" onclick="backToClients()">&larr; All clients</button>
+      <div id="clientDetailBody"></div>
+    </section>
+
+    <section class="view" id="view-ladies">
+      <h2 class="section-title">Ladies (workers)<span class="actions"><button class="btn" id="newLadyBtn">+ Add lady</button></span></h2>
+      <div class="list" id="ladyList"></div>
+    </section>
+
+    <section class="view" id="view-payments">
+      <h2 class="section-title">Payments</h2>
+      <div class="field" style="margin-bottom:16px;">
+        <label>View balances for</label>
+        <select id="paymentTypeFilter">
+          <option value="client">Clients (money coming in)</option>
+          <option value="lady">Ladies (money going out)</option>
+        </select>
+      </div>
+      <div class="list" id="paymentBalanceList"></div>
+    </section>
+  </div>
+
+  <footer class="appfooter">DiaryBook &middot; synced live for everyone</footer>
+
+  <nav class="bottomnav" id="ownerNav">
+    <button class="tab-btn active" data-view="dashboard"><svg viewBox="0 0 24 24"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/></svg>Home</button>
+    <button class="tab-btn" data-view="clients"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="M8 12h8M8 16h5"/></svg>Clients</button>
+    <button class="tab-btn" data-view="ladies"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.4"/><path d="M4.5 20c1-3.6 4-5.5 7.5-5.5s6.5 1.9 7.5 5.5"/></svg>Ladies</button>
+    <button class="tab-btn" data-view="payments"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v10M9 9.5c0-1.4 1.3-2.2 3-2.2s3 .9 3 2.1-1.3 1.8-3 2c-1.7.2-3 .9-3 2.1s1.3 2.1 3 2.1 3-.8 3-2.2"/></svg>Payments</button>
+  </nav>
+</div>
+
+<!-- ====== CLIENT APP ====== -->
+<div id="clientRoot" style="display:none;">
+  <header class="appbar">
+    <div class="brand">
+      <h1>Diary<span>Book</span></h1>
+      <span class="role-chip" id="clientNameBadge">Client</span>
+    </div>
+    <div class="right-actions">
+      <button class="icon-btn" onclick="openInstallModal()" aria-label="Install app">
+        <svg viewBox="0 0 24 24"><path d="M12 3v13M7 11l5 5 5-5"/><path d="M4 19h16"/></svg>
+      </button>
+      <button class="icon-btn" onclick="logout()" aria-label="Sign out">
+        <svg viewBox="0 0 24 24"><path d="M15 4H6a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h9"/><path d="M10 12h11m0 0-3.5-3.5M21 12l-3.5 3.5"/></svg>
+      </button>
+    </div>
+  </header>
+
+  <div class="app no-nav">
+    <div class="summary-strip" style="grid-template-columns:1fr;">
+      <div class="sum-card receivable">
+        <div class="label">Balance you owe</div>
+        <div class="value" id="clientBalanceValue">₹0</div>
+        <div class="sub" id="clientBalanceSub"></div>
+      </div>
+    </div>
+
+    <h2 class="section-title">Your batches<span class="actions"><button class="btn" id="clientNewBatchBtn">+ New batch</button></span></h2>
+    <div class="list" id="clientBatchList"></div>
+
+    <h2 class="section-title">Payment history</h2>
+    <div class="list" id="clientPaymentHistory"></div>
+  </div>
+
+  <footer class="appfooter">DiaryBook &middot; you're viewing your own data only</footer>
+</div>
+
+<!-- ====== LADY APP ====== -->
+<div id="ladyRoot" style="display:none;">
+  <header class="appbar">
+    <div class="brand">
+      <h1>Diary<span>Book</span></h1>
+      <span class="role-chip" id="ladyNameBadge">Lady</span>
+    </div>
+    <div class="right-actions">
+      <button class="icon-btn" onclick="openInstallModal()" aria-label="Install app">
+        <svg viewBox="0 0 24 24"><path d="M12 3v13M7 11l5 5 5-5"/><path d="M4 19h16"/></svg>
+      </button>
+      <button class="icon-btn" onclick="logout()" aria-label="Sign out">
+        <svg viewBox="0 0 24 24"><path d="M15 4H6a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h9"/><path d="M10 12h11m0 0-3.5-3.5M21 12l-3.5 3.5"/></svg>
+      </button>
+    </div>
+  </header>
+
+  <div class="app no-nav">
+    <div class="summary-strip" style="grid-template-columns:1fr;">
+      <div class="sum-card payable">
+        <div class="label">Balance owed to you</div>
+        <div class="value" id="ladyBalanceValue">₹0</div>
+        <div class="sub" id="ladyBalanceSub"></div>
+      </div>
+    </div>
+
+    <h2 class="section-title">Your work</h2>
+    <div class="list" id="ladyAssignmentList"></div>
+
+    <h2 class="section-title">Payment history</h2>
+    <div class="list" id="ladyPaymentHistory"></div>
+  </div>
+
+  <footer class="appfooter">DiaryBook &middot; you're viewing your own data only</footer>
+</div>
+
+<!-- ====== MODALS ====== -->
+<div class="modal-backdrop" id="modalBackdrop">
+  <div class="modal" id="modalBox"></div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script>
+/* ===================== SUPABASE SETUP ===================== */
+const SUPABASE_URL = 'https://bxavnrjdjnwwvhvuwmtl.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJ4YXZucmpkam53d3ZodnV3bXRsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODg3NjI2MTYsImV4cCI6MjEwNDMzODYxNn0.2XX4hBGm3CIgcXyQnH6MZMBAehQJ4Zj9zryn4GHZQGU';
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+function fmtMoney(n){ return '₹' + (Math.round((n||0)*100)/100).toLocaleString('en-IN'); }
+function fmtDate(d){ if(!d) return '—'; const dt = new Date(d+'T00:00:00'); return dt.toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'}); }
+function todayStr(){ return new Date().toISOString().slice(0,10); }
+function daysUntil(d){ const diff = (new Date(d+'T00:00:00') - new Date(todayStr()+'T00:00:00')) / 86400000; return Math.round(diff); }
+function escapeHtml(str){ return String(str||'').replace(/[&<>"']/g, m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
+function escapeAttr(str){ return escapeHtml(str); }
+
+/* ===================== SESSION (persists across app restarts) ===================== */
+let session = null;
+try{ const raw = localStorage.getItem('diarybook_session'); if(raw) session = JSON.parse(raw); }catch(e){}
+
+let ownerData = null;
+let clientData = null;
+let ladyData = null;
+let activeClientId = null; // for owner's client-detail drilldown
+
+function logout(){
+  localStorage.removeItem('diarybook_session');
+  session = null;
+  location.reload();
+}
+
+/* ===================== GATE / LOGIN UI ===================== */
+const gateWrap = document.getElementById('gateWrap');
+let selectedRole = 'owner';   // 'owner' | 'client' | 'lady'
+let pinBuffer = '';
+
+document.querySelectorAll('.role-toggle-btn').forEach(btn=>{
+  btn.addEventListener('click', async ()=>{
+    document.querySelectorAll('.role-toggle-btn').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    const top = btn.dataset.role;
+    document.getElementById('partySubToggle').style.display = top==='party' ? 'block' : 'none';
+    selectedRole = top==='party' ? 'client' : 'owner';
+    if(top==='party'){
+      document.querySelectorAll('.party-sub-btn').forEach(b=>b.classList.remove('active'));
+      document.querySelector('.party-sub-btn[data-sub="client"]').classList.add('active');
+    }
+    await refreshLoginMode();
+  });
+});
+document.querySelectorAll('.party-sub-btn').forEach(btn=>{
+  btn.addEventListener('click', async ()=>{
+    document.querySelectorAll('.party-sub-btn').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    selectedRole = btn.dataset.sub;
+    await refreshLoginMode();
+  });
+});
+
+async function refreshLoginMode(){
+  pinBuffer = '';
+  document.getElementById('loginErr').classList.remove('active');
+  if(selectedRole === 'owner'){
+    const { data: needsSetup } = await sb.rpc('owner_setup_needed');
+    if(needsSetup){
+      document.getElementById('pinArea').style.display = 'none';
+      document.getElementById('ownerSetupArea').style.display = 'block';
+      renderPinDots('setupPinDots', 0);
+      buildKeypad('setupKeypad', handleSetupKeyPress);
+      return;
+    }
+  }
+  document.getElementById('pinArea').style.display = 'block';
+  document.getElementById('ownerSetupArea').style.display = 'none';
+  renderPinDots('pinDots', 0);
+  buildKeypad('keypad', selectedRole==='owner' ? handleOwnerKeyPress : handlePartyKeyPress);
+}
+refreshLoginMode();
+
+function renderPinDots(elId, filled){
+  const el = document.getElementById(elId);
+  el.innerHTML = [0,1,2,3].map(i=>`<div class="dot ${i<filled?'filled':''}"></div>`).join('');
+}
+function buildKeypad(elId, onPress){
+  const el = document.getElementById(elId);
+  const keys = ['1','2','3','4','5','6','7','8','9','','0','⌫'];
+  el.innerHTML = keys.map(k=>{
+    if(k==='') return '<div></div>';
+    const cls = k==='⌫' ? 'wide-key' : '';
+    return `<button class="${cls}" data-key="${k}">${k}</button>`;
+  }).join('');
+  el.querySelectorAll('button').forEach(b=>{ b.addEventListener('click', ()=>onPress(b.dataset.key)); });
+}
+function showLoginErr(msg){
+  const el = document.getElementById('loginErr');
+  el.textContent = msg;
+  el.classList.add('active');
+}
+
+async function handleOwnerKeyPress(key){
+  if(key === '⌫'){ pinBuffer = pinBuffer.slice(0,-1); renderPinDots('pinDots', pinBuffer.length); return; }
+  if(pinBuffer.length >= 4) return;
+  pinBuffer += key;
+  renderPinDots('pinDots', pinBuffer.length);
+  if(pinBuffer.length === 4){
+    document.getElementById('loginErr').classList.remove('active');
+    const { data, error } = await sb.rpc('owner_login', { p_pin: pinBuffer });
+    if(error){ showLoginErr('Something went wrong. Try again.'); pinBuffer=''; renderPinDots('pinDots',0); return; }
+    if(data === true){
+      session = { role:'owner', pin: pinBuffer };
+      localStorage.setItem('diarybook_session', JSON.stringify(session));
+      await enterOwnerApp();
+    } else {
+      showLoginErr('Incorrect PIN.');
+      pinBuffer=''; renderPinDots('pinDots',0);
+    }
+  }
+}
+async function handleSetupKeyPress(key){
+  if(key === '⌫'){ pinBuffer = pinBuffer.slice(0,-1); renderPinDots('setupPinDots', pinBuffer.length); return; }
+  if(pinBuffer.length >= 4) return;
+  pinBuffer += key;
+  renderPinDots('setupPinDots', pinBuffer.length);
+  if(pinBuffer.length === 4){
+    const { data, error } = await sb.rpc('owner_setup', { p_pin: pinBuffer });
+    if(error){ document.getElementById('setupErr').textContent = 'Something went wrong.'; document.getElementById('setupErr').classList.add('active'); pinBuffer=''; renderPinDots('setupPinDots',0); return; }
+    if(data === true){
+      session = { role:'owner', pin: pinBuffer };
+      localStorage.setItem('diarybook_session', JSON.stringify(session));
+      await enterOwnerApp();
+    } else {
+      document.getElementById('setupErr').textContent = 'Owner PIN already exists — use sign in instead.';
+      document.getElementById('setupErr').classList.add('active');
+      pinBuffer=''; renderPinDots('setupPinDots',0);
+    }
+  }
+}
+async function handlePartyKeyPress(key){
+  if(key === '⌫'){ pinBuffer = pinBuffer.slice(0,-1); renderPinDots('pinDots', pinBuffer.length); return; }
+  if(pinBuffer.length >= 4) return;
+  pinBuffer += key;
+  renderPinDots('pinDots', pinBuffer.length);
+  if(pinBuffer.length === 4){
+    document.getElementById('loginErr').classList.remove('active');
+    const fn = selectedRole === 'client' ? 'client_login' : 'lady_login';
+    const { data, error } = await sb.rpc(fn, { p_pin: pinBuffer });
+    if(error || !data){
+      showLoginErr('Incorrect PIN. Ask the owner to check it.');
+      pinBuffer=''; renderPinDots('pinDots',0);
+      return;
+    }
+    if(selectedRole === 'client'){
+      clientData = data;
+      session = { role:'client', pin: pinBuffer };
+      localStorage.setItem('diarybook_session', JSON.stringify(session));
+      enterClientApp();
+    } else {
+      ladyData = data;
+      session = { role:'lady', pin: pinBuffer };
+      localStorage.setItem('diarybook_session', JSON.stringify(session));
+      enterLadyApp();
+    }
+  }
+}
+
+/* ===================== ENTER APP BY ROLE ===================== */
+async function enterOwnerApp(){
+  const { data, error } = await sb.rpc('owner_get_all', { p_pin: session.pin });
+  if(error){ alert('Session expired. Please sign in again.'); logout(); return; }
+  ownerData = data;
+  gateWrap.style.display = 'none';
+  document.getElementById('ownerRoot').style.display = 'block';
+  wireOwnerNav();
+  wireOwnerButtons();
+  renderOwnerAll();
+}
+function enterClientApp(){
+  gateWrap.style.display = 'none';
+  document.getElementById('clientRoot').style.display = 'block';
+  document.getElementById('clientNameBadge').textContent = clientData.name;
+  document.getElementById('clientNewBatchBtn').addEventListener('click', openClientNewBatch);
+  renderClientApp();
+}
+function enterLadyApp(){
+  gateWrap.style.display = 'none';
+  document.getElementById('ladyRoot').style.display = 'block';
+  document.getElementById('ladyNameBadge').textContent = ladyData.name;
+  renderLadyApp();
+}
+
+(async function initSession(){
+  if(!session) return;
+  if(session.role === 'owner'){
+    const { data, error } = await sb.rpc('owner_get_all', { p_pin: session.pin });
+    if(error || !data){ logout(); return; }
+    ownerData = data;
+    gateWrap.style.display = 'none';
+    document.getElementById('ownerRoot').style.display = 'block';
+    wireOwnerNav(); wireOwnerButtons(); renderOwnerAll();
+  } else if(session.role === 'client'){
+    const { data, error } = await sb.rpc('client_login', { p_pin: session.pin });
+    if(error || !data){ logout(); return; }
+    clientData = data;
+    enterClientApp();
+  } else if(session.role === 'lady'){
+    const { data, error } = await sb.rpc('lady_login', { p_pin: session.pin });
+    if(error || !data){ logout(); return; }
+    ladyData = data;
+    enterLadyApp();
+  }
+})();
+
+/* ===================== MODAL HELPERS ===================== */
+const backdrop = document.getElementById('modalBackdrop');
+const modalBox = document.getElementById('modalBox');
+function openModal(html){ modalBox.innerHTML = html; backdrop.classList.add('active'); }
+function closeModal(){ backdrop.classList.remove('active'); modalBox.innerHTML = ''; }
+backdrop.addEventListener('click', e=>{ if(e.target === backdrop) closeModal(); });
+
+function openInstallModal(){
+  openModal(`
+    <h3>Install DiaryBook</h3>
+    <div class="modal-sub">Add it to your home screen — opens full-screen, just like a normal app.</div>
+    <div class="field"><label>iPhone (Safari)</label><p class="tiny" style="margin:0;">Tap the Share icon, then "Add to Home Screen".</p></div>
+    <div class="field"><label>Android (Chrome)</label><p class="tiny" style="margin:0;">Tap the ⋮ menu, then "Install app" or "Add to Home Screen".</p></div>
+    <div class="modal-actions"><button class="btn wide" onclick="closeModal()">Got it</button></div>
+  `);
+}
+
+async function refreshOwnerData(){
+  const { data, error } = await sb.rpc('owner_get_all', { p_pin: session.pin });
+  if(error){ alert('Could not refresh data: ' + error.message); return; }
+  ownerData = data;
+  renderOwnerAll();
+  if(activeClientId){ renderClientDetail(activeClientId); }
+}
+
+/* ===================== OWNER NAV ===================== */
+function wireOwnerNav(){
+  document.querySelectorAll('#ownerNav .tab-btn').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      document.querySelectorAll('#ownerNav .tab-btn').forEach(b=>b.classList.remove('active'));
+      document.querySelectorAll('#ownerApp .view').forEach(v=>v.classList.remove('active'));
+      btn.classList.add('active');
+      document.getElementById('view-'+btn.dataset.view).classList.add('active');
+    });
+  });
+}
+function wireOwnerButtons(){
+  document.getElementById('newClientBtn').addEventListener('click', newClient);
+  document.getElementById('newLadyBtn').addEventListener('click', newLady);
+  document.getElementById('paymentTypeFilter').addEventListener('change', renderPayments);
+}
+function switchOwnerView(viewName){
+  document.querySelectorAll('#ownerNav .tab-btn').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('#ownerApp .view').forEach(v=>v.classList.remove('active'));
+  const navBtn = document.querySelector(`#ownerNav .tab-btn[data-view="${viewName}"]`);
+  if(navBtn) navBtn.classList.add('active');
+  document.getElementById('view-'+viewName).classList.add('active');
+}
+
+/* ===================== OWNER: CLIENTS ===================== */
+function clientById(id){ return ownerData.clients.find(c=>c.id===id); }
+
+function renderClients(){
+  const list = document.getElementById('clientList');
+  if(ownerData.clients.length === 0){
+    list.innerHTML = '<div class="empty">No clients yet. Add the first one to start tracking batches.</div>';
+    return;
+  }
+  list.innerHTML = ownerData.clients.map(c=>{
+    const bal = clientBalance(c.id);
+    const batchCount = ownerData.batches.filter(b=>b.client_id===c.id).length;
+    return `<div class="card tap" onclick="openClientDetail('${c.id}')">
+      <div class="row">
+        <div>
+          <h3>${escapeHtml(c.name)}</h3>
+          <div class="meta">${batchCount} batch${batchCount!==1?'es':''} &middot; ${fmtMoney(c.rate)}/piece</div>
+          <div class="meta">Balance owed to you: <strong style="color:${bal>0?'var(--thread-teal)':'var(--ink-soft)'}">${fmtMoney(bal)}</strong></div>
+        </div>
+        <div class="chev"><svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></div>
+      </div>
+    </div>`;
+  }).join('');
+}
+function randomPin(){ return String(Math.floor(1000 + Math.random()*9000)); }
+function clientModalForm(existing){
+  const c = existing || {name:'',rate:'',phone:'',pin:randomPin()};
+  return `
+    <h3>${existing?'Edit client':'Add client'}</h3>
+    <div class="field"><label>Name</label><input id="f_name" value="${existing?escapeAttr(c.name):''}" placeholder="e.g. Sharma Garments"></div>
+    <div class="field-row">
+      <div class="field"><label>Rate per piece (₹)</label><input id="f_rate" type="number" step="0.01" value="${existing?c.rate:''}" placeholder="15"></div>
+      <div class="field"><label>Phone (optional)</label><input id="f_phone" value="${existing?escapeAttr(c.phone||''):''}"></div>
+    </div>
+    <div class="field"><label>Login PIN (4 digits) — share this with the client</label><input id="f_pin" value="${escapeAttr(c.pin||randomPin())}" maxlength="4" inputmode="numeric"></div>
+    <div class="modal-actions">
+      <button class="btn secondary" onclick="closeModal()">Cancel</button>
+      <button class="btn" onclick="saveClient(${existing?`'${existing.id}'`:'null'})">Save</button>
+    </div>`;
+}
+function newClient(){ openModal(clientModalForm(null)); }
+function editClient(id){ openModal(clientModalForm(clientById(id))); }
+async function saveClient(id){
+  const name = document.getElementById('f_name').value.trim();
+  const rate = parseFloat(document.getElementById('f_rate').value) || 0;
+  const phone = document.getElementById('f_phone').value.trim();
+  const pin = document.getElementById('f_pin').value.trim();
+  if(!name){ alert('Please enter a name.'); return; }
+  if(!/^\d{4}$/.test(pin)){ alert('PIN must be exactly 4 digits.'); return; }
+  const { error } = await sb.rpc('owner_upsert_client', { p_pin: session.pin, p_id: id, p_name: name, p_rate: rate, p_phone: phone, p_client_pin: pin });
+  if(error){ alert('Could not save: ' + error.message); return; }
+  closeModal(); await refreshOwnerData();
+}
+async function deleteClient(id){
+  const used = ownerData.batches.some(b=>b.client_id===id);
+  if(used){ alert('This client has batches on record. Delete those batches first, or keep the client.'); return; }
+  if(!confirm('Delete this client?')) return;
+  const { error } = await sb.rpc('owner_delete_client', { p_pin: session.pin, p_id: id });
+  if(error){ alert('Could not delete: ' + error.message); return; }
+  backToClients();
+  await refreshOwnerData();
+}
+
+/* ---- Client detail (batches now live here) ---- */
+function openClientDetail(clientId){
+  activeClientId = clientId;
+  renderClientDetail(clientId);
+  document.querySelectorAll('#ownerApp .view').forEach(v=>v.classList.remove('active'));
+  document.querySelectorAll('#ownerNav .tab-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('view-client-detail').classList.add('active');
+}
+function backToClients(){
+  activeClientId = null;
+  switchOwnerView('clients');
+}
+function renderClientDetail(clientId){
+  const c = clientById(clientId);
+  if(!c){ backToClients(); return; }
+  const batches = ownerData.batches.filter(b=>b.client_id===clientId).sort((a,b)=>(a.deadline||'9999').localeCompare(b.deadline||'9999'));
+  const bal = clientBalance(clientId);
+
+  document.getElementById('clientDetailBody').innerHTML = `
+    <div class="card" style="margin-bottom:18px;">
+      <div class="row">
+        <div>
+          <h3 style="font-size:18px;">${escapeHtml(c.name)}</h3>
+          <div class="meta">Rate: ${fmtMoney(c.rate)}/piece ${c.phone?(' &middot; '+escapeHtml(c.phone)):''}</div>
+          <div class="meta">Login PIN: <strong>${escapeHtml(c.pin)}</strong></div>
+          <div class="meta" style="margin-top:6px;">Balance owed to you: <strong style="color:${bal>0?'var(--thread-teal)':'var(--ink-soft)'}">${fmtMoney(bal)}</strong></div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:6px;">
+          <button class="btn small secondary" onclick="editClient('${c.id}')">Edit</button>
+          <button class="btn small danger" onclick="deleteClient('${c.id}')">Delete</button>
+        </div>
+      </div>
+      <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap;">
+        <button class="btn small" onclick="newBatchForClient('${c.id}')">+ New batch</button>
+        <button class="btn small secondary" onclick="openDirectPayment('client','${c.id}')">Record payment</button>
+      </div>
+    </div>
+
+    <h2 class="section-title" style="margin-top:0;">Batches</h2>
+    <div class="list">
+      ${batches.length ? batches.map(b=>renderBatchCard(b)).join('') : '<div class="empty">No batches yet for this client.</div>'}
+    </div>
+  `;
+}
+function newBatchForClient(clientId){
+  const c = clientById(clientId);
+  openModal(`
+    <h3>New batch — ${escapeHtml(c.name)}</h3>
+    <div class="modal-sub">Rate is fixed at ${fmtMoney(c.rate)}/piece for this client.</div>
+    <div class="field"><label>Description (e.g. "500 kurtis - blue print")</label><input id="f_desc" placeholder="Batch description"></div>
+    <div class="field-row">
+      <div class="field"><label>Total pieces</label><input id="f_total" type="number" min="1" placeholder="500"></div>
+      <div class="field"><label>Deadline</label><input id="f_deadline" type="date"></div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn secondary" onclick="closeModal()">Cancel</button>
+      <button class="btn" onclick="saveBatchForClient('${clientId}')">Create batch</button>
+    </div>`);
+}
+async function saveBatchForClient(clientId){
+  const c = clientById(clientId);
+  const description = document.getElementById('f_desc').value.trim();
+  const totalPieces = parseInt(document.getElementById('f_total').value) || 0;
+  const deadline = document.getElementById('f_deadline').value || null;
+  if(totalPieces<=0){ alert('Enter total pieces.'); return; }
+  const { error } = await sb.rpc('owner_create_batch', { p_pin: session.pin, p_client_id: clientId, p_description: description, p_total_pieces: totalPieces, p_client_rate: c.rate, p_received_date: todayStr(), p_deadline: deadline });
+  if(error){ alert('Could not create batch: ' + error.message); return; }
+  closeModal(); await refreshOwnerData();
+}
+
+/* ===================== OWNER: LADIES ===================== */
+function ladyById(id){ return ownerData.ladies.find(l=>l.id===id); }
+function renderLadies(){
+  const list = document.getElementById('ladyList');
+  if(ownerData.ladies.length === 0){
+    list.innerHTML = '<div class="empty">No ladies added yet. Add workers to start assigning pieces.</div>';
+    return;
+  }
+  list.innerHTML = ownerData.ladies.map(l=>{
+    const bal = ladyBalance(l.id);
+    return `<div class="card">
+      <div class="row">
+        <div>
+          <h3>${escapeHtml(l.name)}</h3>
+          <div class="meta">Default rate: ${fmtMoney(l.rate)}/piece ${l.phone?(' &middot; '+escapeHtml(l.phone)):''}</div>
+          <div class="meta">Login PIN: <strong>${escapeHtml(l.pin)}</strong></div>
+          <div class="meta">Balance due to her: <strong style="color:${bal>0?'var(--thread-red)':'var(--ink-soft)'}">${fmtMoney(bal)}</strong></div>
+        </div>
+        <div style="display:flex;gap:6px;">
+          <button class="btn small secondary" onclick="editLady('${l.id}')">Edit</button>
+          <button class="btn small danger" onclick="deleteLady('${l.id}')">Delete</button>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+function ladyModalForm(existing){
+  const l = existing || {name:'',rate:'',phone:'',pin:randomPin()};
+  return `
+    <h3>${existing?'Edit lady':'Add lady'}</h3>
+    <div class="field"><label>Name</label><input id="f_name" value="${existing?escapeAttr(l.name):''}" placeholder="e.g. Kamla Devi"></div>
+    <div class="field-row">
+      <div class="field"><label>Default rate per piece (₹)</label><input id="f_rate" type="number" step="0.01" value="${existing?l.rate:''}" placeholder="8"></div>
+      <div class="field"><label>Phone (optional)</label><input id="f_phone" value="${existing?escapeAttr(l.phone||''):''}"></div>
+    </div>
+    <div class="field"><label>Login PIN (4 digits) — share this with her</label><input id="f_pin" value="${escapeAttr(l.pin||randomPin())}" maxlength="4" inputmode="numeric"></div>
+    <div class="modal-actions">
+      <button class="btn secondary" onclick="closeModal()">Cancel</button>
+      <button class="btn" onclick="saveLady(${existing?`'${existing.id}'`:'null'})">Save</button>
+    </div>`;
+}
+function newLady(){ openModal(ladyModalForm(null)); }
+function editLady(id){ openModal(ladyModalForm(ladyById(id))); }
+async function saveLady(id){
+  const name = document.getElementById('f_name').value.trim();
+  const rate = parseFloat(document.getElementById('f_rate').value) || 0;
+  const phone = document.getElementById('f_phone').value.trim();
+  const pin = document.getElementById('f_pin').value.trim();
+  if(!name){ alert('Please enter a name.'); return; }
+  if(!/^\d{4}$/.test(pin)){ alert('PIN must be exactly 4 digits.'); return; }
+  const { error } = await sb.rpc('owner_upsert_lady', { p_pin: session.pin, p_id: id, p_name: name, p_rate: rate, p_phone: phone, p_lady_pin: pin });
+  if(error){ alert('Could not save: ' + error.message); return; }
+  closeModal(); await refreshOwnerData();
+}
+async function deleteLady(id){
+  const used = ownerData.batches.some(b=>b.assignments.some(a=>a.lady_id===id));
+  if(used){ alert('This lady has assignments on record. Remove those first, or keep her on file.'); return; }
+  if(!confirm('Delete this lady?')) return;
+  const { error } = await sb.rpc('owner_delete_lady', { p_pin: session.pin, p_id: id });
+  if(error){ alert('Could not delete: ' + error.message); return; }
+  await refreshOwnerData();
+}
+
+/* ===================== OWNER: BATCHES (rendered inside client detail) ===================== */
+function batchById(id){
+  for(const b of ownerData.batches){ if(b.id===id) return b; }
+  return null;
+}
+function batchAssignedTotal(b){ return b.assignments.reduce((s,a)=>s+a.qty_assigned,0); }
+function batchDoneTotal(b){ return b.assignments.reduce((s,a)=>s+a.qty_done,0); }
+function batchStatus(b){
+  const done = batchDoneTotal(b);
+  if(done >= b.total_pieces && b.total_pieces>0) return 'done';
+  if(b.deadline && daysUntil(b.deadline) < 0) return 'overdue';
+  return 'open';
+}
+function renderBatchCard(b){
+  const done = batchDoneTotal(b);
+  const assigned = batchAssignedTotal(b);
+  const pct = b.total_pieces ? Math.min(100, Math.round(done/b.total_pieces*100)) : 0;
+  const status = batchStatus(b);
+  const pillClass = status==='done'?'done':(status==='overdue'?'overdue':'open');
+  const pillLabel = status==='done'?'Completed':(status==='overdue'?'Overdue':'In progress');
+
+  const assignRows = b.assignments.map(a=>{
+    const lady = ladyById(a.lady_id);
+    const owed = a.qty_done * a.lady_rate;
+    const margin = (b.client_rate - a.lady_rate) * a.qty_done;
+    return `<div class="assign-tile">
+      <div class="assign-tile-top">
+        <span class="assign-name">${escapeHtml(lady?lady.name:'—')}</span>
+        <button class="btn small danger" onclick="removeAssignment('${a.id}')" aria-label="Remove assignment">✕</button>
+      </div>
+      <div class="assign-tile-grid owner-grid">
+        <div><span class="al">Assigned</span><span class="av">${a.qty_assigned}</span></div>
+        <div><span class="al">Done</span>
+          <input type="number" inputmode="numeric" min="0" max="${a.qty_assigned}" value="${a.qty_done}"
+            onchange="updateAssignmentDone('${a.id}', this.value)">
+        </div>
+        <div><span class="al">Client rate</span><span class="av crate">${fmtMoney(b.client_rate)}</span></div>
+        <div><span class="al">Her rate</span><span class="av">${fmtMoney(a.lady_rate)}</span></div>
+        <div><span class="al">Your margin</span><span class="av owed">${fmtMoney(margin)}</span></div>
+      </div>
+    </div>`;
+  }).join('');
+
+  const remaining = b.total_pieces - assigned;
+
+  return `<div class="card">
+    <div class="row">
+      <div>
+        <h3>${escapeHtml(b.description||'Batch')}</h3>
+        <div class="meta">Received ${fmtDate(b.received_date)} &middot; Deadline ${fmtDate(b.deadline)}
+          ${b.deadline && status!=='done' ? `<span class="tiny">(${daysUntil(b.deadline)>=0?daysUntil(b.deadline)+' days left':Math.abs(daysUntil(b.deadline))+' days overdue'})</span>` : ''}
+        </div>
+        <div class="meta">${b.total_pieces} pieces total &middot; ${fmtMoney(b.client_rate)}/pc &middot; you'll receive ${fmtMoney(b.total_pieces*b.client_rate)}</div>
+      </div>
+      <div style="text-align:right;">
+        <span class="pill ${pillClass}">${pillLabel}</span>
+        <div style="margin-top:8px;"><button class="btn small danger" onclick="deleteBatch('${b.id}')">Delete</button></div>
+      </div>
+    </div>
+    <div class="progress-bar"><div style="width:${pct}%"></div></div>
+    <div class="tiny" style="margin-top:4px;">${done} / ${b.total_pieces} pieces done (${pct}%) &middot; ${remaining} unassigned</div>
+    <div class="assign-tiles">${assignRows || '<div class="tiny" style="padding:8px 2px;">No pieces assigned yet.</div>'}</div>
+    <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap;">
+      <button class="btn small secondary" onclick="openAssignForm('${b.id}')">Assign pieces to a lady</button>
+      <button class="btn small secondary" onclick="openBatchPayment('${b.id}', 'lady')">Record payment to a lady</button>
+    </div>
+  </div>`;
+}
+async function deleteBatch(id){
+  if(!confirm('Delete this batch and all its assignment records? This cannot be undone.')) return;
+  const { error } = await sb.rpc('owner_delete_batch', { p_pin: session.pin, p_id: id });
+  if(error){ alert('Could not delete: ' + error.message); return; }
+  await refreshOwnerData();
+}
+function openAssignForm(batchId){
+  const b = batchById(batchId);
+  const remaining = b.total_pieces - batchAssignedTotal(b);
+  if(ownerData.ladies.length===0){
+    openModal(`<h3>Assign pieces</h3><p class="tiny">Add a lady first before assigning work.</p><div class="modal-actions"><button class="btn secondary" onclick="closeModal()">Close</button></div>`);
+    return;
+  }
+  const ladyOptions = ownerData.ladies.map(l=>`<option value="${l.id}" data-rate="${l.rate}">${escapeHtml(l.name)}</option>`).join('');
+  openModal(`
+    <h3>Assign pieces — ${remaining} unassigned</h3>
+    <div class="rate-note">Client is paying you ${fmtMoney(b.client_rate)}/piece for this batch.</div>
+    <div class="field"><label>Lady</label>
+      <select id="f_lady" onchange="document.getElementById('f_ladyRate').value = this.selectedOptions[0].dataset.rate">${ladyOptions}</select>
+    </div>
+    <div class="field-row">
+      <div class="field"><label>Quantity</label><input id="f_qty" type="number" min="1" max="${remaining}" value="${remaining>0?remaining:1}"></div>
+      <div class="field"><label>Her rate per piece (₹)</label><input id="f_ladyRate" type="number" step="0.01" value="${ownerData.ladies[0].rate}"></div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn secondary" onclick="closeModal()">Cancel</button>
+      <button class="btn" onclick="saveAssignment('${batchId}')">Assign</button>
+    </div>`);
+}
+async function saveAssignment(batchId){
+  const b = batchById(batchId);
+  const ladyId = document.getElementById('f_lady').value;
+  const qty = parseInt(document.getElementById('f_qty').value) || 0;
+  const rate = parseFloat(document.getElementById('f_ladyRate').value) || 0;
+  const remaining = b.total_pieces - batchAssignedTotal(b);
+  if(qty<=0){ alert('Enter a quantity.'); return; }
+  if(qty>remaining){ alert(`Only ${remaining} pieces remain unassigned in this batch.`); return; }
+  const { error } = await sb.rpc('owner_add_assignment', { p_pin: session.pin, p_batch_id: batchId, p_lady_id: ladyId, p_lady_rate: rate, p_qty_assigned: qty });
+  if(error){ alert('Could not assign: ' + error.message); return; }
+  closeModal(); await refreshOwnerData();
+}
+async function updateAssignmentDone(assignId, val){
+  let n = parseInt(val)||0;
+  if(n<0) n=0;
+  const { error } = await sb.rpc('owner_update_assignment_done', { p_pin: session.pin, p_id: assignId, p_qty_done: n });
+  if(error){ alert('Could not update: ' + error.message); return; }
+  await refreshOwnerData();
+}
+async function removeAssignment(assignId){
+  if(!confirm('Remove this assignment?')) return;
+  const { error } = await sb.rpc('owner_remove_assignment', { p_pin: session.pin, p_id: assignId });
+  if(error){ alert('Could not remove: ' + error.message); return; }
+  await refreshOwnerData();
+}
+
+/* ===================== OWNER: PAYMENTS ===================== */
+function clientTotalOwed(clientId){
+  let total = 0;
+  ownerData.batches.filter(b=>b.client_id===clientId).forEach(b=>{ total += batchDoneTotal(b) * b.client_rate; });
+  return total;
+}
+function clientTotalPaid(clientId){
+  return ownerData.payments.filter(p=>p.type==='client' && p.party_id===clientId).reduce((s,p)=>s+Number(p.amount),0);
+}
+function clientBalance(clientId){ return clientTotalOwed(clientId) - clientTotalPaid(clientId); }
+function ladyTotalOwed(ladyId){
+  let total = 0;
+  ownerData.batches.forEach(b=>{ b.assignments.filter(a=>a.lady_id===ladyId).forEach(a=>{ total += a.qty_done * a.lady_rate; }); });
+  return total;
+}
+function ladyTotalPaid(ladyId){
+  return ownerData.payments.filter(p=>p.type==='lady' && p.party_id===ladyId).reduce((s,p)=>s+Number(p.amount),0);
+}
+function ladyBalance(ladyId){ return ladyTotalOwed(ladyId) - ladyTotalPaid(ladyId); }
+
+function renderPayments(){
+  const filter = document.getElementById('paymentTypeFilter').value;
+  const list = document.getElementById('paymentBalanceList');
+  if(filter==='client'){
+    if(ownerData.clients.length===0){ list.innerHTML = '<div class="empty">No clients yet.</div>'; return; }
+    list.innerHTML = ownerData.clients.map(c=>{
+      const owed = clientTotalOwed(c.id), paid = clientTotalPaid(c.id), bal = owed-paid;
+      const history = ownerData.payments.filter(p=>p.type==='client'&&p.party_id===c.id).sort((a,b)=>b.date.localeCompare(a.date));
+      return `<div class="card">
+        <div class="row">
+          <div><h3>${escapeHtml(c.name)}</h3><div class="meta">Total billed: ${fmtMoney(owed)} &middot; Received: ${fmtMoney(paid)}</div></div>
+          <div style="text-align:right;">
+            <div class="label tiny">Balance owed to you</div>
+            <div style="font-size:19px;font-weight:800;color:${bal>0?'var(--thread-teal)':'var(--ink-soft)'}">${fmtMoney(bal)}</div>
+            <button class="btn small" style="margin-top:6px;" onclick="openDirectPayment('client','${c.id}')">Record payment</button>
+          </div>
+        </div>
+        ${history.length? `<table style="margin-top:10px;"><thead><tr><th>Date</th><th>Amount</th><th>Note</th></tr></thead><tbody>
+          ${history.map(p=>`<tr><td>${fmtDate(p.date)}</td><td>${fmtMoney(p.amount)}</td><td>${escapeHtml(p.note||'—')}</td></tr>`).join('')}
+        </tbody></table>` : '<div class="tiny" style="margin-top:8px;">No payments recorded yet.</div>'}
+      </div>`;
+    }).join('');
+  } else {
+    if(ownerData.ladies.length===0){ list.innerHTML = '<div class="empty">No ladies yet.</div>'; return; }
+    list.innerHTML = ownerData.ladies.map(l=>{
+      const owed = ladyTotalOwed(l.id), paid = ladyTotalPaid(l.id), bal = owed-paid;
+      const history = ownerData.payments.filter(p=>p.type==='lady'&&p.party_id===l.id).sort((a,b)=>b.date.localeCompare(a.date));
+      return `<div class="card">
+        <div class="row">
+          <div><h3>${escapeHtml(l.name)}</h3><div class="meta">Total earned: ${fmtMoney(owed)} &middot; Paid: ${fmtMoney(paid)}</div></div>
+          <div style="text-align:right;">
+            <div class="label tiny">Balance due to her</div>
+            <div style="font-size:19px;font-weight:800;color:${bal>0?'var(--thread-red)':'var(--ink-soft)'}">${fmtMoney(bal)}</div>
+            <button class="btn small" style="margin-top:6px;" onclick="openDirectPayment('lady','${l.id}')">Record payment</button>
+          </div>
+        </div>
+        ${history.length? `<table style="margin-top:10px;"><thead><tr><th>Date</th><th>Amount</th><th>Note</th></tr></thead><tbody>
+          ${history.map(p=>`<tr><td>${fmtDate(p.date)}</td><td>${fmtMoney(p.amount)}</td><td>${escapeHtml(p.note||'—')}</td></tr>`).join('')}
+        </tbody></table>` : '<div class="tiny" style="margin-top:8px;">No payments recorded yet.</div>'}
+      </div>`;
+    }).join('');
+  }
+}
+function openDirectPayment(type, partyId){
+  const bal = type==='client' ? clientBalance(partyId) : ladyBalance(partyId);
+  openModal(`
+    <h3>Record ${type==='client'?'payment received':'payment made'}</h3>
+    <div class="modal-sub">Current balance: ${fmtMoney(bal)}</div>
+    <div class="field-row">
+      <div class="field"><label>Amount (₹)</label><input id="f_amount" type="number" step="0.01" value="${bal>0?bal:''}"></div>
+      <div class="field"><label>Date</label><input id="f_date" type="date" value="${todayStr()}"></div>
+    </div>
+    <div class="field"><label>Note (optional)</label><input id="f_note" placeholder="e.g. cash, UPI"></div>
+    <div class="modal-actions">
+      <button class="btn secondary" onclick="closeModal()">Cancel</button>
+      <button class="btn ok" onclick="saveDirectPayment('${type}','${partyId}')">Save payment</button>
+    </div>`);
+}
+async function saveDirectPayment(type, partyId){
+  const amount = parseFloat(document.getElementById('f_amount').value) || 0;
+  const date = document.getElementById('f_date').value || todayStr();
+  const note = document.getElementById('f_note').value.trim();
+  if(amount<=0){ alert('Enter an amount greater than 0.'); return; }
+  const { error } = await sb.rpc('owner_add_payment', { p_pin: session.pin, p_type: type, p_party_id: partyId, p_batch_id: null, p_amount: amount, p_date: date, p_note: note });
+  if(error){ alert('Could not save: ' + error.message); return; }
+  closeModal(); await refreshOwnerData();
+}
+function openBatchPayment(batchId, type){
+  const b = batchById(batchId);
+  if(type==='client'){ openDirectPayment('client', b.client_id); return; }
+  if(b.assignments.length===0){ alert('No ladies assigned to this batch yet.'); return; }
+  const opts = b.assignments.map(a=>{ const l = ladyById(a.lady_id); return `<option value="${a.lady_id}">${escapeHtml(l?l.name:'—')}</option>`; }).join('');
+  openModal(`
+    <h3>Record payment to a lady</h3>
+    <div class="field"><label>Lady</label><select id="f_ladySelect">${opts}</select></div>
+    <div class="field-row">
+      <div class="field"><label>Amount (₹)</label><input id="f_amount" type="number" step="0.01"></div>
+      <div class="field"><label>Date</label><input id="f_date" type="date" value="${todayStr()}"></div>
+    </div>
+    <div class="field"><label>Note (optional)</label><input id="f_note" placeholder="e.g. cash, UPI"></div>
+    <div class="modal-actions">
+      <button class="btn secondary" onclick="closeModal()">Cancel</button>
+      <button class="btn ok" onclick="saveBatchLadyPayment('${batchId}')">Save payment</button>
+    </div>`);
+}
+async function saveBatchLadyPayment(batchId){
+  const ladyId = document.getElementById('f_ladySelect').value;
+  const amount = parseFloat(document.getElementById('f_amount').value) || 0;
+  const date = document.getElementById('f_date').value || todayStr();
+  const note = document.getElementById('f_note').value.trim();
+  if(amount<=0){ alert('Enter an amount greater than 0.'); return; }
+  const { error } = await sb.rpc('owner_add_payment', { p_pin: session.pin, p_type: 'lady', p_party_id: ladyId, p_batch_id: batchId, p_amount: amount, p_date: date, p_note: note });
+  if(error){ alert('Could not save: ' + error.message); return; }
+  closeModal(); await refreshOwnerData();
+}
+
+/* ===================== OWNER: DASHBOARD ===================== */
+function renderDashboard(){
+  const totalReceivable = ownerData.clients.reduce((s,c)=>s+clientBalance(c.id),0);
+  const totalPayable = ownerData.ladies.reduce((s,l)=>s+ladyBalance(l.id),0);
+  const openBatches = ownerData.batches.filter(b=>batchStatus(b)!=='done');
+  const overdue = openBatches.filter(b=>b.deadline && daysUntil(b.deadline)<0).length;
+
+  document.getElementById('summaryStrip').innerHTML = `
+    <div class="sum-card receivable"><div class="label">To receive</div><div class="value">${fmtMoney(totalReceivable)}</div><div class="sub">${ownerData.clients.length} client${ownerData.clients.length!==1?'s':''}</div></div>
+    <div class="sum-card payable"><div class="label">To pay ladies</div><div class="value">${fmtMoney(totalPayable)}</div><div class="sub">${ownerData.ladies.length} worker${ownerData.ladies.length!==1?'s':''}</div></div>
+    <div class="sum-card deadline"><div><div class="label">Open batches</div><div class="value">${openBatches.length}</div></div><div class="sub" style="text-align:right;">${overdue>0?overdue+' overdue':'none overdue'}</div></div>`;
+
+  const upcoming = openBatches.filter(b=>b.deadline).sort((a,b)=>a.deadline.localeCompare(b.deadline)).slice(0,5);
+  document.getElementById('upcomingDeadlines').innerHTML = upcoming.length ? upcoming.map(b=>{
+    const client = clientById(b.client_id);
+    const d = daysUntil(b.deadline);
+    const status = batchStatus(b);
+    return `<div class="card tap" onclick="openClientDetail('${b.client_id}')">
+      <div class="row">
+        <div><h3>${escapeHtml(client?client.name:'—')} — ${escapeHtml(b.description||'batch')}</h3><div class="meta">${batchDoneTotal(b)}/${b.total_pieces} pieces done &middot; deadline ${fmtDate(b.deadline)}</div></div>
+        <span class="pill ${status==='overdue'?'overdue':'open'}">${d>=0? d+' days left' : Math.abs(d)+' days overdue'}</span>
+      </div>
+    </div>`;
+  }).join('') : '<div class="empty">No batches with deadlines set.</div>';
+
+  document.getElementById('dashboardOpenBatches').innerHTML = openBatches.length ? openBatches.slice(0,6).map(b=>{
+    const client = clientById(b.client_id);
+    const d = b.deadline ? daysUntil(b.deadline) : null;
+    const status = batchStatus(b);
+    const pct = b.total_pieces ? Math.min(100, Math.round(batchDoneTotal(b)/b.total_pieces*100)) : 0;
+    return `<div class="card tap" onclick="openClientDetail('${b.client_id}')">
+      <div class="row">
+        <div><h3>${escapeHtml(client?client.name:'—')} — ${escapeHtml(b.description||'batch')}</h3>
+          <div class="meta">${batchDoneTotal(b)}/${b.total_pieces} pieces &middot; ${fmtDate(b.deadline)}</div>
+        </div>
+        <span class="pill ${status==='overdue'?'overdue':(status==='done'?'done':'open')}">${status==='done'?'Completed':(d!==null?(d>=0? d+' days left' : Math.abs(d)+' days over'):'Open')}</span>
+      </div>
+      <div class="progress-bar"><div style="width:${pct}%"></div></div>
+    </div>`;
+  }).join('') : '<div class="empty">No open batches. Open a client to add one.</div>';
+}
+function renderOwnerAll(){
+  renderDashboard(); renderClients(); renderLadies(); renderPayments();
+  if(activeClientId) renderClientDetail(activeClientId);
+}
+
+/* ===================== CLIENT PORTAL ===================== */
+function openClientNewBatch(){
+  openModal(`
+    <h3>New batch</h3>
+    <div class="modal-sub">Rate is fixed at ${fmtMoney(clientData.rate)}/piece.</div>
+    <div class="field"><label>Description (e.g. "500 kurtis - blue print")</label><input id="f_desc" placeholder="What are you sending?"></div>
+    <div class="field-row">
+      <div class="field"><label>Total pieces</label><input id="f_total" type="number" min="1" placeholder="500"></div>
+      <div class="field"><label>Deadline</label><input id="f_deadline" type="date"></div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn secondary" onclick="closeModal()">Cancel</button>
+      <button class="btn" onclick="clientSaveBatch()">Create batch</button>
+    </div>`);
+}
+async function clientSaveBatch(){
+  const description = document.getElementById('f_desc').value.trim();
+  const totalPieces = parseInt(document.getElementById('f_total').value) || 0;
+  const deadline = document.getElementById('f_deadline').value || null;
+  if(totalPieces<=0){ alert('Enter total pieces.'); return; }
+  const { error } = await sb.rpc('client_create_batch', { p_pin: session.pin, p_description: description, p_total_pieces: totalPieces, p_deadline: deadline });
+  if(error){ alert('Could not create batch: ' + error.message); return; }
+  closeModal();
+  const { data } = await sb.rpc('client_login', { p_pin: session.pin });
+  clientData = data;
+  renderClientApp();
+}
+function renderClientApp(){
+  let totalOwed = 0, totalPaid = 0;
+  clientData.batches.forEach(b=>{ totalOwed += b.qty_done * b.client_rate; });
+  clientData.payments.forEach(p=>{ totalPaid += Number(p.amount); });
+  const bal = totalOwed - totalPaid;
+  document.getElementById('clientBalanceValue').textContent = fmtMoney(bal);
+  document.getElementById('clientBalanceSub').textContent = `Billed ${fmtMoney(totalOwed)} · Paid ${fmtMoney(totalPaid)}`;
+
+  const list = document.getElementById('clientBatchList');
+  list.innerHTML = clientData.batches.length ? clientData.batches.map(b=>{
+    const pct = b.total_pieces ? Math.min(100, Math.round(b.qty_done/b.total_pieces*100)) : 0;
+    const isDone = b.qty_done >= b.total_pieces && b.total_pieces > 0;
+    const overdue = b.deadline && daysUntil(b.deadline) < 0 && !isDone;
+    const pillClass = isDone ? 'done' : (overdue ? 'overdue' : 'open');
+    const pillLabel = isDone ? 'Completed' : (overdue ? 'Overdue' : 'In progress');
+    return `<div class="card">
+      <div class="row">
+        <div><h3>${escapeHtml(b.description||'Batch')}</h3>
+          <div class="meta">Received ${fmtDate(b.received_date)} &middot; Deadline ${fmtDate(b.deadline)}</div>
+          <div class="meta">${b.total_pieces} pieces &middot; ${fmtMoney(b.client_rate)}/pc</div>
+        </div>
+        <span class="pill ${pillClass}">${pillLabel}</span>
+      </div>
+      <div class="progress-bar"><div style="width:${pct}%"></div></div>
+      <div class="tiny" style="margin-top:4px;">${b.qty_done} / ${b.total_pieces} pieces done (${pct}%)</div>
+    </div>`;
+  }).join('') : '<div class="empty">No batches yet. Tap "+ New batch" to add one.</div>';
+
+  const hist = document.getElementById('clientPaymentHistory');
+  hist.innerHTML = clientData.payments.length ? `<div class="card"><table><thead><tr><th>Date</th><th>Amount</th><th>Note</th></tr></thead><tbody>
+    ${clientData.payments.map(p=>`<tr><td>${fmtDate(p.date)}</td><td>${fmtMoney(p.amount)}</td><td>${escapeHtml(p.note||'—')}</td></tr>`).join('')}
+  </tbody></table></div>` : '<div class="empty">No payments recorded yet.</div>';
+}
+
+/* ===================== LADY PORTAL ===================== */
+function renderLadyApp(){
+  let totalOwed = 0, totalPaid = 0;
+  ladyData.assignments.forEach(a=>{ totalOwed += a.qty_done * a.lady_rate; });
+  ladyData.payments.forEach(p=>{ totalPaid += Number(p.amount); });
+  const bal = totalOwed - totalPaid;
+  document.getElementById('ladyBalanceValue').textContent = fmtMoney(bal);
+  document.getElementById('ladyBalanceSub').textContent = `Earned ${fmtMoney(totalOwed)} · Paid ${fmtMoney(totalPaid)}`;
+
+  const list = document.getElementById('ladyAssignmentList');
+  list.innerHTML = ladyData.assignments.length ? ladyData.assignments.map(a=>{
+    const pct = a.qty_assigned ? Math.min(100, Math.round(a.qty_done/a.qty_assigned*100)) : 0;
+    const isDone = a.qty_done >= a.qty_assigned && a.qty_assigned > 0;
+    const overdue = a.deadline && daysUntil(a.deadline) < 0 && !isDone;
+    const pillClass = isDone ? 'done' : (overdue ? 'overdue' : 'open');
+    const pillLabel = isDone ? 'Completed' : (overdue ? 'Overdue' : 'In progress');
+    return `<div class="card">
+      <div class="row">
+        <div><h3>${escapeHtml(a.batch_description||'Job')}</h3>
+          <div class="meta">Deadline ${fmtDate(a.deadline)} &middot; your rate ${fmtMoney(a.lady_rate)}/pc</div>
+        </div>
+        <span class="pill ${pillClass}">${pillLabel}</span>
+      </div>
+      <div class="progress-bar"><div style="width:${pct}%"></div></div>
+      <div class="tiny" style="margin-top:4px;">${a.qty_done} / ${a.qty_assigned} pieces done &middot; earned so far ${fmtMoney(a.qty_done*a.lady_rate)}</div>
+      <div style="margin-top:10px;display:flex;gap:8px;align-items:center;">
+        <label class="tiny" style="margin:0;">Update pieces done:</label>
+        <input type="number" inputmode="numeric" min="0" max="${a.qty_assigned}" value="${a.qty_done}" style="width:80px;font-size:16px;padding:6px 8px;border-radius:8px;border:1px solid rgba(43,42,61,0.15);"
+          onchange="ladyUpdateDone('${a.id}', this.value)">
+      </div>
+    </div>`;
+  }).join('') : '<div class="empty">No work assigned yet.</div>';
+
+  const hist = document.getElementById('ladyPaymentHistory');
+  hist.innerHTML = ladyData.payments.length ? `<div class="card"><table><thead><tr><th>Date</th><th>Amount</th><th>Note</th></tr></thead><tbody>
+    ${ladyData.payments.map(p=>`<tr><td>${fmtDate(p.date)}</td><td>${fmtMoney(p.amount)}</td><td>${escapeHtml(p.note||'—')}</td></tr>`).join('')}
+  </tbody></table></div>` : '<div class="empty">No payments recorded yet.</div>';
+}
+async function ladyUpdateDone(assignId, val){
+  let n = parseInt(val)||0;
+  if(n<0) n=0;
+  const { error } = await sb.rpc('lady_update_done', { p_lady_pin: session.pin, p_assignment_id: assignId, p_qty_done: n });
+  if(error){ alert('Could not update: ' + error.message); return; }
+  const { data } = await sb.rpc('lady_login', { p_pin: session.pin });
+  ladyData = data;
+  renderLadyApp();
+}
+</script>
+</body>
+</html>
