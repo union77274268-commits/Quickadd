@@ -1,32 +1,151 @@
-import Busboy from "busboy";
-import { PDFParse } from "pdf-parse";
+import busboy from "busboy";
 
-export const config={api:{bodyParser:false}};
-const MODEL=process.env.GEMINI_MODEL||"gemini-2.5-flash-lite";
+export const config = {
+  api: { bodyParser: false },
+};
 
-function filesFrom(req){return new Promise((resolve,reject)=>{const bb=Busboy({headers:req.headers});const out=[];bb.on("file",(n,s,i)=>{const c=[];s.on("data",x=>c.push(x));s.on("end",()=>out.push({name:i.filename,type:i.mimeType,buffer:Buffer.concat(c)}))});bb.on("finish",()=>resolve(out));bb.on("error",reject);req.pipe(bb)})}
+const MODEL = process.env.GEMINI_MODEL || "gemini-2.5-flash-lite";
 
-async function gemini(contents){
- const r=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent?key=${encodeURIComponent(process.env.GEMINI_API_KEY)}`,{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify({contents:[{role:"user",parts:contents}]})});
- const d=await r.json();if(!r.ok)throw Error(d.error?.message||"Gemini request failed");return d.candidates?.[0]?.content?.parts?.map(p=>p.text||"").join("")||"";
+function readMultipart(req) {
+  return new Promise((resolve, reject) => {
+    let bb;
+    try { bb = busboy({ headers: req.headers }); }
+    catch (e) { reject(e); return; }
+
+    const files = [];
+    bb.on("file", (_field, stream, info) => {
+      const chunks = [];
+      stream.on("data", c => chunks.push(c));
+      stream.on("end", () => files.push({
+        name: info.filename,
+        type: info.mimeType || "application/octet-stream",
+        buffer: Buffer.concat(chunks)
+      }));
+      stream.on("error", reject);
+    });
+    bb.on("finish", () => resolve(files));
+    bb.on("error", reject);
+    req.pipe(bb);
+  });
 }
-async function extract(file){
- if(file.type==="application/pdf"||file.name.toLowerCase().endsWith(".pdf")){
-   const p=new PDFParse({data:file.buffer});const r=await p.getText();return r.text||"";
- }
- const base=file.buffer.toString("base64");
- return await gemini([{text:"Transcribe this page accurately. Return only the visible book text. Preserve paragraphs and dialogue. Do not describe the image."},{inlineData:{mimeType:file.type||"image/jpeg",data:base}}]);
+
+async function gemini(parts) {
+  const key = process.env.GEMINI_API_KEY;
+  if (!key) throw new Error("GEMINI_API_KEY is missing in Vercel Environment Variables.");
+
+  const response = await fetch(
+    `https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent?key=${encodeURIComponent(key)}`,
+    {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ contents: [{ role: "user", parts }] })
+    }
+  );
+
+  const raw = await response.text();
+  let data;
+  try { data = JSON.parse(raw); }
+  catch { throw new Error(`Gemini returned HTTP ${response.status}: ${raw.slice(0,200)}`); }
+
+  if (!response.ok) {
+    throw new Error(data?.error?.message || `Gemini API error ${response.status}`);
+  }
+
+  const text = data?.candidates?.[0]?.content?.parts
+    ?.map(p => p.text || "").join("") || "";
+
+  if (!text) throw new Error("Gemini returned no text.");
+  return text;
 }
-function clean(t){return t.replace(/\r/g,"").replace(/(\w)-\n(\w)/g,"$1$2").replace(/[ \t]+/g," ").replace(/\n{3,}/g,"\n\n").trim()}
-async function refine(text){
- const limit=60000;const source=text.length>limit?text.slice(0,limit):text;
- return await gemini([{text:`You are an audiobook story editor. Transform the supplied book text into polished spoken storytelling. Preserve characters, events, chronology, facts and meaning. Fix obvious OCR errors. Remove headers, footers, page numbers and repetitive artifacts. Improve transitions and dialogue readability. Do not invent major events. Make it engaging when spoken aloud. Return ONLY the finished narration.\n\nBOOK TEXT:\n${source}`}]);
+
+async function transcribeFile(file) {
+  const base64 = file.buffer.toString("base64");
+  return gemini([
+    {
+      text:
+        "Extract the readable book text from this uploaded document/page. " +
+        "Preserve paragraphs and dialogue. Remove page numbers and obvious scan artifacts. " +
+        "Return ONLY the book text. Do not describe the image or document."
+    },
+    {
+      inlineData: {
+        mimeType: file.type,
+        data: base64
+      }
+    }
+  ]);
 }
-export default async function handler(req,res){
- if(req.method!=="POST")return res.status(405).json({error:"POST required"});
- if(!process.env.GEMINI_API_KEY)return res.status(500).json({error:"GEMINI_API_KEY is missing"});
- try{const fs=await filesFrom(req);if(!fs.length)return res.status(400).json({error:"No files uploaded"});
- let text="";for(const f of fs)text+="\n\n"+await extract(f);text=clean(text);if(!text)return res.status(422).json({error:"No readable text found"});
- const story=await refine(text);return res.status(200).json({title:fs.length===1?fs[0].name.replace(/\.[^.]+$/,""):"Untitled Story",pages:fs.length,words:text.split(/\s+/).filter(Boolean).length,story});
- }catch(e){console.error(e);return res.status(500).json({error:e.message||"Processing failed"})}
+
+function clean(text) {
+  return text
+    .replace(/\r/g, "")
+    .replace(/(\w)-\n(\w)/g, "$1$2")
+    .replace(/[ \t]+/g, " ")
+    .replace(/\n{3,}/g, "\n\n")
+    .trim();
+}
+
+async function refine(text) {
+  // Keep this MVP bounded. Chapter-wise processing will remove this limit later.
+  const source = text.slice(0, 60000);
+
+  return gemini([{
+    text:
+      "You are an expert audiobook story editor. Rewrite the supplied book text " +
+      "into polished, natural spoken storytelling. Preserve characters, events, " +
+      "chronology, facts and meaning. Fix obvious OCR errors. Remove headers, " +
+      "footers, page numbers and repetitive artifacts. Improve transitions and " +
+      "dialogue readability. Do not invent major events. Return ONLY the finished narration.\n\n" +
+      "BOOK TEXT:\n" + source
+  }]);
+}
+
+export default async function handler(req, res) {
+  res.setHeader("content-type", "application/json; charset=utf-8");
+
+  if (req.method !== "POST") {
+    return res.status(405).json({ error: "POST required" });
+  }
+
+  try {
+    const files = await readMultipart(req);
+
+    if (!files.length) {
+      return res.status(400).json({ error: "No files were uploaded." });
+    }
+
+    // Basic guard against accidentally huge uploads on the free MVP.
+    const totalBytes = files.reduce((n, f) => n + f.buffer.length, 0);
+    if (totalBytes > 15 * 1024 * 1024) {
+      return res.status(413).json({
+        error: "Upload is over the 15 MB MVP limit. Use a smaller PDF or fewer page images."
+      });
+    }
+
+    let extracted = "";
+    for (const file of files) {
+      extracted += "\n\n" + await transcribeFile(file);
+    }
+
+    extracted = clean(extracted);
+    if (!extracted) {
+      return res.status(422).json({ error: "No readable text was found." });
+    }
+
+    const story = await refine(extracted);
+
+    return res.status(200).json({
+      title: files.length === 1
+        ? files[0].name.replace(/\.[^.]+$/, "")
+        : "Untitled Story",
+      pages: files.length,
+      words: extracted.split(/\s+/).filter(Boolean).length,
+      story
+    });
+  } catch (error) {
+    console.error("STORYTELLER_API_ERROR", error);
+    return res.status(500).json({
+      error: error?.message || "The Vercel processing function failed."
+    });
+  }
 }
