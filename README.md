@@ -35,3 +35,7 @@ Open Vercel:
 Project → Deployments → latest deployment → Functions → api/process
 
 The function log will now contain `STORYTELLER_API_ERROR` followed by the actual cause.
+
+
+## Runtime fix
+`vercel.json` intentionally does NOT set `runtime: nodejs24.x`. Official Node.js Functions need no runtime property; Vercel selects Node.js automatically. The Node version is pinned through `package.json` as `24.x`.
