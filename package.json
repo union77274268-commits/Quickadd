@@ -1,0 +1,12 @@
+{
+  "name": "storyteller-gemini-free",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vercel dev"
+  },
+  "dependencies": {
+    "busboy": "latest",
+    "pdf-parse": "latest"
+  }
+}

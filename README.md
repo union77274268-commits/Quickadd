@@ -1,36 +1,21 @@
-# Storyteller MVP
+# Storyteller AI — Gemini Free Mode
 
-Mobile-first book-to-audio-story web app.
+Vercel-ready book-to-story app.
 
-## Current MVP
-- PDF upload
-- Multiple page-image upload
-- PDF text extraction in browser
-- OCR for page images
-- Basic text cleanup
-- Refined-story script preview
-- Browser/device speech narration
-- Playback rate control
-- Local library using localStorage
-- PWA manifest
-- Backend endpoint settings placeholder
+## Environment variable
+Set in Vercel:
+`GEMINI_API_KEY=...`
 
-## Run
-Open `index.html` through a local web server (recommended because browser modules/CORS can be restricted by file://).
+Optional:
+`GEMINI_MODEL=gemini-2.5-flash-lite`
 
-Examples:
-- VS Code Live Server
-- `python -m http.server 8080`
+The app uses Gemini for OCR of uploaded images and story refinement. Audio is spoken by the device/browser SpeechSynthesis API, so there is no TTS API charge.
 
-Then open `http://localhost:8080`.
+## Deploy
+1. Replace your existing repo files with this project.
+2. Push to GitHub.
+3. Vercel redeploys.
+4. Add `GEMINI_API_KEY` in Vercel Environment Variables.
+5. Redeploy.
 
-## Production architecture
-For true AI refinement and downloadable MP3, connect:
-1. PDF/image ingestion
-2. OCR
-3. LLM story refinement
-4. TTS
-5. Audio storage
-6. Job queue/status
-
-Keep API secrets on the server/Edge Function, not in client HTML.
+Free-tier limits still apply. Large books should later be processed chapter-by-chapter.
