@@ -1,29 +1,75 @@
 <!doctype html>
-<html lang="en"><head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#111"><title>Storyteller AI</title>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#111111">
+<title>Storyteller AI</title>
 <style>
-*{box-sizing:border-box}body{margin:0;background:#f5f3ed;color:#171717;font-family:system-ui,-apple-system,Segoe UI,sans-serif}.app{max-width:760px;margin:auto;padding:22px 18px 100px}.top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:24px}.ey{font-size:10px;letter-spacing:.18em;font-weight:800;opacity:.5}h1{font-size:36px;line-height:1;letter-spacing:-.05em;margin:8px 0}h1 span{opacity:.4}h2{letter-spacing:-.04em}.icon{border:0;border-radius:50%;width:42px;height:42px;background:white}.hero{padding:25px;border-radius:28px;background:#171717;color:white;min-height:190px}.hero .book{font-size:42px}.hero h2{font-size:27px;margin:12px 0 7px}.hero p{font-size:13px;line-height:1.5;opacity:.65}.upload{margin-top:14px;border:1.5px dashed #aaa;border-radius:24px;padding:23px;text-align:center;background:#fff;cursor:pointer}.upload strong{display:block;margin:7px}.upload small{opacity:.5}.section{display:flex;justify-content:space-between;margin:28px 3px 10px;font-size:12px;font-weight:700}.section span:last-child{opacity:.45}.card{background:#fff;border-radius:20px;padding:15px;margin:9px 0;display:flex;align-items:center;gap:12px;box-shadow:0 7px 25px #00000008}.thumb{width:50px;height:62px;border-radius:12px;background:#e3d5b8;display:grid;place-items:center;font-size:23px}.info{flex:1}.info strong{display:block;font-size:14px}.info small{opacity:.5}.listen,.primary{border:0;background:#171717;color:#fff;border-radius:12px;padding:10px 13px;font-weight:700}.screen{display:none}.screen.active{display:block}.back{border:0;background:none;padding:4px 0;font-weight:700}.status{margin:28px 0 15px;font-size:14px}.bar{height:8px;background:#ddd;border-radius:9px;overflow:hidden}.bar i{display:block;height:100%;width:0;background:#171717;transition:.3s}.player{background:#191919;color:#fff;border-radius:28px;padding:22px;margin-top:22px}.wave{height:48px;display:flex;gap:3px;align-items:center}.wave i{width:3px;background:#fff;border-radius:4px;opacity:.7}.controls{display:flex;justify-content:center;align-items:center;gap:25px;margin:14px}.controls button{border:0;border-radius:50%;width:45px;height:45px}.controls .play{width:62px;height:62px}.script{background:#fff;border-radius:22px;padding:18px;margin-top:12px;line-height:1.7;font-size:14px;white-space:pre-wrap;max-height:46vh;overflow:auto}.notice{background:#fff1d0;padding:14px;border-radius:15px;font-size:12px;line-height:1.5;margin-top:15px}.nav{position:fixed;bottom:12px;left:50%;transform:translateX(-50%);width:min(92%,430px);background:#fffffff0;backdrop-filter:blur(16px);border-radius:22px;padding:8px;display:grid;grid-template-columns:repeat(3,1fr);box-shadow:0 12px 35px #0002}.nav button{border:0;background:none;padding:10px;border-radius:15px}.nav button.active{background:#171717;color:#fff}
-</style></head><body><div class="app">
+*{box-sizing:border-box}body{margin:0;background:#f5f3ed;color:#171717;font-family:system-ui,-apple-system,Segoe UI,sans-serif}.app{max-width:760px;margin:auto;padding:22px 18px 100px}.top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:24px}.ey{font-size:10px;letter-spacing:.18em;font-weight:800;opacity:.5}h1{font-size:36px;line-height:1;letter-spacing:-.05em;margin:8px 0}h1 span{opacity:.4}h2{letter-spacing:-.04em}.icon{border:0;border-radius:50%;width:42px;height:42px;background:#fff}.hero{padding:25px;border-radius:28px;background:#171717;color:#fff;min-height:190px}.hero .book{font-size:42px}.hero h2{font-size:27px;margin:12px 0 7px}.hero p{font-size:13px;line-height:1.5;opacity:.65}.upload{margin-top:14px;border:1.5px dashed #aaa;border-radius:24px;padding:23px;text-align:center;background:#fff;cursor:pointer}.upload strong{display:block;margin:7px}.upload small{opacity:.5}.section{display:flex;justify-content:space-between;margin:28px 3px 10px;font-size:12px;font-weight:700}.section span:last-child{opacity:.45}.card{background:#fff;border-radius:20px;padding:15px;margin:9px 0;display:flex;align-items:center;gap:12px;box-shadow:0 7px 25px #00000008}.thumb{width:50px;height:62px;border-radius:12px;background:#e3d5b8;display:grid;place-items:center;font-size:23px}.info{flex:1}.info strong{display:block;font-size:14px}.info small{opacity:.5}.listen,.primary{border:0;background:#171717;color:#fff;border-radius:12px;padding:10px 13px;font-weight:700}.screen{display:none}.screen.active{display:block}.back{border:0;background:none;padding:4px 0;font-weight:700}.status{margin:28px 0 15px;font-size:14px}.bar{height:8px;background:#ddd;border-radius:9px;overflow:hidden}.bar i{display:block;height:100%;width:0;background:#171717;transition:.3s}.player{background:#191919;color:#fff;border-radius:28px;padding:22px;margin-top:22px}.wave{height:48px;display:flex;gap:3px;align-items:center}.wave i{width:3px;background:#fff;border-radius:4px;opacity:.7}.controls{display:flex;justify-content:center;align-items:center;gap:25px;margin:14px}.controls button{border:0;border-radius:50%;width:45px;height:45px}.controls .play{width:62px;height:62px}.script{background:#fff;border-radius:22px;padding:18px;margin-top:12px;line-height:1.7;font-size:14px;white-space:pre-wrap;max-height:46vh;overflow:auto}.error{margin-top:18px;padding:15px;border-radius:16px;background:#ffe7e7;color:#8b1616;font-size:12px;line-height:1.5}.nav{position:fixed;bottom:12px;left:50%;transform:translateX(-50%);width:min(92%,430px);background:#fffffff0;backdrop-filter:blur(16px);border-radius:22px;padding:8px;display:grid;grid-template-columns:repeat(3,1fr);box-shadow:0 12px 35px #0002}.nav button{border:0;background:none;padding:10px;border-radius:15px}.nav button.active{background:#171717;color:#fff}
+</style>
+</head>
+<body><div class="app">
 <header class="top"><div><div class="ey">AI STORYTELLER · FREE MODE</div><h1>Turn books into<br><span>audio stories.</span></h1></div><button class="icon" onclick="toggleTheme()">◐</button></header>
-<section id="home" class="screen active"><div class="hero"><div class="book">📖</div><h2>Read less.<br>Listen better.</h2><p>Upload a book. Gemini refines it into a natural story, then your phone narrates it for free.</p></div>
+
+<section id="home" class="screen active">
+<div class="hero"><div class="book">📖</div><h2>Read less.<br>Listen better.</h2><p>Upload a book. Gemini refines it into a natural story, then your phone narrates it for free.</p></div>
 <label class="upload" for="files"><div style="font-size:28px">＋</div><strong>Add your book</strong><small>PDF or page images · multiple files supported</small></label>
-<input id="files" type="file" accept=".pdf,image/*" multiple hidden onchange="uploadBook(this.files)">
-<div class="section"><span>Your stories</span><span id="count">0</span></div><div id="library"></div></section>
-<section id="processing" class="screen"><button class="back" onclick="go('home')">← Library</button><h2>Creating your story</h2><p id="status" class="status">Uploading…</p><div class="bar"><i id="progress"></i></div><div id="detail" style="margin-top:18px;font-size:12px;opacity:.55"></div></section>
-<section id="story" class="screen"><button class="back" onclick="go('home')">← Library</button><div class="ey">READY TO LISTEN</div><h2 id="title"></h2><p id="meta" style="opacity:.5;font-size:12px"></p><div class="player"><div class="wave" id="wave"></div><div class="controls"><button onclick="seek(-15)">↶</button><button class="play" id="play" onclick="toggleAudio()">▶</button><button onclick="seek(15)">↷</button></div><div style="font-size:11px;opacity:.55;text-align:center">Browser voice · free</div></div><h3>Refined story</h3><div id="script" class="script"></div></section>
-<section id="settings" class="screen"><div class="ey">FREE SETUP</div><h2>Gemini connection</h2><p style="opacity:.6;line-height:1.5">Create a Gemini API key and put it only in Vercel Environment Variables. Never put it in this page.</p><div class="notice"><b>Variable:</b> GEMINI_API_KEY<br><br>Gemini currently offers a free tier for selected models, with rate limits. citeturn0search0</div></section>
-</div><nav class="nav"><button class="active" onclick="go('home')">⌂<br><small>Library</small></button><button onclick="go('story')">▶<br><small>Player</small></button><button onclick="go('settings')">⚙<br><small>Setup</small></button></nav>
+<input id="files" type="file" accept=".pdf,image/*" multiple>
+<div class="section"><span>Your stories</span><span id="count">0</span></div><div id="library"></div>
+</section>
+
+<section id="processing" class="screen">
+<button class="back" onclick="go('home')">← Library</button>
+<h2>Creating your story</h2><p id="status" class="status">Preparing…</p><div class="bar"><i id="progress"></i></div>
+<div id="detail" style="margin-top:18px;font-size:12px;opacity:.55"></div><div id="errorBox" class="error" hidden></div>
+</section>
+
+<section id="story" class="screen">
+<button class="back" onclick="go('home')">← Library</button><div class="ey">READY TO LISTEN</div><h2 id="title"></h2><p id="meta" style="opacity:.5;font-size:12px"></p>
+<div class="player"><div class="wave" id="wave"></div><div class="controls"><button onclick="stopSpeech()">■</button><button class="play" id="play" onclick="toggleAudio()">▶</button><button onclick="restartSpeech()">↻</button></div><div style="font-size:11px;opacity:.55;text-align:center">Device/browser voice · free</div></div>
+<h3>Refined story</h3><div id="script" class="script"></div>
+</section>
+
+<section id="settings" class="screen"><div class="ey">FREE SETUP</div><h2>Gemini connection</h2><p style="opacity:.6;line-height:1.5">The Gemini key is kept server-side in Vercel. It must never be placed in this page.</p><div class="error" style="background:#fff1d0;color:#5d4510">Vercel Environment Variable:<br><b>GEMINI_API_KEY</b></div></section>
+</div>
+<nav class="nav"><button class="active" onclick="go('home')">⌂<br><small>Library</small></button><button onclick="go('story')">▶<br><small>Player</small></button><button onclick="go('settings')">⚙<br><small>Setup</small></button></nav>
+
 <script>
-let books=JSON.parse(localStorage.getItem('story_books')||'[]'),current=null;
+let books=JSON.parse(localStorage.getItem('story_books')||'[]'),current=null,speaking=false;
 const $=id=>document.getElementById(id);
-function go(id){document.querySelectorAll('.screen').forEach(x=>x.classList.toggle('active',x.id===id));window.scrollTo(0,0)}
-function toggleTheme(){document.body.style.background=document.body.style.background===''?'#111':'#f5f3ed';document.body.style.color=document.body.style.color===''?'#eee':'#171717'}
+function go(id){document.querySelectorAll('.screen').forEach(x=>x.classList.toggle('active',x.id===id));document.querySelectorAll('.nav button').forEach((b,i)=>b.classList.toggle('active',['home','story','settings'][i]===id));window.scrollTo(0,0)}
+function toggleTheme(){document.body.classList.toggle('dark');}
 function esc(s){return String(s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]))}
-function render(){$('count').textContent=books.length;$('library').innerHTML=books.length?books.map((b,i)=>`<div class="card"><div class="thumb">📖</div><div class="info"><strong>${esc(b.title)}</strong><small>${b.pages||1} pages · ${b.words||0} words</small></div><button class="listen" onclick="openStory(${i})">Listen</button></div>`).join(''):'<div style="text-align:center;padding:25px;opacity:.5;font-size:13px">No stories yet.</div>'}
-async function uploadBook(files){if(!files.length)return;go('processing');$('status').textContent='Uploading…';$('progress').style.width='10%';const fd=new FormData();[...files].forEach(f=>fd.append('files',f));try{$('status').textContent='Reading PDF / page images…';$('progress').style.width='30%';const r=await fetch('/api/process',{method:'POST',body:fd});const d=await r.json();if(!r.ok)throw Error(d.error||'Processing failed');$('progress').style.width='100%';$('status').textContent='Story ready.';const b={title:d.title,pages:d.pages,words:d.words,story:d.story};books.unshift(b);books=books.slice(0,20);localStorage.setItem('story_books',JSON.stringify(books));render();setTimeout(()=>openStory(0),300)}catch(e){$('status').textContent='Error: '+e.message;$('detail').textContent='Check your Vercel GEMINI_API_KEY and free-tier limits.';$('progress').style.width='0%'}}
-function openStory(i){current=books[i];$('title').textContent=current.title;$('meta').textContent=`${current.pages} pages · ${current.words||0} words`;$('script').textContent=current.story||'';makeWave();go('story')}
+function render(){$('count').textContent=books.length;$('library').innerHTML=books.length?books.map((b,i)=>`<div class="card"><div class="thumb">📖</div><div class="info"><strong>${esc(b.title)}</strong><small>${b.pages||1} pages · ${(b.words||0).toLocaleString()} words</small></div><button class="listen" onclick="openStory(${i})">Listen</button></div>`).join(''):'<div style="text-align:center;padding:25px;opacity:.5;font-size:13px">No stories yet.</div>'}
+async function uploadBook(files){
+ if(!files.length)return;
+ go('processing'); $('errorBox').hidden=true; $('detail').textContent=`${files.length} file${files.length>1?'s':''} selected`;
+ $('status').textContent='Uploading…';$('progress').style.width='8%';
+ const fd=new FormData();[...files].forEach(f=>fd.append('files',f));
+ try{
+  $('status').textContent='Sending pages to Gemini…';$('progress').style.width='25%';
+  const response=await fetch('/api/process',{method:'POST',body:fd});
+  const raw=await response.text();
+  let data;try{data=JSON.parse(raw)}catch{throw Error(`Server returned ${response.status} instead of JSON. ${raw.slice(0,180)}`)}
+  if(!response.ok)throw Error(data.error||`Server error ${response.status}`);
+  $('progress').style.width='100%';$('status').textContent='Story ready.';
+  const b={title:data.title,pages:data.pages,words:data.words,story:data.story};
+  books.unshift(b);books=books.slice(0,20);localStorage.setItem('story_books',JSON.stringify(books));render();
+  setTimeout(()=>openStory(0),350);
+ }catch(e){
+  $('status').textContent='Processing failed';
+  $('detail').textContent='The app received an error from the Vercel API.';
+  $('errorBox').hidden=false;$('errorBox').textContent=e.message;
+  $('progress').style.width='0%';
+ }
+}
+function openStory(i){current=books[i];$('title').textContent=current.title;$('meta').textContent=`${current.pages||1} pages · ${(current.words||0).toLocaleString()} words`;$('script').textContent=current.story||'';makeWave();go('story')}
 function makeWave(){let w=$('wave');w.innerHTML='';for(let i=0;i<70;i++){let x=document.createElement('i');x.style.height=(8+Math.random()*38)+'px';w.appendChild(x)}}
-function toggleAudio(){if(!current)return;let u=new SpeechSynthesisUtterance(current.story);u.rate=1;u.pitch=.98;u.onstart=()=>$('play').textContent='Ⅱ';u.onend=()=>$('play').textContent='▶';speechSynthesis.cancel();speechSynthesis.speak(u)}
-function seek(s){/* Browser SpeechSynthesis has no reliable seek API. */}render();
+function toggleAudio(){if(!current)return;if(speaking)stopSpeech();else startSpeech()}
+function startSpeech(){if(!('speechSynthesis'in window))return alert('Speech synthesis is not supported on this browser.');let u=new SpeechSynthesisUtterance(current.story);u.rate=1;u.pitch=.98;u.onstart=()=>{speaking=true;$('play').textContent='Ⅱ'};u.onend=()=>{speaking=false;$('play').textContent='▶'};speechSynthesis.cancel();speechSynthesis.speak(u)}
+function stopSpeech(){speechSynthesis.cancel();speaking=false;$('play').textContent='▶'}
+function restartSpeech(){stopSpeech();setTimeout(startSpeech,100)}
+$('files').onchange=e=>{uploadBook(e.target.files);e.target.value=''};
+render();
 </script></body></html>
