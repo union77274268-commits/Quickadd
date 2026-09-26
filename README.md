@@ -21,7 +21,7 @@ GEMINI_API_KEY = your Gemini API key
 
 Optional:
 
-GEMINI_MODEL = gemini-2.5-flash-lite
+GEMINI_MODEL = gemini-3.5-flash-lite
 
 Redeploy after changing the environment variable.
 
