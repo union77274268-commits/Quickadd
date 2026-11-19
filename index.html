@@ -494,6 +494,37 @@ footer .tel_{display:flex;gap:16px;flex-wrap:wrap;margin-top:18px;font-weight:70
 .lite .wy .wimg,.lite .pn .ph{box-shadow:none}
 .lite .rv{transition-duration:.6s}
 @media(prefers-reduced-motion:reduce){.rv,.wy .w{filter:none!important}}
+
+/* desktop fixes: short laptop screens, overlap and clipping */
+@media(min-width:1024px){
+ .pn{background:var(--navy)}
+ .pn .gn{-webkit-text-stroke-color:rgba(255,255,255,.5)!important}
+ .pn h3{font-size:clamp(44px,min(6.2vw,11.5svh),116px);margin:12px 0 14px}
+ .pn p{font-size:clamp(14px,2.4svh,17px)}
+ .pn .cap{padding-bottom:0}
+ .pn .ph{inset:max(104px,15svh) 5vw max(34px,7svh) 47%}
+ .ixr .nm{min-width:0}
+ .ixr .nm b{font-size:clamp(40px,min(6vw,11svh),104px)}
+ .ixr{padding:clamp(14px,3.2svh,30px) 0}
+ .ixr i{width:clamp(44px,8svh,56px);height:clamp(44px,8svh,56px)}
+ .lk .st{padding-top:92px;justify-content:center}
+ .lk h2 br.mb{display:none}
+ .lk h2{font-size:clamp(40px,min(6vw,10.5svh),104px)}
+ .lc{width:min(24vw,44svh,420px)}
+ .lk .top{padding-bottom:clamp(12px,2.5svh,26px)}
+ .oc .st{padding-top:104px;padding-bottom:40px;gap:2svh}
+ .oc .ow{max-width:min(1240px,92vw);font-size:clamp(40px,min(7vw,12svh),120px)}
+ .oc .oi{width:min(20vw,36svh,320px)}
+ .oc .od{min-height:3.4em}
+ .wy .st{padding:104px 48px 40px}
+ .wy .hd{top:max(96px,14svh);left:48px;right:48px;text-align:left}
+ .wy h3{font-size:clamp(40px,min(5vw,9.5svh),84px)}
+ .wy .wimg{width:min(30vw,44svh,420px)}
+ .gd{grid-template-columns:repeat(3,1fr);gap:30px}
+ .pc:nth-child(even){margin-top:0}.pc:nth-child(3n+2){margin-top:64px}
+ .sh h2,.ixs h2,.sty h2,.igs h2,.fq h2,.lo h2{font-size:clamp(48px,min(6.4vw,12svh),112px)}
+ .lo .fig{height:min(66svh,640px)}
+}
 </style>
 </head>
 <body>
@@ -590,7 +621,7 @@ footer .tel_{display:flex;gap:16px;flex-wrap:wrap;margin-top:18px;font-weight:70
 
 <!-- 6 LOOKBOOK -->
 <section class="lk" id="looks"><div class="st">
- <div class="top"><h2>The<br><em>lookbook.</em></h2><div class="rt"><div class="ct"><b id="lc">01</b> / 06</div><div class="arw"><button class="pv" id="lkp" aria-label="Previous look"><svg class="g"><use href="#arr"/></svg></button><button id="lkn" aria-label="Next look"><svg class="g"><use href="#arr"/></svg></button></div></div></div>
+ <div class="top"><h2>The<br class="mb"> <em>lookbook.</em></h2><div class="rt"><div class="ct"><b id="lc">01</b> / 06</div><div class="arw"><button class="pv" id="lkp" aria-label="Previous look"><svg class="g"><use href="#arr"/></svg></button><button id="lkn" aria-label="Next look"><svg class="g"><use href="#arr"/></svg></button></div></div></div>
  <div class="tr" id="tr">
   <div class="lc"><div class="ph hx t1" data-img="g1" data-ic="shirt" data-l="Look 01"></div><span><b>Look 01</b><i style="font-style:normal">Men</i></span></div>
   <div class="lc"><div class="ph hx t2" data-img="g2" data-ic="romper" data-l="Look 02"></div><span><b>Look 02</b><i style="font-style:normal">Kids</i></span></div>
