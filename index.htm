@@ -1,0 +1,959 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Beyond Living</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+/* Layout: pinned arch hero that grows into the showroom, word-by-word manifesto, horizontal collection rail, sticky craft sequence, lit facade, enquiry, wordmark footer */
+:root{
+  --bg:#FAF7F3; --bg2:#F0E8DD; --fg:#2A1D13; --muted:#85705A;
+  --brand:#5F4630; --gold:#B98A45; --line:rgba(95,70,48,.2); --glow:rgba(185,138,69,.0);
+  --facade:#D9D3CA; --facade2:#C9C1B6; --card:#F6F0E8;
+  --display:'Cormorant Garamond','Cormorant',Georgia,'Times New Roman',serif;
+  --body:'Jost','Helvetica Neue',Arial,sans-serif;
+  --gutter:max(16px,env(safe-area-inset-left,0px));
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#16100B; --bg2:#20160E; --fg:#F2E8DA; --muted:#B5A18A;
+  --brand:#D8B88A; --gold:#EDBE6C; --line:rgba(237,190,108,.22); --glow:rgba(237,190,108,.5);
+  --facade:#3A332C; --facade2:#2B251F; --card:#1E150D; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#16100B; --bg2:#20160E; --fg:#F2E8DA; --muted:#B5A18A;
+  --brand:#D8B88A; --gold:#EDBE6C; --line:rgba(237,190,108,.22); --glow:rgba(237,190,108,.5);
+  --facade:#3A332C; --facade2:#2B251F; --card:#1E150D; color-scheme:dark}
+
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--fg);font-family:var(--body);font-weight:300;font-size:17px;line-height:1.65;
+  padding-left:max(0px,env(safe-area-inset-left,0px));padding-right:max(0px,env(safe-area-inset-right,0px));overflow-x:hidden;-webkit-font-smoothing:antialiased}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:60;background:var(--bg)}
+a{color:inherit;text-decoration:none}
+:focus-visible{outline:2px solid var(--gold);outline-offset:3px}
+.wrap{width:100%;max-width:1240px;margin-inline:auto;padding-left:max(20px,env(safe-area-inset-left,0px));padding-right:max(20px,env(safe-area-inset-right,0px))}
+.eyebrow{font-size:.72rem;letter-spacing:.34em;text-transform:uppercase;color:var(--muted);font-weight:400}
+h1,h2,h3{font-family:var(--display);font-weight:400;line-height:1.02;margin:0;text-wrap:balance;letter-spacing:-.01em}
+h2{font-size:clamp(2.4rem,6vw,4.6rem)}
+em{font-style:italic;color:var(--gold)}
+
+/* nav */
+.nav{position:fixed;top:env(safe-area-inset-top,0px);left:0;right:0;z-index:50;display:flex;align-items:center;justify-content:space-between;gap:16px;
+  padding:14px max(20px,env(safe-area-inset-right,0px)) 14px max(20px,env(safe-area-inset-left,0px));transition:background .4s,backdrop-filter .4s,border-color .4s;border-bottom:1px solid transparent}
+.nav.solid{background:color-mix(in srgb,var(--bg) 82%,transparent);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-color:var(--line)}
+.brand{display:flex;align-items:center;gap:12px;color:var(--brand)}
+.brand svg{width:30px;height:auto;display:block}
+.brand span{font-family:var(--display);font-size:1.25rem;letter-spacing:.32em;text-transform:uppercase;font-weight:500}
+.links{display:flex;align-items:center;gap:30px;font-size:.78rem;letter-spacing:.22em;text-transform:uppercase;font-weight:400}
+.links a{position:relative;padding:6px 0}
+.links a::after{content:"";position:absolute;left:0;bottom:0;height:1px;width:100%;background:var(--gold);transform:scaleX(0);transform-origin:left;transition:transform .4s}
+.links a:hover::after{transform:scaleX(1)}
+.tbtn{width:38px;height:38px;border-radius:50%;border:1px solid var(--line);background:transparent;color:var(--fg);cursor:pointer;display:grid;place-items:center;flex:none}
+.tbtn svg{width:16px;height:16px}
+@media(max-width:820px){.links a{display:none}.links{gap:0}.brand span{font-size:1.05rem;letter-spacing:.26em}}
+
+/* hero */
+.hero{height:340svh;position:relative}
+.stage{position:sticky;top:0;height:100svh;overflow:hidden;display:grid;align-items:center}
+.hero-grid{display:grid;grid-template-columns:1.05fr .95fr;align-items:center;gap:32px;width:100%;max-width:1240px;margin-inline:auto;
+  padding:84px max(20px,env(safe-area-inset-right,0px)) 40px max(20px,env(safe-area-inset-left,0px))}
+.hero-copy{position:relative;z-index:3;will-change:transform,opacity}
+.hero-copy h1{font-size:clamp(3.3rem,9.5vw,8rem);font-weight:300;margin:18px 0 22px}
+.hero-copy h1 em{display:block;font-weight:300}
+.hero-copy p{max-width:30rem;margin:0 0 30px;color:var(--muted);font-size:1.02rem}
+.cta{display:inline-flex;align-items:center;gap:14px;padding:15px 28px;border:1px solid var(--brand);color:var(--brand);font-size:.76rem;letter-spacing:.26em;text-transform:uppercase;font-weight:400;border-radius:999px;transition:background .35s,color .35s}
+.cta:hover{background:var(--brand);color:var(--bg)}
+.cta.fill{background:var(--brand);color:var(--bg)}
+.cta.fill:hover{background:transparent;color:var(--brand)}
+.slot{justify-self:center;width:min(100%,430px);aspect-ratio:3/3.7;visibility:hidden}
+.arch{position:absolute;overflow:hidden;z-index:2;background:linear-gradient(180deg,#2a1b11 0%,#4b3320 48%,#a9763a 100%);will-change:left,top,width,height;box-shadow:0 40px 120px -40px rgba(0,0,0,.45)}
+.arch .glow{position:absolute;inset:0;background:radial-gradient(60% 50% at 50% 66%,rgba(255,206,130,.55),transparent 70%)}
+.arch svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
+.arch .step{position:absolute;left:0;right:0;bottom:11%;text-align:center;color:#F6E7CE;opacity:0;transform:translateY(24px);will-change:opacity,transform;pointer-events:none}
+.arch .step h2{font-size:clamp(2.2rem,6vw,5rem);font-weight:300;text-shadow:0 2px 30px rgba(0,0,0,.4)}
+.arch .step .eyebrow{color:#EBCB95;display:block;margin-bottom:12px}
+.ring{position:absolute;pointer-events:none;border:1px solid var(--gold);opacity:.5;border-radius:999px 999px 0 0;z-index:1}
+.cue{position:absolute;left:50%;bottom:22px;transform:translateX(-50%);z-index:4;display:flex;flex-direction:column;align-items:center;gap:8px;font-size:.66rem;letter-spacing:.34em;text-transform:uppercase;color:var(--muted)}
+.cue i{display:block;width:1px;height:38px;background:linear-gradient(var(--gold),transparent);animation:drip 2.2s ease-in-out infinite}
+@keyframes drip{0%{transform:scaleY(0);transform-origin:top}50%{transform:scaleY(1);transform-origin:top}51%{transform-origin:bottom}100%{transform:scaleY(0);transform-origin:bottom}}
+@media(max-width:820px){
+  .hero-grid{grid-template-columns:1fr;gap:18px;padding-top:78px;align-content:center}
+  .slot{width:min(66%,300px);order:-1}
+  .hero-copy h1{font-size:clamp(2.9rem,15vw,4.6rem);margin:12px 0 14px}
+  .hero-copy p{font-size:.95rem;margin-bottom:20px}
+  .cta{padding:13px 22px}
+}
+@media(max-height:640px) and (max-width:820px){.slot{width:min(40%,200px)}.hero-copy p{display:none}}
+
+/* marquee */
+.marq{border-block:1px solid var(--line);overflow:hidden;white-space:nowrap;padding:18px 0;background:var(--bg)}
+.marq div{display:inline-flex;gap:56px;animation:roll 38s linear infinite;font-family:var(--display);font-size:clamp(1.5rem,3vw,2.2rem);font-style:italic;font-weight:300;color:var(--brand);padding-right:56px}
+.marq span::after{content:"◦";margin-left:56px;color:var(--gold);font-style:normal}
+@keyframes roll{to{transform:translateX(-50%)}}
+
+/* manifesto */
+.manifesto{padding:clamp(96px,16vw,220px) 0;position:relative;overflow:hidden}
+.manifesto .eyebrow{display:block;margin-bottom:34px}
+.manifesto p{font-family:var(--display);font-size:clamp(2rem,5.2vw,4.1rem);line-height:1.14;font-weight:300;margin:0;max-width:20ch;max-width:min(100%,1000px);text-wrap:pretty}
+.manifesto p .w{color:var(--fg);opacity:.2;transition:opacity .35s}
+.manifesto p .w.on{opacity:1}
+.manifesto p .w.g.on{color:var(--gold);font-style:italic}
+.mark-bg{position:absolute;right:-6%;top:50%;width:min(52vw,560px);transform:translateY(-50%);opacity:.07;color:var(--brand);pointer-events:none}
+
+/* collections rail */
+.rail{position:relative}
+.rail-pin{position:sticky;top:0;height:100svh;overflow:hidden;display:flex;flex-direction:column;justify-content:center;gap:clamp(18px,3vh,36px);background:var(--bg2)}
+.rail-head{display:flex;justify-content:space-between;align-items:end;gap:24px;flex-wrap:wrap;padding-top:64px}
+.rail-head h2{max-width:11ch}
+.prog{display:flex;align-items:center;gap:14px;font-size:.72rem;letter-spacing:.26em;color:var(--muted);text-transform:uppercase}
+.prog b{display:block;width:clamp(90px,16vw,200px);height:1px;background:var(--line);position:relative}
+.prog b i{position:absolute;left:0;top:0;height:1px;background:var(--gold);width:0}
+.track{display:flex;gap:clamp(16px,2.4vw,32px);padding-left:max(20px,calc((100vw - 1240px)/2 + 20px));padding-right:20px;will-change:transform}
+.card{flex:none;width:clamp(230px,26vw,340px);display:flex;flex-direction:column;gap:14px}
+.card .frame{aspect-ratio:3/4;border-radius:999px 999px 0 0;position:relative;overflow:hidden;background:var(--c1);display:grid;place-items:end center;transition:transform .7s cubic-bezier(.2,.7,.2,1)}
+.card:hover .frame{transform:translateY(-8px)}
+.card .frame::before{content:"";position:absolute;inset:0;background:radial-gradient(70% 50% at 50% 78%,var(--c2),transparent 72%)}
+.card .frame svg{position:relative;width:86%;height:auto;margin-bottom:9%;color:var(--ink);transition:transform .9s cubic-bezier(.2,.7,.2,1)}
+.card:hover .frame svg{transform:scale(1.05)}
+.card h3{font-size:1.7rem;font-weight:400}
+.card p{margin:0;color:var(--muted);font-size:.92rem;line-height:1.5}
+.card .n{font-size:.68rem;letter-spacing:.3em;text-transform:uppercase;color:var(--gold)}
+@media(max-height:620px){.rail-head h2{font-size:2rem}.card .frame{aspect-ratio:3/3.2}}
+
+/* craft */
+.craft{padding:clamp(88px,12vw,170px) 0}
+.craft-grid{display:grid;grid-template-columns:.9fr 1.1fr;gap:clamp(32px,7vw,110px);align-items:start}
+.craft-side{position:sticky;top:110px}
+.craft-side h2{margin:18px 0 22px}
+.craft-side p{color:var(--muted);max-width:26rem}
+.steps{position:relative;display:grid;gap:clamp(60px,12vh,140px);padding-left:clamp(28px,5vw,64px)}
+.steps::before{content:"";position:absolute;left:0;top:6px;bottom:6px;width:1px;background:var(--line)}
+.steps .line{position:absolute;left:0;top:6px;width:1px;background:var(--gold);height:0}
+.step-i{position:relative;opacity:.35;transition:opacity .5s,transform .6s}
+.step-i.on{opacity:1}
+.step-i::before{content:"";position:absolute;left:calc(-1 * clamp(28px,5vw,64px) - 5px);top:12px;width:11px;height:11px;border-radius:50%;background:var(--bg);border:1px solid var(--gold);transition:background .4s,box-shadow .4s}
+.step-i.on::before{background:var(--gold);box-shadow:0 0 0 6px var(--bg),0 0 24px var(--glow)}
+.step-i h3{font-size:clamp(1.9rem,3.6vw,2.8rem);margin:8px 0 12px}
+.step-i p{margin:0;color:var(--muted);max-width:32rem}
+.step-i svg{display:block;width:min(100%,360px);margin-top:26px;color:var(--brand)}
+@media(max-width:820px){.craft-grid{grid-template-columns:1fr}.craft-side{position:static}}
+
+/* showroom */
+.show{background:var(--bg2);padding:clamp(88px,12vw,160px) 0;overflow:hidden}
+.show-head{display:flex;justify-content:space-between;gap:32px;flex-wrap:wrap;align-items:end;margin-bottom:clamp(36px,6vw,72px)}
+.show-head h2{max-width:12ch}
+.show-head p{max-width:26rem;color:var(--muted);margin:0}
+.facade{position:relative;border-radius:6px;background:linear-gradient(180deg,var(--facade),var(--facade2));aspect-ratio:16/8.4;min-height:300px;display:grid;grid-template-rows:1fr auto;overflow:hidden;border:1px solid var(--line)}
+.facade .vent{position:absolute;top:0;width:clamp(48px,9vw,120px);height:58%;background:repeating-linear-gradient(90deg,transparent 0 5px,rgba(0,0,0,.14) 5px 7px);opacity:.7}
+.facade .vent.l{left:6%}.facade .vent.r{right:6%}
+.sign{align-self:center;justify-self:center;text-align:center;transform:translateY(8%);z-index:2}
+.sign b{display:block;font-family:var(--display);font-weight:500;font-size:clamp(2rem,7.4vw,6.4rem);letter-spacing:.3em;margin-right:-.3em;line-height:1;color:color-mix(in srgb,var(--fg) 40%,var(--facade));transition:color .2s,text-shadow .2s}
+.sign span{display:block;font-size:clamp(.7rem,1.7vw,1.4rem);letter-spacing:.62em;margin-right:-.62em;margin-top:.5em;color:color-mix(in srgb,var(--fg) 40%,var(--facade))}
+.facade.lit .sign b,.facade.lit .sign span{color:#FFE2A8;text-shadow:0 0 22px rgba(255,196,110,.85),0 0 70px rgba(255,170,70,.55)}
+.glass{position:relative;height:clamp(110px,18vw,200px);background:linear-gradient(180deg,#2a1a0e,#7a5028 70%,#c58b45);display:flex;align-items:flex-end;justify-content:space-around;padding:0 4% 0;overflow:hidden;border-top:6px solid var(--facade2)}
+.glass .dots{position:absolute;top:10px;left:0;right:0;display:flex;justify-content:space-around;padding:0 6%}
+.glass .dots i{width:8px;height:8px;border-radius:50%;background:#6b5a46;transition:background .4s,box-shadow .4s}
+.glass .dots i.on{background:#FFE3B0;box-shadow:0 0 14px 4px rgba(255,200,120,.8)}
+.glass svg{height:78%;width:auto;color:#2b1a0d;opacity:.9}
+.hours{display:grid;grid-template-columns:repeat(3,1fr);gap:0;margin-top:clamp(36px,5vw,60px);border-top:1px solid var(--line)}
+.hours div{padding:26px 24px 0 0}
+.hours h3{font-size:1.5rem;margin-bottom:6px}
+.hours p{margin:0;color:var(--muted);font-size:.94rem}
+@media(max-width:700px){.hours{grid-template-columns:1fr}}
+
+/* enquiry */
+.enq{padding:clamp(88px,12vw,170px) 0}
+.enq-grid{display:grid;grid-template-columns:1fr 1fr;gap:clamp(32px,7vw,100px);align-items:start}
+.enq h2{margin:18px 0 22px}
+.enq p.lead{color:var(--muted);max-width:28rem;margin:0}
+form{display:grid;gap:22px}
+.f{display:grid;gap:8px;min-width:0}
+.f label{font-size:.7rem;letter-spacing:.26em;text-transform:uppercase;color:var(--muted);font-weight:400}
+.f input,.f select,.f textarea{width:100%;font:inherit;color:var(--fg);background:transparent;border:0;border-bottom:1px solid var(--line);padding:10px 0;border-radius:0;font-size:1.05rem;transition:border-color .3s}
+.f textarea{resize:vertical;min-height:90px}
+.f input:focus,.f select:focus,.f textarea:focus{outline:none;border-color:var(--gold)}
+.f select option{background:var(--bg);color:var(--fg)}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:22px}
+.note{min-height:1.6em;font-size:.9rem;color:var(--gold);margin:0}
+@media(max-width:820px){.enq-grid{grid-template-columns:1fr}.row2{grid-template-columns:1fr}}
+
+/* footer */
+footer{background:var(--brand);color:var(--bg);padding:clamp(60px,9vw,120px) 0 28px;position:relative;overflow:hidden}
+footer .big{font-family:var(--display);font-weight:300;font-size:clamp(3.2rem,15.5vw,15rem);letter-spacing:.06em;line-height:.9;text-transform:uppercase;text-align:center;margin:0 0 clamp(32px,5vw,70px);white-space:nowrap}
+footer .cols{display:flex;justify-content:space-between;gap:24px;flex-wrap:wrap;font-size:.74rem;letter-spacing:.24em;text-transform:uppercase;border-top:1px solid color-mix(in srgb,var(--bg) 30%,transparent);padding-top:22px}
+footer .cols a:hover{opacity:.7}
+
+/* shop */
+.shop{padding:clamp(88px,12vw,170px) 0 clamp(60px,8vw,110px)}
+.shop-head{display:flex;justify-content:space-between;align-items:end;gap:28px;flex-wrap:wrap;margin-bottom:clamp(28px,4vw,48px)}
+.shop-head h2{margin-top:16px;max-width:12ch}
+.chips{display:flex;gap:10px;flex-wrap:wrap}
+.chip{border:1px solid var(--line);background:transparent;color:var(--fg);padding:10px 18px;border-radius:999px;font:inherit;font-size:.72rem;letter-spacing:.2em;text-transform:uppercase;cursor:pointer;transition:background .3s,color .3s,border-color .3s;font-weight:400}
+.chip:hover{border-color:var(--gold)}
+.chip[aria-pressed="true"]{background:var(--brand);color:var(--bg);border-color:var(--brand)}
+.pgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,250px),1fr));gap:clamp(34px,4vw,56px) clamp(16px,2vw,28px)}
+.prod{display:flex;flex-direction:column;gap:14px;min-width:0}
+.prod[hidden]{display:none}
+.pframe{position:relative;aspect-ratio:4/4.5;border-radius:999px 999px 10px 10px;overflow:hidden;background:linear-gradient(180deg,#F0E6D6,#E2D0B6);display:grid;place-items:end center;transition:transform .7s cubic-bezier(.2,.7,.2,1)}
+.pframe::before{content:"";position:absolute;inset:0;background:radial-gradient(68% 46% at 50% 82%,rgba(214,166,92,.5),transparent 72%)}
+.pframe svg{position:relative;width:76%;height:auto;margin-bottom:12%;color:var(--ink);transition:transform .9s cubic-bezier(.2,.7,.2,1),color .4s;overflow:visible}
+.prod:hover .pframe{transform:translateY(-6px)}
+.prod:hover .pframe svg{transform:scale(1.05)}
+.tag{position:absolute;top:16%;left:50%;transform:translateX(-50%);z-index:2;font-size:.6rem;letter-spacing:.22em;text-transform:uppercase;color:#5F4630;background:rgba(255,250,242,.8);padding:4px 10px;border-radius:999px;white-space:nowrap}
+.pmeta h3{font-size:1.55rem;font-weight:400}
+.pmat{margin:2px 0 10px;color:var(--muted);font-size:.86rem;line-height:1.45}
+.sw{display:flex;gap:9px;margin-bottom:14px}
+.sw button{width:20px;height:20px;border-radius:50%;border:1px solid var(--line);background:var(--c);cursor:pointer;padding:0}
+.sw button[aria-pressed="true"]{box-shadow:0 0 0 2px var(--bg),0 0 0 3.5px var(--gold)}
+.prow{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.price{font-family:var(--display);font-size:1.6rem;font-weight:500;color:var(--brand)}
+.add{border:1px solid var(--brand);background:transparent;color:var(--brand);border-radius:999px;padding:10px 18px;font:inherit;font-size:.68rem;letter-spacing:.2em;text-transform:uppercase;cursor:pointer;transition:background .3s,color .3s;font-weight:400}
+.add:hover,.add.ok{background:var(--brand);color:var(--bg)}
+.fine{margin:clamp(28px,4vw,44px) 0 0;color:var(--muted);font-size:.84rem}
+.card[data-f]{cursor:pointer}
+
+/* studio */
+.studio{background:var(--bg2);padding:clamp(88px,12vw,170px) 0}
+.studio-grid{display:grid;grid-template-columns:1.15fr .85fr;gap:clamp(28px,5vw,80px);align-items:center}
+.studio h2{margin:16px 0 18px;max-width:12ch}
+.studio .lead{color:var(--muted);max-width:30rem;margin:0 0 30px}
+.sstage{position:relative;aspect-ratio:1/.92;border-radius:999px 999px 14px 14px;background:linear-gradient(180deg,#2a1b11,#4b3320 55%,#a9763a);overflow:hidden;display:grid;place-items:end center;min-width:0}
+.sstage::before{content:"";position:absolute;inset:0;background:radial-gradient(60% 46% at 50% 78%,rgba(255,206,130,.5),transparent 70%)}
+.sstage svg{position:relative;width:96%;height:auto;margin-bottom:6%}
+.ctrl{display:grid;gap:26px}
+.ctrl .lab{display:flex;justify-content:space-between;gap:12px;font-size:.7rem;letter-spacing:.26em;text-transform:uppercase;color:var(--muted);margin-bottom:12px;font-weight:400}
+.ctrl .lab b{color:var(--fg);font-weight:400;letter-spacing:.12em;text-transform:none;font-size:.9rem}
+.fabs{display:flex;gap:12px;flex-wrap:wrap}
+.fabs button{width:34px;height:34px;border-radius:50%;border:1px solid var(--line);background:var(--c);cursor:pointer;padding:0}
+.fabs button[aria-pressed="true"]{box-shadow:0 0 0 3px var(--bg2),0 0 0 4.5px var(--gold)}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:999px;padding:3px}
+.seg button{border:0;background:transparent;color:var(--fg);font:inherit;font-size:.74rem;letter-spacing:.16em;text-transform:uppercase;padding:9px 18px;border-radius:999px;cursor:pointer;font-weight:400}
+.seg button[aria-pressed="true"]{background:var(--brand);color:var(--bg)}
+input[type=range]{width:100%;accent-color:var(--gold);height:28px}
+.quote{display:flex;align-items:end;justify-content:space-between;gap:16px;flex-wrap:wrap;border-top:1px solid var(--line);padding-top:24px}
+.quote .price{font-size:2.4rem;line-height:1}
+.quote small{display:block;color:var(--muted);font-size:.78rem;margin-bottom:6px;letter-spacing:.14em;text-transform:uppercase}
+@media(max-width:820px){.studio-grid{grid-template-columns:1fr}}
+
+/* find us */
+.find{padding:clamp(88px,12vw,170px) 0}
+.find-head{margin-bottom:clamp(28px,4vw,50px)}
+.find-head h2{margin-top:16px;max-width:14ch}
+.find-grid{display:grid;grid-template-columns:.8fr 1.2fr;gap:clamp(24px,4vw,56px);align-items:stretch}
+.info{display:grid;gap:26px;align-content:start;min-width:0}
+.info h3{font-size:1.5rem;margin-bottom:6px}
+.info p{margin:0;color:var(--muted);font-size:.96rem}
+.info address{font-style:normal;color:var(--fg);font-size:1.05rem;line-height:1.6}
+.status{display:inline-flex;align-items:center;gap:10px;font-size:.74rem;letter-spacing:.2em;text-transform:uppercase;border:1px solid var(--line);border-radius:999px;padding:8px 16px;width:fit-content;font-weight:400}
+.status i{width:9px;height:9px;border-radius:50%;background:#3f9d5f;box-shadow:0 0 0 0 rgba(63,157,95,.6);animation:ping 2s infinite}
+.status.closed i{background:#c0564a;animation:none}
+@keyframes ping{70%{box-shadow:0 0 0 9px rgba(63,157,95,0)}100%{box-shadow:0 0 0 0 rgba(63,157,95,0)}}
+.hrs{display:grid;gap:0;border-top:1px solid var(--line)}
+.hrs div{display:flex;justify-content:space-between;gap:12px;padding:9px 0;border-bottom:1px solid var(--line);font-size:.92rem;color:var(--muted)}
+.hrs div.today{color:var(--fg)}
+.hrs div.today span:first-child::after{content:" · today";color:var(--gold)}
+.btns{display:flex;gap:12px;flex-wrap:wrap}
+.map{position:relative;border-radius:10px;overflow:hidden;border:1px solid var(--line);min-height:380px;background:var(--facade)}
+.map svg{display:block;width:100%;height:100%;min-height:380px}
+.map .open{position:absolute;right:14px;bottom:14px;background:var(--bg);color:var(--fg);border:1px solid var(--line);border-radius:999px;padding:10px 18px;font-size:.7rem;letter-spacing:.2em;text-transform:uppercase;font-weight:400}
+.map .open:hover{border-color:var(--gold)}
+.map .cap{position:absolute;left:14px;top:14px;font-size:.62rem;letter-spacing:.24em;text-transform:uppercase;color:var(--muted);background:color-mix(in srgb,var(--bg) 80%,transparent);padding:5px 10px;border-radius:999px}
+.pulse{transform-box:fill-box;transform-origin:center;animation:pl 2.6s ease-out infinite}
+@keyframes pl{0%{transform:scale(.4);opacity:.7}100%{transform:scale(2.6);opacity:0}}
+@media(max-width:820px){.find-grid{grid-template-columns:1fr}.map,.map svg{min-height:320px}}
+
+/* faq */
+.faq{padding:0 0 clamp(88px,12vw,160px)}
+.faq-grid{display:grid;grid-template-columns:.8fr 1.2fr;gap:clamp(28px,6vw,90px)}
+.faq h2{margin-top:16px}
+details{border-top:1px solid var(--line);padding:20px 0}
+details:last-child{border-bottom:1px solid var(--line)}
+summary{cursor:pointer;list-style:none;display:flex;justify-content:space-between;gap:16px;align-items:center;font-family:var(--display);font-size:clamp(1.3rem,2.4vw,1.8rem)}
+summary::-webkit-details-marker{display:none}
+summary::after{content:"+";font-family:var(--body);font-weight:200;font-size:1.8rem;color:var(--gold);transition:transform .3s;flex:none}
+details[open] summary::after{transform:rotate(45deg)}
+details p{margin:14px 0 0;color:var(--muted);max-width:36rem}
+@media(max-width:820px){.faq-grid{grid-template-columns:1fr}}
+
+/* cart */
+.cartbtn{position:relative}
+.badge{position:absolute;top:-5px;right:-5px;min-width:18px;height:18px;border-radius:9px;background:var(--gold);color:#1a0f08;font-size:.64rem;font-weight:500;display:grid;place-items:center;padding:0 4px;line-height:1}
+.badge[hidden]{display:none}
+.ov{position:fixed;inset:0;background:rgba(12,7,3,.55);opacity:0;visibility:hidden;transition:opacity .4s,visibility .4s;z-index:70}
+.ov.open{opacity:1;visibility:visible}
+.drawer{position:fixed;top:0;right:0;bottom:0;width:min(450px,100%);background:var(--bg);z-index:71;transform:translateX(102%);visibility:hidden;transition:transform .55s cubic-bezier(.2,.7,.2,1),visibility .55s;display:flex;flex-direction:column;border-left:1px solid var(--line);padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);padding-right:env(safe-area-inset-right,0px)}
+.drawer.open{transform:none;visibility:visible}
+.dh{display:flex;justify-content:space-between;align-items:center;padding:20px 22px;border-bottom:1px solid var(--line)}
+.dh h3{font-size:1.8rem}
+.db{flex:1;overflow-y:auto;padding:8px 22px;min-height:0}
+.df{padding:18px 22px 22px;border-top:1px solid var(--line);display:grid;gap:14px}
+.empty{padding:50px 0;text-align:center;color:var(--muted)}
+.empty h4{font-family:var(--display);font-weight:400;font-size:1.7rem;margin:0 0 8px;color:var(--fg)}
+.ci{display:grid;grid-template-columns:62px 1fr auto;gap:14px;padding:18px 0;border-bottom:1px solid var(--line);align-items:center}
+.ci .t{width:62px;aspect-ratio:4/4.5;border-radius:999px 999px 6px 6px;background:linear-gradient(180deg,#F0E6D6,#E2D0B6);display:grid;place-items:end center;overflow:hidden}
+.ci .t svg{width:78%;color:var(--ink);margin-bottom:12%;overflow:visible}
+.ci h4{margin:0;font-family:var(--display);font-weight:400;font-size:1.2rem;line-height:1.15}
+.ci small{display:block;color:var(--muted);font-size:.78rem;line-height:1.4;margin-top:2px}
+.qty{display:inline-flex;align-items:center;border:1px solid var(--line);border-radius:999px;margin-top:8px}
+.qty button{width:28px;height:28px;border:0;background:transparent;color:var(--fg);cursor:pointer;font-size:1rem}
+.qty span{min-width:22px;text-align:center;font-size:.86rem}
+.ci .pr{text-align:right;font-family:var(--display);font-size:1.2rem;color:var(--brand);font-weight:500}
+.ci .rm{display:block;margin-top:6px;border:0;background:none;color:var(--muted);font:inherit;font-size:.7rem;letter-spacing:.14em;text-transform:uppercase;cursor:pointer;text-decoration:underline;padding:0;margin-left:auto}
+.tot{display:flex;justify-content:space-between;align-items:baseline;font-size:.78rem;letter-spacing:.2em;text-transform:uppercase;color:var(--muted)}
+.tot b{font-family:var(--display);font-size:1.9rem;color:var(--fg);letter-spacing:0;font-weight:500}
+.df small{color:var(--muted);font-size:.78rem;line-height:1.5}
+.df .cta{justify-content:center;width:100%;cursor:pointer;font-family:var(--body)}
+.osum{width:100%;min-height:150px;font:inherit;font-size:.82rem;line-height:1.5;color:var(--muted);background:var(--bg2);border:1px solid var(--line);border-radius:8px;padding:12px;resize:vertical}
+.link{background:none;border:0;color:var(--muted);font:inherit;font-size:.74rem;letter-spacing:.18em;text-transform:uppercase;text-decoration:underline;cursor:pointer;padding:0;justify-self:center}
+.toast{position:fixed;left:50%;bottom:calc(22px + env(safe-area-inset-bottom,0px));transform:translate(-50%,30px);background:var(--brand);color:var(--bg);padding:12px 22px;border-radius:999px;font-size:.8rem;letter-spacing:.14em;z-index:80;opacity:0;pointer-events:none;transition:opacity .35s,transform .35s;white-space:nowrap}
+.toast.on{opacity:1;transform:translate(-50%,0)}
+footer .addr{max-width:26rem;font-size:.86rem;letter-spacing:.06em;text-transform:none;opacity:.85;line-height:1.6}
+
+/* reveals: visible by default, JS only hides what is below the fold */
+.rv.pre{opacity:0;transform:translateY(34px)}
+.rv{transition:opacity 1s cubic-bezier(.2,.7,.2,1),transform 1s cubic-bezier(.2,.7,.2,1)}
+@media(prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  .rv,.rv.pre{opacity:1;transform:none;transition:none}
+  .marq div,.cue i{animation:none}
+  .hero{height:auto}.stage{position:relative;height:auto;min-height:100svh}
+  .arch{position:relative;width:min(80%,360px);height:440px;margin:0 auto;border-radius:999px 999px 0 0}
+  .arch .step{opacity:1;transform:none}
+  .rail{height:auto}.rail-pin{position:relative;height:auto;padding:80px 0}.track{overflow-x:auto}
+}
+</style>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <symbol id="logo" viewBox="400 200 960 1130"><g fill="currentColor"><path d="M583 300C583 284 568 275 553 276C528 278 518 298 508 314C494 336 462 346 442 336C420 325 410 294 415 268C422 236 462 218 508 220C545 222 575 238 602 255L660 291C690 305 720 302 743 291C732 303 727 318 726 345L726 713C662 755 606 830 581 896Z"/><path d="M596 915C618 820 690 748 792 680C855 640 930 626 990 628C1190 632 1348 812 1348 1025L1335 1025C1335 832 1182 638 990 637C862 637 764 728 745 822C745 880 752 930 752 975C742 1028 716 1062 676 1062C626 1062 590 1022 592 962C592 944 594 928 596 915Z"/><path d="M581 1025C604 1064 644 1084 698 1080C698 1160 724 1230 782 1268C830 1296 872 1305 906 1305L1076 1305C1182 1300 1282 1232 1322 1148C1334 1110 1340 1076 1336 1043L1346 1043L1346 1316L581 1316Z"/></g></symbol>
+
+    <symbol id="sofa" viewBox="0 0 400 200"><g fill="currentColor"><rect x="30" y="70" width="340" height="80" rx="30"/><rect x="10" y="90" width="64" height="76" rx="26"/><rect x="326" y="90" width="64" height="76" rx="26"/><rect x="62" y="50" width="276" height="70" rx="34" opacity=".82"/><rect x="48" y="166" width="10" height="22" rx="3"/><rect x="342" y="166" width="10" height="22" rx="3"/></g></symbol>
+    <symbol id="table" viewBox="0 0 400 220"><g fill="currentColor"><ellipse cx="200" cy="70" rx="170" ry="30"/><rect x="190" y="90" width="20" height="100" rx="6"/><ellipse cx="200" cy="196" rx="66" ry="12"/><rect x="40" y="140" width="46" height="52" rx="14" opacity=".8"/><rect x="314" y="140" width="46" height="52" rx="14" opacity=".8"/></g></symbol>
+    <symbol id="bed" viewBox="0 0 400 220"><g fill="currentColor"><rect x="30" y="30" width="340" height="120" rx="60" opacity=".85"/><rect x="40" y="100" width="320" height="70" rx="12"/><rect x="60" y="76" width="110" height="38" rx="16" opacity=".7"/><rect x="230" y="76" width="110" height="38" rx="16" opacity=".7"/><rect x="40" y="170" width="12" height="30" rx="3"/><rect x="348" y="170" width="12" height="30" rx="3"/></g></symbol>
+    <symbol id="lamp" viewBox="0 0 400 240"><g fill="currentColor"><rect x="198" y="-600" width="3" height="650"/><path d="M110 150C110 100 150 52 200 52C250 52 290 100 290 150Z"/><ellipse cx="200" cy="150" rx="90" ry="12" opacity=".6"/><circle cx="200" cy="170" r="10" opacity=".9"/></g></symbol>
+    <symbol id="chair" viewBox="0 0 300 260"><g fill="currentColor"><path d="M70 40C70 14 90 6 150 6C210 6 230 14 230 40L238 120L62 120Z"/><rect x="40" y="118" width="220" height="56" rx="24"/><rect x="62" y="174" width="12" height="70" rx="4" transform="rotate(8 68 174)"/><rect x="226" y="174" width="12" height="70" rx="4" transform="rotate(-8 232 174)"/></g></symbol>
+    <symbol id="vase" viewBox="0 0 240 280"><g fill="currentColor"><path d="M96 70C96 44 104 30 120 30C136 30 144 44 144 70C144 100 188 120 188 188C188 244 160 264 120 264C80 264 52 244 52 188C52 120 96 100 96 70Z"/><path d="M120 30C112 -20 80 -50 60 -60M120 30C124 -30 150 -70 176 -86M120 30C132 -10 184 -20 214 -20" stroke="currentColor" stroke-width="4" fill="none" stroke-linecap="round"/><circle cx="60" cy="-60" r="7"/><circle cx="176" cy="-86" r="8"/><circle cx="214" cy="-20" r="7"/></g></symbol>
+    <symbol id="mirror" viewBox="0 0 240 300"><g fill="currentColor"><path fill-rule="evenodd" d="M30 290V120C30 60 70 20 120 20C170 20 210 60 210 120V290ZM50 270V120C50 72 82 40 120 40C158 40 190 72 190 120V270Z"/><path d="M60 270V120C60 80 86 52 120 52C154 52 180 80 180 120V270Z" opacity=".16"/></g></symbol>
+    <symbol id="flamp" viewBox="0 0 240 400"><g fill="currentColor"><path d="M56 100L84 24H156L184 100Z"/><rect x="117" y="96" width="6" height="272"/><ellipse cx="120" cy="372" rx="58" ry="11"/></g></symbol>
+    <symbol id="ctable" viewBox="0 0 400 200"><g fill="currentColor"><ellipse cx="200" cy="96" rx="150" ry="34" opacity=".55"/><ellipse cx="200" cy="82" rx="150" ry="34"/><rect x="118" y="104" width="12" height="70" rx="4"/><rect x="270" y="104" width="12" height="70" rx="4"/><rect x="194" y="114" width="12" height="76" rx="4"/></g></symbol>
+    <symbol id="palm" viewBox="0 0 200 400"><g fill="currentColor"><path d="M96 400C98 300 100 220 104 150L112 150C112 230 108 320 108 400Z"/><path d="M104 150C60 150 20 120 4 70C50 80 90 100 104 150Z"/><path d="M104 150C150 150 190 120 198 70C150 80 112 100 104 150Z"/><path d="M104 150C70 110 70 50 96 6C116 50 112 110 104 150Z"/><path d="M104 150C40 140 8 160 0 210C50 190 90 180 104 150Z" opacity=".8"/><path d="M104 150C170 140 198 160 200 210C150 190 118 180 104 150Z" opacity=".8"/></g></symbol>
+  </defs>
+</svg>
+
+<header class="nav" id="nav">
+  <a class="brand" href="#top" aria-label="Beyond Living home">
+    <svg viewBox="0 0 960 1130" aria-hidden="true"><use href="#logo"/></svg>
+    <span>Beyond</span>
+  </a>
+  <nav class="links" aria-label="Primary">
+    <a href="#collections">Collections</a><a href="#shop">Shop</a><a href="#studio">Studio</a><a href="#find">Visit</a><a href="#visit">Enquire</a>
+    <button class="tbtn" id="theme" type="button" aria-label="Switch between light and dark">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M20 14.5A8.5 8.5 0 1 1 9.5 4a7 7 0 0 0 10.5 10.5Z"/></svg>
+    </button>
+    <button class="tbtn cartbtn" id="cartbtn" type="button" aria-label="Open cart" aria-haspopup="dialog">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 8h14l-1 12H6L5 8Z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/></svg>
+      <span class="badge" id="badge" hidden>0</span>
+    </button>
+  </nav>
+</header>
+
+<main id="top">
+<!-- HERO -->
+<section class="hero" id="hero" aria-label="Introduction">
+  <div class="stage" id="stage">
+    <div class="hero-grid">
+      <div class="hero-copy" id="copy">
+        <span class="eyebrow">Furniture &amp; interiors</span>
+        <h1>Spaces that go <em>beyond living.</em></h1>
+        <p>Sofas, dining, beds and lighting chosen for the way you actually live. Come in out of the street and into a warmer room.</p>
+        <a class="cta" href="#collections">Explore collections <span aria-hidden="true">→</span></a>
+      </div>
+      <div class="slot" id="slot"></div>
+    </div>
+
+    <div class="arch" id="arch" aria-hidden="true">
+      <div class="glow"></div>
+      <svg viewBox="0 0 1000 1000" preserveAspectRatio="xMidYMax meet" fill="none">
+        <g style="color:#1d120a">
+          <use href="#lamp" x="180" y="-40" width="170" height="102"/>
+          <use href="#lamp" x="415" y="-120" width="170" height="102"/>
+          <use href="#lamp" x="650" y="-40" width="170" height="102"/>
+        </g>
+        <g style="color:#2b4a2e" opacity=".85">
+          <use href="#palm" x="30" y="560" width="150" height="300"/>
+          <use href="#palm" x="830" y="590" width="130" height="260"/>
+        </g>
+        <rect x="-2000" y="860" width="5000" height="400" fill="#2a1a0e" opacity=".55"/>
+        <g style="color:#e8d4b2"><use href="#sofa" x="230" y="690" width="540" height="270"/></g>
+        <g style="color:#c58b45"><use href="#vase" x="790" y="800" width="80" height="94"/></g>
+      </svg>
+      <div class="step" id="step"><span class="eyebrow">Step inside</span><h2>Light, warmth &amp; <em>room to breathe.</em></h2></div>
+    </div>
+    <div class="cue" id="cue"><span>Scroll</span><i></i></div>
+  </div>
+</section>
+
+<div class="marq" aria-hidden="true"><div>
+  <span>Sofas &amp; Seating</span><span>Dining</span><span>Beds &amp; Bedrooms</span><span>Lighting</span><span>Accent Chairs</span><span>Decor &amp; Accessories</span>
+  <span>Sofas &amp; Seating</span><span>Dining</span><span>Beds &amp; Bedrooms</span><span>Lighting</span><span>Accent Chairs</span><span>Decor &amp; Accessories</span>
+</div></div>
+
+<!-- MANIFESTO -->
+<section class="manifesto" id="story">
+  <svg class="mark-bg" viewBox="0 0 960 1130" aria-hidden="true"><use href="#logo"/></svg>
+  <div class="wrap">
+    <span class="eyebrow">Our idea</span>
+    <p id="manifesto" data-gold="beyond,comfort,home">A home is not a showroom. It is the place you come back to. We choose each piece to look good on the first day and feel better every year after, so your rooms go beyond comfort and become home.</p>
+  </div>
+</section>
+
+<!-- COLLECTIONS -->
+<section class="rail" id="collections" aria-label="Collections">
+  <div class="rail-pin" id="railpin">
+    <div class="wrap rail-head">
+      <div><span class="eyebrow">Collections</span><h2 style="margin-top:16px">Every room, <em>considered.</em></h2></div>
+      <div class="prog"><span id="pcount">01 / 06</span><b><i id="pbar"></i></b></div>
+    </div>
+    <div class="track" id="track">
+      <article class="card" style="--c1:#E8DCCB;--c2:#D9B47A;--ink:#5F4630"><div class="frame"><svg viewBox="0 0 400 200"><use href="#sofa"/></svg></div><span class="n">01</span><h3>Sofas &amp; Seating</h3><p>Deep, generous seats in performance fabrics and soft leathers.</p></article>
+      <article class="card" style="--c1:#D8C7B1;--c2:#C58B45;--ink:#3b2918"><div class="frame"><svg viewBox="0 0 400 220"><use href="#table"/></svg></div><span class="n">02</span><h3>Dining</h3><p>Tables and chairs made for long dinners and loud families.</p></article>
+      <article class="card" style="--c1:#CDB9A0;--c2:#E3B66F;--ink:#4b3320"><div class="frame"><svg viewBox="0 0 400 220"><use href="#bed"/></svg></div><span class="n">03</span><h3>Beds &amp; Bedrooms</h3><p>Upholstered frames and storage that keep the room calm.</p></article>
+      <article class="card" style="--c1:#3A2819;--c2:#C58B45;--ink:#F0D9AE"><div class="frame"><svg viewBox="0 0 400 240" style="overflow:visible"><use href="#lamp"/></svg></div><span class="n">04</span><h3>Lighting</h3><p>Pendants and lamps with the same glow as our showroom.</p></article>
+      <article class="card" style="--c1:#E3D2BC;--c2:#D9B47A;--ink:#6a4a2a"><div class="frame"><svg viewBox="0 0 300 260"><use href="#chair"/></svg></div><span class="n">05</span><h3>Accent Chairs</h3><p>One good chair can finish a corner and start a conversation.</p></article>
+      <article class="card" style="--c1:#5F4630;--c2:#B98A45;--ink:#F3E4C8"><div class="frame"><svg viewBox="0 -90 240 370" style="overflow:visible"><use href="#vase" y="0"/></svg></div><span class="n">06</span><h3>Decor</h3><p>Vases, mirrors and objects that bring the room together.</p></article>
+    </div>
+  </div>
+</section>
+
+<!-- SHOP -->
+<section class="shop" id="shop" aria-label="Shop">
+  <div class="wrap">
+    <div class="shop-head">
+      <div class="rv"><span class="eyebrow">Shop</span><h2>Pieces to <em>take home.</em></h2></div>
+      <div class="chips rv" id="chips" role="group" aria-label="Filter products">
+        <button class="chip" type="button" data-f="all" aria-pressed="true">All</button>
+        <button class="chip" type="button" data-f="seating" aria-pressed="false">Seating</button>
+        <button class="chip" type="button" data-f="dining" aria-pressed="false">Dining</button>
+        <button class="chip" type="button" data-f="beds" aria-pressed="false">Beds</button>
+        <button class="chip" type="button" data-f="lighting" aria-pressed="false">Lighting</button>
+        <button class="chip" type="button" data-f="decor" aria-pressed="false">Decor</button>
+      </div>
+    </div>
+    <div class="pgrid" id="pgrid"></div>
+    <p class="fine">Prices are indicative. The showroom confirms the final price, fabric and delivery with you before anything is charged.</p>
+  </div>
+</section>
+
+<!-- STUDIO -->
+<section class="studio" id="studio" aria-label="Sofa studio">
+  <div class="wrap studio-grid">
+    <div class="sstage rv" id="sstage" role="img" aria-label="Preview of your custom sofa"><svg id="sofa-svg" viewBox="0 0 640 330"></svg></div>
+    <div class="rv">
+      <span class="eyebrow">Made to order</span>
+      <h2>Design your <em>own sofa.</em></h2>
+      <p class="lead">Beyond Living makes furniture to your size, design and finish. Try it here, then add it to your cart or bring the idea to the showroom.</p>
+      <div class="ctrl">
+        <div><div class="lab"><span>Fabric</span><b id="fabname">Oat linen</b></div><div class="fabs" id="fabs" role="group" aria-label="Fabric"></div></div>
+        <div><div class="lab"><span>Width</span><b id="wval">240 cm</b></div><input id="wrange" type="range" min="160" max="300" step="10" value="240" aria-label="Sofa width in centimetres"></div>
+        <div><div class="lab"><span>Back</span></div><div class="seg" id="backseg" role="group" aria-label="Back height"><button type="button" data-v="high" aria-pressed="true">High</button><button type="button" data-v="low" aria-pressed="false">Low</button></div></div>
+        <div><div class="lab"><span>Legs</span></div><div class="seg" id="legseg" role="group" aria-label="Leg finish"><button type="button" data-v="wood" aria-pressed="true">Walnut</button><button type="button" data-v="brass" aria-pressed="false">Brass</button></div></div>
+        <div class="quote"><div><small>Estimated price</small><span class="price" id="qprice">₹0</span></div><button class="cta fill" id="qadd" type="button" style="cursor:pointer;font-family:var(--body)">Add to cart <span aria-hidden="true">→</span></button></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CRAFT -->
+<section class="craft" id="craft">
+  <div class="wrap craft-grid">
+    <div class="craft-side">
+      <span class="eyebrow">How it works</span>
+      <h2>From a first visit to <em>a finished room.</em></h2>
+      <p>You do not need to arrive with a plan. Walk in, sit down, and we will work out the rest with you.</p>
+    </div>
+    <div class="steps" id="steps">
+      <div class="line" id="sline"></div>
+      <div class="step-i"><span class="eyebrow">Choose</span><h3>Sit in it first</h3><p>Try the sofa, lift the chair, run a hand along the table. Our team helps you compare sizes, fabrics and finishes in person.</p>
+        <svg viewBox="0 0 400 200" aria-hidden="true"><use href="#sofa"/></svg></div>
+      <div class="step-i"><span class="eyebrow">Make</span><h3>Made to fit your room</h3><p>Pick the fabric, wood and colour that suit your space. Measurements are checked before anything is ordered.</p>
+        <svg viewBox="0 0 400 220" aria-hidden="true"><use href="#table"/></svg></div>
+      <div class="step-i"><span class="eyebrow">Place</span><h3>Delivered and set up</h3><p>We bring it home, place it where it belongs and take away the packaging. You only have to enjoy it.</p>
+        <svg viewBox="0 0 400 220" aria-hidden="true"><use href="#bed"/></svg></div>
+    </div>
+  </div>
+</section>
+
+<!-- SHOWROOM -->
+<section class="show" id="showroom">
+  <div class="wrap">
+    <div class="show-head">
+      <h2 class="rv">The showroom, <em>lit for you.</em></h2>
+      <p class="rv">Walk in and the whole floor opens up: warm light, real rooms, and furniture you can sit on, move around and imagine at home.</p>
+    </div>
+    <div class="facade" id="facade" role="img" aria-label="Illustration of the Beyond Living showroom front with its lit sign">
+      <div class="vent l"></div><div class="vent r"></div>
+      <div class="sign"><b>BEYOND</b><span>LIVING</span></div>
+      <div class="glass" id="glass">
+        <div class="dots" id="dots"></div>
+        <svg viewBox="0 0 200 400" style="height:96%;margin-left:-2%"><use href="#palm"/></svg>
+        <svg viewBox="0 0 400 200" style="height:62%;color:#e8d4b2;opacity:.85"><use href="#sofa"/></svg>
+        <svg viewBox="0 0 400 240" style="height:46%;color:#2b1a0d;opacity:.8"><use href="#table"/></svg>
+        <svg viewBox="0 0 200 400" style="height:84%;margin-right:-2%"><use href="#palm"/></svg>
+      </div>
+    </div>
+    <div class="hours">
+      <div class="rv"><h3>Walk in</h3><p>Open every day, 10 AM to 8 PM. Browse at your own pace, no appointment needed.</p></div>
+      <div class="rv"><h3>Book a design visit</h3><p>Bring your floor plan and photos for one to one help with a layout.</p></div>
+      <div class="rv"><h3>Shop with family</h3><p>Seating for the whole group, and a quiet corner for the long decisions.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- FIND US -->
+<section class="find" id="find" aria-label="Find the showroom">
+  <div class="wrap">
+    <div class="find-head rv"><span class="eyebrow">Visit</span><h2>Find us in <em>Jhotwara, Jaipur.</em></h2></div>
+    <div class="find-grid">
+      <div class="info rv">
+        <span class="status" id="status"><i></i><span id="stxt">Checking hours</span></span>
+        <div><h3>Showroom</h3>
+          <address>Shop No. 211, Takiya ki Chowki,<br>Opp. Power House, near Ravan Gate,<br>Kalwar Road, Jhotwara,<br>Jaipur, Rajasthan 302012</address></div>
+        <div><h3>Phone</h3><p id="phone">+91 90243 25271</p></div>
+        <div class="hrs" id="hrs" aria-label="Opening hours">
+          <div data-d="Mon"><span>Monday</span><span>10 AM – 8 PM</span></div>
+          <div data-d="Tue"><span>Tuesday</span><span>10 AM – 8 PM</span></div>
+          <div data-d="Wed"><span>Wednesday</span><span>10 AM – 8 PM</span></div>
+          <div data-d="Thu"><span>Thursday</span><span>10 AM – 8 PM</span></div>
+          <div data-d="Fri"><span>Friday</span><span>10 AM – 8 PM</span></div>
+          <div data-d="Sat"><span>Saturday</span><span>10 AM – 8 PM</span></div>
+          <div data-d="Sun"><span>Sunday</span><span>10 AM – 8 PM</span></div>
+        </div>
+        <div class="btns">
+          <a class="cta fill" target="_blank" rel="noopener" href="https://www.google.com/maps/dir/?api=1&amp;destination=26.9479833,75.7219197&amp;destination_place_id=ChIJ5zbYeymzbTkRWyovC8hJReo">Get directions <span aria-hidden="true">↗</span></a>
+          <button class="cta" id="copyaddr" type="button" style="cursor:pointer;font-family:var(--body)">Copy address</button>
+        </div>
+      </div>
+      <div class="map rv">
+        <svg viewBox="0 0 800 560" preserveAspectRatio="xMidYMid slice" role="img" aria-label="Illustrated map showing the showroom on Kalwar Road near Ravan Gate, opposite the Power House, in Jhotwara, Jaipur" style="font-family:var(--body)">
+          <rect width="800" height="560" fill="var(--facade)"/>
+          <g fill="var(--facade2)">
+            <rect x="30" y="30" width="170" height="150" rx="10"/><rect x="230" y="30" width="150" height="110" rx="10"/><rect x="440" y="24" width="190" height="130" rx="10"/><rect x="660" y="40" width="120" height="180" rx="10"/>
+            <rect x="40" y="220" width="150" height="120" rx="10"/><rect x="230" y="200" width="130" height="70" rx="10"/><rect x="450" y="204" width="130" height="64" rx="10"/><rect x="640" y="270" width="140" height="110" rx="10"/>
+            <rect x="40" y="380" width="180" height="140" rx="10"/><rect x="260" y="360" width="130" height="160" rx="10"/><rect x="460" y="400" width="150" height="120" rx="10"/><rect x="650" y="420" width="130" height="110" rx="10"/>
+          </g>
+          <g fill="none" stroke="var(--bg)" stroke-linecap="round">
+            <path d="M-20 320C140 316 260 304 420 304C560 304 680 316 820 312" stroke-width="30"/>
+            <path d="M420 -20V304V580" stroke-width="20"/>
+            <path d="M-20 190C120 196 190 188 420 190C600 192 700 180 820 190" stroke-width="14"/>
+            <path d="M-20 470C200 460 320 470 420 468C600 466 700 480 820 474" stroke-width="14"/>
+            <path d="M210 -20V580M620 -20V580" stroke-width="12"/>
+            <path d="M-20 560L300 380L420 304" stroke-width="10" opacity=".8"/>
+          </g>
+          <g fill="var(--muted)" font-size="12" letter-spacing="3" font-weight="500">
+            <text x="60" y="352" transform="rotate(-1.6 60 352)">KALWAR ROAD</text>
+            <text x="238" y="172">RAVAN GATE</text>
+            <text x="508" y="354">POWER HOUSE</text>
+            <text x="596" y="520" opacity=".8">HARNATHAPURA</text>
+            <text x="60" y="520" opacity=".8">JAGDAMBA NAGAR</text>
+          </g>
+          <g fill="var(--muted)"><rect x="224" y="176" width="10" height="10" rx="2" transform="translate(0 -22)"/><rect x="488" y="342" width="10" height="10" rx="2" transform="translate(0 -14)"/></g>
+          <text x="400" y="86" text-anchor="middle" fill="var(--brand)" opacity=".16" font-family="var(--display)" font-size="84" letter-spacing="8">JHOTWARA</text>
+          <g transform="translate(420 304)">
+            <circle class="pulse" r="30" fill="var(--gold)" opacity=".5"/><circle class="pulse" r="30" fill="var(--gold)" opacity=".5" style="animation-delay:1.3s"/>
+            <path d="M0 0C-14-22-24-36-24-50A24 24 0 1 1 24-50C24-36 14-22 0 0Z" fill="var(--brand)"/>
+            <circle cy="-50" r="9" fill="var(--bg)"/>
+          </g>
+          <g transform="translate(446 232)"><rect width="190" height="52" rx="8" fill="var(--bg)" stroke="var(--line)"/><text x="14" y="23" fill="var(--fg)" font-family="var(--display)" font-size="20" font-weight="500">Beyond Living</text><text x="14" y="41" fill="var(--muted)" font-size="11" letter-spacing="1.4">SHOP 211 · KALWAR ROAD</text></g>
+          <g transform="translate(748 44)" fill="var(--muted)"><circle r="18" fill="none" stroke="var(--line)"/><path d="M0-12L4 2H-4Z"/><text y="30" text-anchor="middle" font-size="10" letter-spacing="2">N</text></g>
+        </svg>
+        <span class="cap">Illustrated map</span>
+        <a class="open" target="_blank" rel="noopener" href="https://www.google.com/maps/search/?api=1&amp;query=Beyond%20Living&amp;query_place_id=ChIJ5zbYeymzbTkRWyovC8hJReo">Open live map ↗</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section class="faq" id="faq">
+  <div class="wrap faq-grid">
+    <div class="rv"><span class="eyebrow">Questions</span><h2>Good to <em>know.</em></h2></div>
+    <div class="rv">
+      <details><summary>Can furniture be made to my size?</summary><p>Yes. Sofas, beds and other pieces can be made to your size, design and finish. Use the studio above, visit the showroom, or send an enquiry with your room measurements.</p></details>
+      <details><summary>Do I need an appointment to visit?</summary><p>No. The showroom is open every day from 10 AM to 8 PM. For a longer design conversation, send an enquiry and the team will set aside time for you.</p></details>
+      <details><summary>How does ordering from this site work?</summary><p>Add pieces to your cart, then send the order request to the showroom on WhatsApp. The team confirms availability, final price and delivery with you before anything is charged.</p></details>
+      <details><summary>What about delivery and care?</summary><p>Delivery time and care depend on the piece and the finish you choose. Ask the team when you confirm your order and they will walk you through both.</p></details>
+      <details><summary>Where exactly is the showroom?</summary><p>Shop No. 211, Takiya ki Chowki, opposite the Power House and near Ravan Gate on Kalwar Road, Jhotwara, Jaipur. Look for the lit Beyond Living sign.</p></details>
+    </div>
+  </div>
+</section>
+
+<!-- ENQUIRE -->
+<section class="enq" id="visit">
+  <div class="wrap enq-grid">
+    <div class="rv">
+      <span class="eyebrow">Enquire</span>
+      <h2>Tell us about <em>your room.</em></h2>
+      <p class="lead">Share what you are looking for and the team will get back to you with options, fabrics and a time to visit.</p>
+    </div>
+    <form id="form" class="rv" novalidate>
+      <div class="row2">
+        <div class="f"><label for="fn">Name</label><input id="fn" name="name" autocomplete="name" required></div>
+        <div class="f"><label for="fp">Phone</label><input id="fp" name="phone" type="tel" autocomplete="tel" inputmode="tel"></div>
+      </div>
+      <div class="f"><label for="fi">I am looking for</label>
+        <select id="fi" name="interest"><option>Sofas &amp; Seating</option><option>Dining</option><option>Beds &amp; Bedrooms</option><option>Lighting</option><option>Accent Chairs</option><option>Decor</option><option>A full room</option></select></div>
+      <div class="f"><label for="fm">Message</label><textarea id="fm" name="message" placeholder="Room size, style, timeline"></textarea></div>
+      <div><button class="cta fill" type="submit">Send enquiry <span aria-hidden="true">→</span></button></div>
+      <p class="note" id="note" role="status"></p>
+      <div id="fwawrap" hidden><a class="cta" id="fwa" target="_blank" rel="noopener" href="#">Send on WhatsApp <span aria-hidden="true">↗</span></a></div>
+    </form>
+  </div>
+</section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <p class="big" aria-label="Beyond Living">Beyond</p>
+    <div class="cols"><span class="addr">Shop No. 211, Takiya ki Chowki, Opp. Power House, near Ravan Gate, Kalwar Road, Jhotwara, Jaipur 302012<br>+91 90243 25271 · Open daily 10 AM – 8 PM</span><a href="#shop">Shop</a><a href="#find">Visit</a><a href="#top">Back to top ↑</a></div>
+  </div>
+</footer>
+
+<div class="ov" id="ov"></div>
+<aside class="drawer" id="drawer" role="dialog" aria-modal="true" aria-label="Your cart" aria-hidden="true">
+  <div class="dh"><h3 id="dtitle">Your cart</h3><button class="tbtn" id="dclose" type="button" aria-label="Close cart"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
+  <div class="db" id="dbody"></div>
+  <div class="df" id="dfoot"></div>
+</aside>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+(function(){
+  var $=function(s){return document.querySelector(s)};
+  var reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var clamp=function(v,a,b){return Math.min(b,Math.max(a,v))};
+  var lerp=function(a,b,t){return a+(b-a)*t};
+  var ease=function(t){return t<.5?4*t*t*t:1-Math.pow(-2*t+2,3)/2};
+
+  /* theme toggle */
+  var root=document.documentElement;
+  $('#theme').addEventListener('click',function(){
+    var dark=root.getAttribute('data-theme')?root.getAttribute('data-theme')==='dark':matchMedia('(prefers-color-scheme: dark)').matches;
+    root.setAttribute('data-theme',dark?'light':'dark');
+  });
+
+  /* manifesto words */
+  var mp=$('#manifesto'),gold=(mp.dataset.gold||'').split(',');
+  var words=mp.textContent.trim().split(/\s+/);
+  mp.innerHTML=words.map(function(w){
+    var k=w.toLowerCase().replace(/[^a-z]/g,'');
+    return '<span class="w'+(gold.indexOf(k)>-1?' g':'')+'">'+w+'</span>';
+  }).join(' ');
+  var wEls=[].slice.call(mp.querySelectorAll('.w'));
+  if(reduce)wEls.forEach(function(e){e.classList.add('on')});
+
+  /* reveals: only hide what is below the fold, then show as it enters */
+  var rv=[].slice.call(document.querySelectorAll('.rv'));
+  if(!reduce&&'IntersectionObserver' in window){
+    rv.forEach(function(e){if(e.getBoundingClientRect().top>innerHeight)e.classList.add('pre')});
+    var io=new IntersectionObserver(function(es){es.forEach(function(en){if(en.isIntersecting){en.target.classList.remove('pre');io.unobserve(en.target)}})},{threshold:.12});
+    rv.forEach(function(e){io.observe(e)});
+  }
+
+  /* facade dots */
+  var dots=$('#dots');for(var i=0;i<9;i++)dots.appendChild(document.createElement('i'));
+  var dEls=[].slice.call(dots.children);
+
+  /* elements */
+  var hero=$('#hero'),stage=$('#stage'),arch=$('#arch'),slot=$('#slot'),copy=$('#copy'),step=$('#step'),cue=$('#cue'),nav=$('#nav');
+  var rail=$('#railpin').parentNode,track=$('#track'),pbar=$('#pbar'),pcount=$('#pcount');
+  var steps=[].slice.call(document.querySelectorAll('.step-i')),sline=$('#sline'),stepsBox=$('#steps');
+  var facade=$('#facade');
+  var start={l:0,t:0,w:300,h:360};
+
+  function measure(){
+    var sr=stage.getBoundingClientRect(),r=slot.getBoundingClientRect();
+    start={l:r.left-sr.left,t:r.top-sr.top,w:r.width,h:r.height};
+    sizeRail();
+  }
+  function sizeRail(){
+    var dist=Math.max(0,track.scrollWidth-innerWidth+20);
+    rail.style.height=(innerHeight+dist*1.15)+'px';
+    rail._dist=dist;
+  }
+
+  function draw(){
+    var y=scrollY,vh=innerHeight;
+    nav.classList.toggle('solid',y>40);
+
+    /* hero */
+    if(!reduce){
+      var hr=hero.offsetHeight-vh;
+      var p=clamp(y/hr,0,1);
+      var t=ease(clamp(p/.72,0,1));
+      var W=stage.clientWidth,H=stage.clientHeight;
+      var w=lerp(start.w,W,t),h=lerp(start.h,H,t);
+      var l=lerp(start.l,0,t),tp=lerp(start.t,0,t);
+      var rad=(w/2)*(1-clamp(t*1.25,0,1));
+      arch.style.cssText='left:'+l+'px;top:'+tp+'px;width:'+w+'px;height:'+h+'px;border-radius:'+rad+'px '+rad+'px 0 0';
+      copy.style.opacity=clamp(1-p*3.2,0,1);
+      copy.style.transform='translateY('+(-p*90)+'px)';
+      cue.style.opacity=clamp(1-p*8,0,1);
+      var sp=clamp((p-.62)/.3,0,1);
+      step.style.opacity=sp;step.style.transform='translateY('+((1-sp)*24)+'px)';
+    }
+
+    /* manifesto */
+    var mr=mp.getBoundingClientRect();
+    if(!reduce){
+      var mpg=clamp((vh*.82-mr.top)/(mr.height+vh*.25),0,1);
+      var n=Math.round(mpg*wEls.length*1.08);
+      wEls.forEach(function(e,i){e.classList.toggle('on',i<n)});
+    }
+
+    /* rail */
+    var rr=rail.getBoundingClientRect();
+    var rp=clamp(-rr.top/(rail.offsetHeight-vh),0,1);
+    if(!reduce)track.style.transform='translate3d('+(-(rail._dist||0)*rp)+'px,0,0)';
+    pbar.style.width=(rp*100)+'%';
+    var idx=Math.min(6,1+Math.floor(rp*6));
+    pcount.textContent='0'+idx+' / 06';
+
+    /* craft */
+    var sb=stepsBox.getBoundingClientRect();
+    var lp=clamp((vh*.55-sb.top)/sb.height,0,1);
+    sline.style.height=(lp*(sb.height-12))+'px';
+    steps.forEach(function(s){var r=s.getBoundingClientRect();s.classList.toggle('on',r.top<vh*.62)});
+
+    /* facade lights */
+    var fr=facade.getBoundingClientRect();
+    var fp=clamp((vh*.85-fr.top)/(vh*.5),0,1);
+    facade.classList.toggle('lit',fp>.35);
+    dEls.forEach(function(d,i){d.classList.toggle('on',fp>.2+i*.07)});
+  }
+
+  var tick=false;
+  function onScroll(){if(!tick){tick=true;requestAnimationFrame(function(){tick=false;draw()})}}
+  addEventListener('scroll',onScroll,{passive:true});
+  addEventListener('resize',function(){measure();draw()});
+  if(document.fonts&&document.fonts.ready)document.fonts.ready.then(function(){measure();draw()});
+  measure();draw();
+
+  /* form */
+  $('#form').addEventListener('submit',function(e){
+    e.preventDefault();
+    var n=$('#fn').value.trim(),note=$('#note');
+    if(!n){note.textContent='Please add your name so we know who to reply to.';$('#fn').focus();return}
+    var msg='Hello Beyond Living, I would like to enquire about '+$('#fi').value+'.\nName: '+n+($('#fp').value.trim()?'\nPhone: '+$('#fp').value.trim():'')+($('#fm').value.trim()?'\nDetails: '+$('#fm').value.trim():'');
+    $('#fwa').href='https://wa.me/919024325271?text='+encodeURIComponent(msg);
+    $('#fwawrap').hidden=false;
+    note.textContent='Thanks, '+n.split(' ')[0]+'. Tap the button below to send this to the showroom on WhatsApp.';
+  });
+})();
+</script>
+
+<script>
+(function(){
+  var $=function(s){return document.querySelector(s)},$$=function(s){return [].slice.call(document.querySelectorAll(s))};
+  var inr=function(n){return '₹'+Math.round(n).toLocaleString('en-IN')};
+  var WA='919024325271';
+  var SW=[['Espresso','#5F4630'],['Sand','#C9A878'],['Olive','#55603f'],['Clay','#A4553a'],['Charcoal','#2e2a27']];
+  var P=[
+    {id:'arco',n:'Arco 3-Seater Sofa',c:'seating',m:'Performance fabric, solid wood frame',p:54900,s:'sofa',vb:'0 0 400 200',mto:1},
+    {id:'lune',n:'Lune Lounge Sofa',c:'seating',m:'Deep seat, soft bouclé, brass feet',p:72900,s:'sofa',vb:'0 0 400 200',mto:1,sw:2},
+    {id:'curve',n:'Curve Lounge Chair',c:'seating',m:'Rounded back, hand-finished legs',p:19800,s:'chair',vb:'0 0 300 260',sw:1},
+    {id:'orbit',n:'Orbit Dining Table',c:'dining',m:'Round top on a sculpted pedestal',p:38500,s:'table',vb:'0 0 400 220',mto:1},
+    {id:'pebble',n:'Pebble Coffee Table',c:'dining',m:'Layered tops, solid wood legs',p:14900,s:'ctable',vb:'0 0 400 200',sw:3},
+    {id:'halo',n:'Halo Upholstered Bed',c:'beds',m:'Arched headboard, king size',p:62000,s:'bed',vb:'0 0 400 220',mto:1},
+    {id:'nest',n:'Nest Bed with Storage',c:'beds',m:'Queen size, lift-up base',p:48500,s:'bed',vb:'0 0 400 220',mto:1,sw:4},
+    {id:'glow',n:'Glow Pendant Light',c:'lighting',m:'Dome shade, warm brass finish',p:7800,s:'lamp',vb:'0 0 400 240',sw:1},
+    {id:'arcl',n:'Arc Floor Lamp',c:'lighting',m:'Slim stem, weighted base',p:9900,s:'flamp',vb:'0 0 240 400',sw:2},
+    {id:'arm',n:'Arch Mirror',c:'decor',m:'Full-length, arched frame',p:11500,s:'mirror',vb:'0 0 240 300',sw:3},
+    {id:'petal',n:'Petal Vase with Stems',c:'decor',m:'Hand-glazed, with dried stems',p:2400,s:'vase',vb:'0 -100 240 380',sw:0},
+    {id:'dune',n:'Dune Accent Chair',c:'seating',m:'Low profile, textured weave',p:16500,s:'chair',vb:'0 0 300 260',sw:4}
+  ];
+  var byId={};P.forEach(function(p){byId[p.id]=p});
+
+  /* ---------- toast ---------- */
+  var tt;function toast(m){var t=$('#toast');t.textContent=m;t.classList.add('on');clearTimeout(tt);tt=setTimeout(function(){t.classList.remove('on')},1900)}
+
+  /* ---------- cart state ---------- */
+  var cart=[];
+  try{cart=JSON.parse(localStorage.getItem('bl-cart')||'[]');if(!Array.isArray(cart))cart=[]}catch(e){cart=[]}
+  function save(){try{localStorage.setItem('bl-cart',JSON.stringify(cart))}catch(e){}}
+  function count(){return cart.reduce(function(a,i){return a+i.q},0)}
+  function total(){return cart.reduce(function(a,i){return a+i.q*i.p},0)}
+  function addItem(it){
+    var k=it.id+'|'+it.o,f=cart.filter(function(c){return c.id+'|'+c.o===k})[0];
+    if(f)f.q+=1;else cart.push({id:it.id,n:it.n,o:it.o,p:it.p,s:it.s,vb:it.vb,ink:it.ink,q:1});
+    save();updateBadge();if($('#drawer').classList.contains('open'))render();
+  }
+  function updateBadge(){var b=$('#badge'),n=count();b.textContent=n;b.hidden=n===0}
+
+  /* ---------- shop grid ---------- */
+  var grid=$('#pgrid');
+  grid.innerHTML=P.map(function(p){
+    var sel=p.sw||0;
+    return '<article class="prod" data-id="'+p.id+'" data-c="'+p.c+'" data-sw="'+sel+'">'+
+      '<div class="pframe" style="--ink:'+SW[sel][1]+'">'+(p.mto?'<span class="tag">Made to order</span>':'')+'<svg viewBox="'+p.vb+'" aria-hidden="true"><use href="#'+p.s+'"/></svg></div>'+
+      '<div class="pmeta"><h3>'+p.n+'</h3><p class="pmat">'+p.m+'</p>'+
+      '<div class="sw" role="group" aria-label="Finish for '+p.n+'">'+SW.map(function(s,i){return '<button type="button" style="--c:'+s[1]+'" data-i="'+i+'" aria-label="'+s[0]+'" title="'+s[0]+'" aria-pressed="'+(i===sel)+'"></button>'}).join('')+'</div>'+
+      '<div class="prow"><span class="price">'+inr(p.p)+'</span><button class="add" type="button">Add to cart</button></div></div></article>';
+  }).join('');
+  grid.addEventListener('click',function(e){
+    var art=e.target.closest('.prod');if(!art)return;
+    var sb=e.target.closest('.sw button');
+    if(sb){
+      art.dataset.sw=sb.dataset.i;
+      [].forEach.call(art.querySelectorAll('.sw button'),function(b){b.setAttribute('aria-pressed',b===sb)});
+      art.querySelector('.pframe').style.setProperty('--ink',SW[+sb.dataset.i][1]);return;
+    }
+    var ab=e.target.closest('.add');
+    if(ab){
+      var p=byId[art.dataset.id],s=SW[+art.dataset.sw];
+      addItem({id:p.id,n:p.n,o:s[0],p:p.p,s:p.s,vb:p.vb,ink:s[1]});
+      ab.classList.add('ok');ab.textContent='Added ✓';setTimeout(function(){ab.classList.remove('ok');ab.textContent='Add to cart'},1300);
+      toast(p.n+' added to cart');
+    }
+  });
+  function setFilter(f){
+    $$('#chips .chip').forEach(function(c){c.setAttribute('aria-pressed',c.dataset.f===f)});
+    $$('.prod').forEach(function(a){a.hidden=!(f==='all'||a.dataset.c===f)});
+  }
+  $('#chips').addEventListener('click',function(e){var c=e.target.closest('.chip');if(c)setFilter(c.dataset.f)});
+  /* collection cards open the shop on that category */
+  var cmap=['seating','dining','beds','lighting','seating','decor'];
+  $$('.card').forEach(function(c,i){
+    c.dataset.f=cmap[i];c.tabIndex=0;c.setAttribute('role','link');
+    var go=function(){setFilter(cmap[i]);$('#shop').scrollIntoView({behavior:'smooth'})};
+    c.addEventListener('click',go);c.addEventListener('keydown',function(e){if(e.key==='Enter')go()});
+  });
+
+  /* ---------- sofa studio ---------- */
+  var FAB=[['Oat linen','#D3BC96',0],['Moss velvet','#6b7550',4000],['Terracotta bouclé','#A4553a',6000],['Cocoa leather','#5F4630',14000],['Charcoal weave','#3a3633',2000],['Ivory bouclé','#E6DCC9',6000]];
+  var st={f:0,w:240,b:'high',l:'wood'};
+  var fabs=$('#fabs');
+  fabs.innerHTML=FAB.map(function(f,i){return '<button type="button" style="--c:'+f[1]+'" data-i="'+i+'" aria-label="'+f[0]+'" title="'+f[0]+'" aria-pressed="'+(i===0)+'"></button>'}).join('');
+  function sofaSvg(){
+    var fab=FAB[st.f][1],w=st.w,sw=260+(w-160)*(300/140),x0=320-sw/2,hi=st.b==='high';
+    var n=w<200?2:w<260?3:4,inner=sw-88,gap=8,cw=(inner-gap*(n-1))/n,leg=st.l==='wood'?'#5F4630':'#C9A25A';
+    var s='<ellipse cx="320" cy="282" rx="'+(sw/2+14)+'" ry="12" fill="#000" opacity=".28"/>';
+    s+='<rect x="'+(x0+22)+'" y="'+(hi?62:100)+'" width="'+(sw-44)+'" height="'+(hi?118:84)+'" rx="34" fill="'+fab+'"/>';
+    s+='<rect x="'+(x0+22)+'" y="'+(hi?62:100)+'" width="'+(sw-44)+'" height="'+(hi?118:84)+'" rx="34" fill="#000" opacity=".16"/>';
+    s+='<rect x="'+x0+'" y="132" width="'+sw+'" height="118" rx="30" fill="'+fab+'"/>';
+    s+='<rect x="'+(x0-8)+'" y="118" width="52" height="132" rx="26" fill="'+fab+'" stroke="#000" stroke-opacity=".14"/>';
+    s+='<rect x="'+(x0+sw-44)+'" y="118" width="52" height="132" rx="26" fill="'+fab+'" stroke="#000" stroke-opacity=".14"/>';
+    for(var i=0;i<n;i++){s+='<rect x="'+(x0+44+i*(cw+gap))+'" y="146" width="'+cw+'" height="52" rx="18" fill="'+fab+'" stroke="#000" stroke-opacity=".18" stroke-width="1.5"/>'}
+    s+='<rect x="'+(x0+30)+'" y="248" width="11" height="28" rx="3" fill="'+leg+'"/><rect x="'+(x0+sw-41)+'" y="248" width="11" height="28" rx="3" fill="'+leg+'"/>';
+    s+='<g stroke="#F6E7CE" stroke-opacity=".7" stroke-width="1.2"><path d="M'+x0+' 306H'+(x0+sw)+'M'+x0+' 300V312M'+(x0+sw)+' 300V312"/></g><text x="320" y="324" text-anchor="middle" fill="#F6E7CE" opacity=".85" font-size="13" letter-spacing="2" font-family="Jost,sans-serif">'+w+' CM</text>';
+    return s;
+  }
+  function studioPrice(){return 36000+(st.w-160)*180+FAB[st.f][2]+(st.b==='high'?4000:0)+(st.l==='brass'?3500:0)}
+  function studio(){
+    $('#sofa-svg').innerHTML=sofaSvg();
+    $('#fabname').textContent=FAB[st.f][0];$('#wval').textContent=st.w+' cm';
+    $('#qprice').textContent=inr(studioPrice());
+  }
+  fabs.addEventListener('click',function(e){var b=e.target.closest('button');if(!b)return;st.f=+b.dataset.i;$$('#fabs button').forEach(function(x){x.setAttribute('aria-pressed',x===b)});studio()});
+  $('#wrange').addEventListener('input',function(e){st.w=+e.target.value;studio()});
+  function seg(id,key){$(id).addEventListener('click',function(e){var b=e.target.closest('button');if(!b)return;st[key]=b.dataset.v;[].forEach.call($(id).children,function(x){x.setAttribute('aria-pressed',x===b)});studio()})}
+  seg('#backseg','b');seg('#legseg','l');
+  $('#qadd').addEventListener('click',function(){
+    var o=FAB[st.f][0]+' · '+st.w+' cm · '+(st.b==='high'?'High':'Low')+' back · '+(st.l==='wood'?'Walnut':'Brass')+' legs';
+    addItem({id:'custom-sofa',n:'Custom sofa',o:o,p:studioPrice(),s:'sofa',vb:'0 0 400 200',ink:FAB[st.f][1]});
+    toast('Custom sofa added to cart');
+  });
+  studio();
+
+  /* ---------- drawer ---------- */
+  var drawer=$('#drawer'),ov=$('#ov'),view='cart',lastFocus=null;
+  var CK={n:'',ph:'',ar:'',no:''};
+  function open(v){
+    view=v||'cart';lastFocus=document.activeElement;render();
+    drawer.classList.add('open');ov.classList.add('open');drawer.setAttribute('aria-hidden','false');
+    document.documentElement.style.overflow='hidden';
+    setTimeout(function(){$('#dclose').focus()},50);
+  }
+  function close(){
+    drawer.classList.remove('open');ov.classList.remove('open');drawer.setAttribute('aria-hidden','true');
+    document.documentElement.style.overflow='';
+    if(lastFocus&&lastFocus.focus)lastFocus.focus();
+  }
+  function orderText(){
+    var l=['Hello Beyond Living, I would like to order:',''];
+    cart.forEach(function(i){l.push('- '+i.q+' x '+i.n+' ('+i.o+') — '+inr(i.p*i.q))});
+    l.push('','Total (indicative): '+inr(total()),'');
+    l.push('Name: '+(CK.n||'-'),'Phone: '+(CK.ph||'-'),'Delivery area: '+(CK.ar||'-'));
+    if(CK.no)l.push('Note: '+CK.no);
+    return l.join('\n');
+  }
+  function render(){
+    var b=$('#dbody'),f=$('#dfoot'),t=$('#dtitle');
+    if(view==='cart'){
+      t.textContent='Your cart';
+      if(!cart.length){
+        b.innerHTML='<div class="empty"><h4>Nothing here yet</h4><p>Add a sofa, a lamp or a vase and it will wait for you here.</p></div>';
+        f.innerHTML='<button class="cta" type="button" id="keep">Keep browsing</button>';
+        $('#keep').onclick=function(){close();$('#shop').scrollIntoView({behavior:'smooth'})};return;
+      }
+      b.innerHTML=cart.map(function(i,ix){
+        return '<div class="ci"><div class="t" style="--ink:'+i.ink+'"><svg viewBox="'+i.vb+'" aria-hidden="true"><use href="#'+i.s+'"/></svg></div>'+
+        '<div><h4>'+i.n+'</h4><small>'+i.o+'</small><div class="qty"><button type="button" data-a="dec" data-i="'+ix+'" aria-label="Decrease quantity">−</button><span>'+i.q+'</span><button type="button" data-a="inc" data-i="'+ix+'" aria-label="Increase quantity">+</button></div></div>'+
+        '<div class="pr">'+inr(i.p*i.q)+'<button class="rm" type="button" data-a="rm" data-i="'+ix+'">Remove</button></div></div>';
+      }).join('');
+      f.innerHTML='<div class="tot"><span>Total</span><b>'+inr(total())+'</b></div><small>Indicative total. The showroom confirms final price, delivery and payment with you.</small><button class="cta fill" type="button" id="tocheck">Request this order <span aria-hidden="true">→</span></button>';
+      $('#tocheck').onclick=function(){view='checkout';render()};
+    }else{
+      t.textContent='Your details';
+      b.innerHTML='<form id="cform" novalidate style="display:grid;gap:20px;padding:14px 0 6px">'+
+        '<div class="f"><label for="cn">Name</label><input id="cn" autocomplete="name" value="'+esc(CK.n)+'"></div>'+
+        '<div class="f"><label for="cp">Phone</label><input id="cp" type="tel" inputmode="tel" autocomplete="tel" value="'+esc(CK.ph)+'"></div>'+
+        '<div class="f"><label for="ca">Delivery area</label><input id="ca" autocomplete="address-level2" value="'+esc(CK.ar)+'" placeholder="Area or pin code"></div>'+
+        '<div class="f"><label for="cno">Note</label><input id="cno" value="'+esc(CK.no)+'" placeholder="Size, finish or timing"></div>'+
+        '<div class="f"><label for="osum">Order summary</label><textarea class="osum" id="osum" readonly></textarea></div></form>';
+      f.innerHTML='<a class="cta fill" id="wa" target="_blank" rel="noopener" href="#">Send order on WhatsApp <span aria-hidden="true">↗</span></a><button class="cta" type="button" id="cp2">Copy order</button><button class="link" type="button" id="back">Back to cart</button>';
+      var sync=function(){
+        CK.n=$('#cn').value.trim();CK.ph=$('#cp').value.trim();CK.ar=$('#ca').value.trim();CK.no=$('#cno').value.trim();
+        var tx=orderText();$('#osum').value=tx;$('#wa').href='https://wa.me/'+WA+'?text='+encodeURIComponent(tx);
+      };
+      sync();
+      ['#cn','#cp','#ca','#cno'].forEach(function(s){$(s).addEventListener('input',sync)});
+      $('#wa').addEventListener('click',function(e){if(!CK.n){e.preventDefault();toast('Please add your name first');$('#cn').focus()}});
+      $('#cp2').onclick=function(){
+        sync();
+        var done=function(){toast('Order copied')},fail=function(){$('#osum').select();toast('Select and copy the summary')};
+        if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText($('#osum').value).then(done,fail);else fail();
+      };
+      $('#back').onclick=function(){view='cart';render()};
+    }
+  }
+  function esc(s){return String(s).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;')}
+  $('#dbody').addEventListener('click',function(e){
+    var b=e.target.closest('button[data-a]');if(!b)return;var i=+b.dataset.i,it=cart[i];if(!it)return;
+    if(b.dataset.a==='inc')it.q++;
+    if(b.dataset.a==='dec'){it.q--;if(it.q<1)cart.splice(i,1)}
+    if(b.dataset.a==='rm')cart.splice(i,1);
+    save();updateBadge();render();
+  });
+  $('#cartbtn').addEventListener('click',function(){open('cart')});
+  $('#dclose').addEventListener('click',close);ov.addEventListener('click',close);
+  document.addEventListener('keydown',function(e){if(e.key==='Escape'&&drawer.classList.contains('open'))close()});
+  updateBadge();
+
+  /* ---------- live open/closed + today ---------- */
+  function hours(){
+    var parts={};
+    try{new Intl.DateTimeFormat('en-GB',{timeZone:'Asia/Kolkata',weekday:'short',hour:'2-digit',minute:'2-digit',hour12:false}).formatToParts(new Date()).forEach(function(p){parts[p.type]=p.value})}catch(e){return}
+    var h=parseInt(parts.hour,10)%24,isOpen=h>=10&&h<20,st=$('#status');
+    st.classList.toggle('closed',!isOpen);
+    $('#stxt').textContent=isOpen?'Open now · closes 8 PM':(h<10?'Closed · opens 10 AM today':'Closed · opens 10 AM tomorrow');
+    $$('#hrs div').forEach(function(d){d.classList.toggle('today',d.dataset.d===parts.weekday)});
+  }
+  hours();setInterval(hours,60000);
+
+  $('#copyaddr').addEventListener('click',function(){
+    var a='Beyond Living, Shop No. 211, Takiya ki Chowki, Opp. Power House, near Ravan Gate, Kalwar Road, Jhotwara, Jaipur, Rajasthan 302012';
+    if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(a).then(function(){toast('Address copied')},function(){toast('Copy not available here')});else toast('Copy not available here');
+  });
+})();
+</script>
+
+</body></html>
