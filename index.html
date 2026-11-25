@@ -604,6 +604,102 @@ a.pframe{cursor:pointer}
 @media(min-width:821px){.pstick{padding-right:240px}}
 @media(prefers-reduced-motion:reduce){.pstick{transition:none}}
 
+
+/* ===== v9 admin: simpler, desktop sidebar + mobile bottom nav ===== */
+.adm{grid-template-rows:auto minmax(0,1fr)}
+.adt{display:grid;gap:2px;min-width:0}.adt b{margin:0}
+.adt small{white-space:nowrap}
+.adtabs button,.admbnav button{display:flex;align-items:center;gap:12px}
+.adtabs button svg,.admbnav button svg{width:20px;height:20px;flex:none}
+.adm .adtabs button{text-transform:none;letter-spacing:0;font-size:.95rem;padding:12px 14px;white-space:nowrap}
+.adtabs .sh,.admbnav .lg{display:none}
+.admbar,.admbnav{display:none}
+.adcard{border:1px solid var(--line);border-radius:16px;padding:18px;display:grid;gap:14px;background:var(--bg)}
+.adcard h4{margin:0;font-family:var(--display);font-weight:400;font-size:1.25rem}
+.adadv summary{cursor:pointer;font-size:.9rem;list-style:none}
+.adadv[open] summary{margin-bottom:14px}
+.adsw{display:flex;align-items:center;justify-content:space-between;gap:16px;border:1px solid var(--line);border-radius:14px;padding:14px 16px;cursor:pointer}
+.adsw span{display:grid;gap:2px}.adsw b{font-weight:500;font-size:.95rem}.adsw small{color:var(--muted);font-size:.78rem}
+.adsw input{appearance:none;-webkit-appearance:none;flex:none;width:46px;height:28px;border-radius:999px;background:var(--line);position:relative;cursor:pointer;transition:background .25s;border:0;margin:0}
+.adsw input::after{content:"";position:absolute;top:3px;left:3px;width:22px;height:22px;border-radius:50%;background:var(--bg);transition:transform .25s;box-shadow:0 1px 3px rgba(0,0,0,.3)}
+.adsw input:checked{background:var(--brand)}.adsw input:checked::after{transform:translateX(18px)}
+.adback{display:none}
+.adaddph{justify-self:start;cursor:pointer;font-family:var(--body)}
+.adf input[type=text],.adf input[type=number],.adf input[type=url],.adf select,.adf textarea,.adin{min-height:46px}
+.adimgs{gap:10px}
+@media(min-width:900px){
+  .adbody{grid-template-columns:230px 1fr}
+  .adtabs{padding:18px 14px;gap:6px}
+  .adpane{padding:26px 32px 50px}
+  .adprod{grid-template-columns:290px minmax(0,1fr);gap:28px}
+  .adf{max-width:780px}
+  .adlist{max-height:calc(100svh - 150px);overflow:auto;padding-right:4px}
+}
+@media(min-width:1380px){.adprod{grid-template-columns:290px minmax(0,780px) 260px}.adprev{display:block}}
+@media(max-width:899px){
+  .adm .adh{padding-top:10px;padding-bottom:10px}
+  .adm .adh .small-cta,.adm .adh #admpub{display:none}
+  .adm .adbody{grid-template-columns:1fr;grid-template-rows:minmax(0,1fr)}
+  .adm .adtabs{display:none}
+  .adm .adpane{padding:14px max(14px,env(safe-area-inset-right,0px)) calc(150px + env(safe-area-inset-bottom,0px)) max(14px,env(safe-area-inset-left,0px))}
+  .admbnav{display:grid;grid-template-columns:repeat(5,1fr);position:absolute;left:0;right:0;bottom:0;z-index:3;background:var(--bg);border-top:1px solid var(--line);padding:6px max(6px,env(safe-area-inset-right,0px)) calc(6px + env(safe-area-inset-bottom,0px)) max(6px,env(safe-area-inset-left,0px))}
+  .admbnav button{flex-direction:column;gap:3px;border:0;background:transparent;color:var(--muted);font:inherit;font-size:.68rem;padding:8px 2px;border-radius:12px;cursor:pointer;min-height:52px;justify-content:center}
+  .admbnav button[aria-pressed="true"]{color:var(--brand);background:var(--bg2);font-weight:500}
+  .admbnav .sh{display:inline}
+  .admbar{position:absolute;left:12px;right:12px;bottom:calc(72px + env(safe-area-inset-bottom,0px));z-index:3;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 10px 10px 18px;border-radius:999px;background:var(--brand);color:var(--bg);box-shadow:0 10px 30px rgba(0,0,0,.25);font-size:.88rem}
+  .admbar[hidden]{display:none}
+  .admbar .cta{background:var(--bg);color:var(--brand);padding:10px 20px}
+  .adm .adprod{grid-template-columns:1fr;gap:12px}
+  .adm .adprev{display:none}
+  .adm .adprod.editing .adlist{display:none}
+  .adm .adprod:not(.editing) #adform{display:none}
+  .adm .adlist{position:static;grid-template-columns:1fr}
+  .adm .adrow{grid-template-columns:56px 1fr auto;padding:10px;border-radius:14px}
+  .adm .adrow .t{width:56px;height:56px;border-radius:10px}
+  .adm .adrow .mv{grid-auto-flow:column;gap:6px}
+  .adm .adrow .mv span{width:34px;height:34px;font-size:.7rem;border-radius:9px}
+  .adm .adback{display:inline-flex;align-items:center;justify-self:start;border:0;background:transparent;color:var(--brand);font:inherit;font-size:.95rem;padding:8px 0;cursor:pointer;position:sticky;top:-14px;z-index:2;background:var(--bg);width:calc(100% + 28px);margin:-6px -14px 0;padding:12px 14px;border-bottom:1px solid var(--line)}
+  .adm .adf .two{grid-template-columns:1fr}
+  .adm .adf input[type=text],.adm .adf input[type=number],.adm .adf input[type=url],.adm .adf select,.adm .adf textarea,.adm .adin{font-size:16px}
+  .adm .adimg{width:calc(33.3% - 7px);height:auto;aspect-ratio:1}
+  .adm .adaddph{justify-self:stretch;justify-content:center}
+  .adm .adig{grid-template-columns:64px 1fr}
+  .adm .adig>:last-child{grid-column:1/-1}
+}
+
+
+/* ===== v10 admin: phone polish ===== */
+.adchips{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:14px}
+.adbh{display:flex;justify-content:space-between;gap:12px;align-items:baseline}
+.adbh span{color:var(--brand);font-family:var(--display);font-size:1.15rem;text-align:right}
+.adts{color:var(--muted);display:block;margin-top:2px}
+.adcontact{display:flex;gap:8px;flex-wrap:wrap}
+.adcontact .small-cta{flex:1;justify-content:center;text-align:center;min-width:110px}
+.addone{display:none}
+.adm .adpane{overscroll-behavior:contain;-webkit-overflow-scrolling:touch}
+.adm:not([hidden])~.toast{bottom:calc(140px + env(safe-area-inset-bottom,0px))}
+@media(min-width:900px){.adm:not([hidden])~.toast{bottom:28px}}
+@media(max-width:899px){
+  .adm{inset:0 0 auto 0;height:100vh;height:100dvh}
+  .adm .tbtn{width:44px;height:44px}
+  .adm .small-cta,.adm .cta,.adm .chip{min-height:44px;display:inline-flex;align-items:center;justify-content:center}
+  .adm .adh b{font-size:1.35rem}
+  .adm .adh small{font-size:.74rem}
+  .adm .adbox{padding:16px}
+  .adm .adbox select{width:100%;max-width:none!important}
+  .adm .adimg .rm,.adm .adimg .mn{width:32px;height:32px;font-size:1rem}
+  .adm .adig{padding:12px}
+  .adm .adchk,.adm .adsw{min-height:56px}
+  .adm .addone{display:flex;width:100%;justify-content:center}
+  .adm .adf .adact{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .adm .adf .adact .link{grid-column:1/-1}
+  .adm.kb .admbnav,.adm.kb .admbar{display:none}
+  .adm.kb .adpane{padding-bottom:40vh}
+  .adm .adrow{touch-action:manipulation}
+  .adm textarea{min-height:120px}
+}
+@media(max-width:359px){.adm .admbnav button{font-size:.62rem}.adm .adh small{display:none}}
+
 /* ===== sitemap footer ===== */
 .fgrid{display:grid;grid-template-columns:1.4fr repeat(4,1fr);gap:clamp(22px,3vw,44px);padding-bottom:clamp(36px,6vw,70px);margin-bottom:clamp(26px,4vw,50px);border-bottom:1px solid color-mix(in srgb,var(--bg) 30%,transparent)}
 .fcol{display:grid;gap:2px;align-content:start;min-width:0}
@@ -1765,8 +1861,10 @@ a.pframe{cursor:pointer}
 <div class="intro" id="intro" aria-hidden="true"><svg viewBox="0 0 960 1130"><use href="#logo"/></svg><span>Beyond<br>Living</span></div>
 <button class="admfab" id="admfab" type="button" hidden>Admin</button>
 <div class="adm" id="adm" role="dialog" aria-modal="true" aria-label="Admin panel" aria-hidden="true" hidden>
-  <header class="adh"><div><b>Admin</b><small id="admstat"></small></div><div class="adact"><button class="small-cta" type="button" id="admview">View site</button><button class="cta fill" type="button" id="admpub" style="cursor:pointer;font-family:var(--body);padding:11px 22px">Publish changes</button><button class="tbtn" id="admclose" type="button" aria-label="Close admin"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div></header>
-  <div class="adbody"><nav class="adtabs" id="admtabs" aria-label="Admin sections"><button type="button" data-t="products" aria-pressed="true">Products</button><button type="button" data-t="site" aria-pressed="false">Site &amp; social</button><button type="button" data-t="ig" aria-pressed="false">Instagram posts</button><button type="button" data-t="orders" aria-pressed="false">Orders &amp; leads</button><button type="button" data-t="data" aria-pressed="false">Backup</button></nav><div class="adpane" id="admpane"></div></div>
+  <header class="adh"><div class="adt"><b id="admttl">Admin</b><small id="admstat"></small></div><div class="adact"><button class="small-cta" type="button" id="admview">View site</button><button class="cta fill" type="button" id="admpub" style="cursor:pointer;font-family:var(--body);padding:11px 22px">Publish changes</button><button class="tbtn" id="admclose" type="button" aria-label="Close admin"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div></header>
+  <div class="adbody"><nav class="adtabs" id="admtabs" aria-label="Admin sections"></nav><div class="adpane" id="admpane"></div></div>
+  <div class="admbar" id="admbar" hidden><span>Draft. Not live yet.</span><button class="cta fill" type="button" id="admbarpub" style="cursor:pointer;font-family:var(--body)">Publish</button></div>
+  <nav class="admbnav" id="admbnav" aria-label="Admin sections"></nav>
 </div>
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
@@ -3086,7 +3184,7 @@ a.pframe{cursor:pointer}
      ===================================================================== */
   var VB={sofa:'0 0 400 200',chair:'0 0 300 260',table:'0 0 400 220',ctable:'0 0 400 200',bed:'0 0 400 220',lamp:'0 0 400 240',flamp:'0 0 240 400',mirror:'0 0 240 300',vase:'0 -100 240 380'};
   var SHAPEN={sofa:'Sofa',chair:'Chair',table:'Dining table',ctable:'Coffee table',bed:'Bed',lamp:'Pendant lamp',flamp:'Floor lamp',mirror:'Mirror',vase:'Vase'};
-  var SITE={ann:''},ANN0=$('.ann span')?$('.ann span').textContent:'',ALL=[],DEFAULTS=[],SOC={ig:'',fb:'',yt:''},IGP=[],published=null,canAdmin=!!window.__BL_ADMIN_TEST,admOn=false,demoAdm=false,adTab='products',adSel=null,dirty=false,adDel=false;
+  var SITE={ann:''},ANN0=$('.ann span')?$('.ann span').textContent:'',ALL=[],DEFAULTS=[],SOC={ig:'',fb:'',yt:''},IGP=[],published=null,canAdmin=!!window.__BL_ADMIN_TEST,admOn=false,adEdit=false,demoAdm=false,adTab='products',adSel=null,dirty=false,adDel=false;
   function txt(s,n){return String(s==null?'':s).replace(/["<>]/g,'').slice(0,n||200)}
   function okImg(u){return typeof u==='string'&&u.length<4e6&&(/^data:image\/(jpeg|png|webp);base64,[A-Za-z0-9+\/=]+$/.test(u)||(!!PUB&&u.indexOf(PUB)===0&&/^[\w\-.\/]+$/.test(u.slice(PUB.length))))}
   function cleanP(p){
@@ -3155,8 +3253,10 @@ a.pframe{cursor:pointer}
   /* ---------- admin panel ---------- */
   var adm=$('#adm'),admpane=$('#admpane'),admfab=$('#admfab'),admT=0;
   function admStatus(){
-    $('#admstat').textContent=demoAdm?'Demo mode: changes are saved on this device only':dirty?'Unpublished changes (saved as a draft in this browser)':'Everything shown here is published';
+    $('#admstat').textContent=demoAdm?'Demo mode · saved on this device only':dirty?'Draft · not live yet':(SB&&SBU?'All changes are live':'Everything shown here is published');
     $('#admpub').disabled=!dirty&&!window.__BL_ADMIN_TEST;
+    var bar=$('#admbar');if(bar)bar.hidden=!dirty||demoAdm||!admOn;
+    var bb=$('#admbarpub');if(bb){bb.disabled=false;bb.textContent='Publish'}
   }
   function draftSave(){
     dirty=true;try{localStorage.setItem('bl-draft',JSON.stringify(catJSON()))}catch(e){toast('Could not keep a draft. The photos may be too large.')}
@@ -3167,27 +3267,32 @@ a.pframe{cursor:pointer}
   function thumb(p){return p.img&&p.img[0]?'<img alt="" src="'+p.img[0]+'">':'<svg viewBox="'+p.vb+'" aria-hidden="true" style="overflow:visible"><use href="#'+p.s+'"/></svg>'}
   function adListHtml(){
     return '<div class="adlist"><button class="cta fill" type="button" data-ad="add" style="cursor:pointer;font-family:var(--body);justify-content:center">+ Add a piece</button>'+
-      ALL.map(function(p,i){return '<div class="adrow'+(p.hidden?' off':'')+'" role="button" tabindex="0" data-ad="sel" data-id="'+p.id+'" aria-pressed="'+(p.id===adSel)+'"><span class="t" style="color:'+SW[p.sw][1]+'">'+thumb(p)+'</span><span><b>'+p.n+'</b><small>'+inr(p.p)+(p.hidden?' · hidden':'')+'</small></span><span class="mv"><span data-ad="up" data-id="'+p.id+'" title="Move up" role="button" aria-label="Move up">▲</span><span data-ad="dn" data-id="'+p.id+'" title="Move down" role="button" aria-label="Move down">▼</span></span></div>'}).join('')+'</div>';
+      ALL.map(function(p,i){return '<div class="adrow'+(p.hidden?' off':'')+'" role="button" tabindex="0" data-ad="sel" data-id="'+p.id+'" aria-pressed="'+(p.id===adSel)+'"><span class="t" style="color:'+SW[p.sw][1]+'">'+thumb(p)+'</span><span><b>'+esc(p.n)+'</b><small>'+CATN[p.c]+' · '+inr(p.p)+(p.hidden?' · hidden':'')+(p.out?' · sold out':'')+'</small></span><span class="mv"><span data-ad="up" data-id="'+p.id+'" title="Move up" role="button" aria-label="Move up">▲</span><span data-ad="dn" data-id="'+p.id+'" title="Move down" role="button" aria-label="Move down">▼</span></span></div>'}).join('')+'</div>';
   }
   function opt(list,sel){return list.map(function(x){return '<option value="'+x[0]+'"'+(x[0]==sel?' selected':'')+'>'+x[1]+'</option>'}).join('')}
   function adFormHtml(p){
     if(!p)return '<p class="adnote">Pick a piece on the left, or add a new one.</p>';
     return '<div class="adf" data-id="'+p.id+'">'+
-      '<label class="adchk"><input type="checkbox" data-f="vis"'+(p.hidden?'':' checked')+'> Visible in the shop</label>'+
-      '<div><label class="l" for="af-n">Name</label><input type="text" id="af-n" data-f="n" value="'+esc(p.n)+'" maxlength="80"></div>'+
-      '<div class="two"><div><label class="l" for="af-c">Category</label><select id="af-c" data-f="c">'+opt(Object.keys(CATN).map(function(k){return [k,CATN[k]]}),p.c)+'</select></div>'+
-      '<div><label class="l" for="af-p">Price (₹)</label><input type="number" id="af-p" data-f="p" min="0" step="100" value="'+p.p+'"></div></div>'+
-      '<div class="two"><div><label class="l" for="af-tag">Badge</label><select id="af-tag" data-f="tag">'+opt([['','None'],['New','New'],['Bestseller','Bestseller'],['Limited','Limited'],['Sale','Sale'],['Back soon','Back soon']],p.tag||'')+'</select></div><div><label class="l" for="af-oldp">Old price (optional, ₹)</label><input type="number" id="af-oldp" data-f="oldp" min="0" step="100" value="'+(p.oldp||'')+'"></div></div>'+
-      '<label class="adchk"><input type="checkbox" data-f="out"'+(p.out?' checked':'')+'> Sold out (shows "Ask availability")</label>'+
-      '<div><label class="l" for="af-m">Materials (one line)</label><input type="text" id="af-m" data-f="m" value="'+esc(p.m)+'" maxlength="140"></div>'+
-      '<div><label class="l" for="af-d">Description</label><textarea id="af-d" data-f="d" maxlength="600">'+esc(p.d||'')+'</textarea></div>'+
-      '<div class="two"><div><label class="l" for="af-sw">Default finish</label><select id="af-sw" data-f="sw">'+opt(SW.map(function(s,i){return [i,s[0]]}),p.sw)+'</select></div>'+
-      '<div><label class="l" for="af-s">Drawing (used when there is no photo)</label><select id="af-s" data-f="s">'+opt(Object.keys(SHAPEN).map(function(k){return [k,SHAPEN[k]]}),p.s)+'</select></div></div>'+
-      '<label class="adchk"><input type="checkbox" data-f="mto"'+(p.mto?' checked':'')+'> Made to order tag</label>'+
-      '<div><label class="l">Photos (the first one is the main photo)</label><div class="adimgs" id="af-imgs">'+adImgsHtml(p)+'</div>'+
-      '<p class="adnote" style="margin:8px 0">Up to 5 photos. They are resized to fit before they are saved.</p>'+
-      '<label class="small-cta" for="af-file" style="cursor:pointer">Add photos</label><input type="file" id="af-file" accept="image/*" multiple hidden></div>'+
-      '<div class="adact" style="margin-top:6px"><button class="small-cta" type="button" data-ad="dup">Duplicate</button>'+
+      '<button class="adback" type="button" data-ad="back">← All pieces</button>'+
+      '<label class="adsw"><span><b>Show in the shop</b><small>'+(p.hidden?'Hidden. Visitors cannot see it.':'Visible to everyone once published.')+'</small></span><input type="checkbox" data-f="vis"'+(p.hidden?'':' checked')+'></label>'+
+      '<section class="adcard"><h4>Basics</h4>'+
+        '<div><label class="l" for="af-n">Name</label><input type="text" id="af-n" data-f="n" value="'+esc(p.n)+'" maxlength="80"></div>'+
+        '<div class="two"><div><label class="l" for="af-c">Category</label><select id="af-c" data-f="c">'+opt(Object.keys(CATN).map(function(k){return [k,CATN[k]]}),p.c)+'</select></div>'+
+        '<div><label class="l" for="af-p">Price (₹)</label><input type="number" id="af-p" inputmode="numeric" data-f="p" min="0" step="100" value="'+p.p+'"></div></div>'+
+        '<div><label class="l" for="af-m">Materials (one line)</label><input type="text" id="af-m" data-f="m" value="'+esc(p.m)+'" maxlength="140"></div>'+
+        '<div><label class="l" for="af-d">Description</label><textarea id="af-d" data-f="d" maxlength="600">'+esc(p.d||'')+'</textarea></div></section>'+
+      '<section class="adcard"><h4>Photos</h4><p class="adnote" style="margin:0">The first photo is the main one. Up to 5, resized automatically.</p><div class="adimgs" id="af-imgs">'+adImgsHtml(p)+'</div>'+
+        '<label class="cta fill adaddph" for="af-file">+ Add photos</label><input type="file" id="af-file" accept="image/*" multiple hidden></section>'+
+      '<section class="adcard"><h4>Offer and status</h4>'+
+        '<div class="two"><div><label class="l" for="af-tag">Badge</label><select id="af-tag" data-f="tag">'+opt([['','None'],['New','New'],['Bestseller','Bestseller'],['Limited','Limited'],['Sale','Sale'],['Back soon','Back soon']],p.tag||'')+'</select></div><div><label class="l" for="af-oldp">Old price (₹, optional)</label><input type="number" id="af-oldp" inputmode="numeric" data-f="oldp" min="0" step="100" value="'+(p.oldp||'')+'"></div></div>'+
+        '<label class="adsw"><span><b>Sold out</b><small>Shows "Ask availability"</small></span><input type="checkbox" data-f="out"'+(p.out?' checked':'')+'></label>'+
+        '<label class="adsw"><span><b>Made to order</b><small>Adds the tag on the product</small></span><input type="checkbox" data-f="mto"'+(p.mto?' checked':'')+'></label></section>'+
+      '<details class="adcard adadv"><summary>More options</summary>'+
+        '<div class="two"><div><label class="l" for="af-sw">Default finish</label><select id="af-sw" data-f="sw">'+opt(SW.map(function(s,i){return [i,s[0]]}),p.sw)+'</select></div>'+
+        '<div><label class="l" for="af-s">Drawing (when no photo)</label><select id="af-s" data-f="s">'+opt(Object.keys(SHAPEN).map(function(k){return [k,SHAPEN[k]]}),p.s)+'</select></div></div></details>'+
+      '<p class="adnote" style="margin:0">Edits save as a draft automatically. Press Publish to put them live.</p>'+
+      '<button class="cta fill addone" type="button" data-ad="back">Done</button>'+
+      '<div class="adact"><button class="small-cta" type="button" data-ad="dup">Duplicate</button>'+
       (adDel?'<button class="small-cta danger" type="button" data-ad="delyes">Yes, delete this piece</button><button class="link" type="button" data-ad="delno">Cancel</button>':'<button class="small-cta danger" type="button" data-ad="delask">Delete</button>')+'</div></div>';
   }
   function adImgsHtml(p){
@@ -3201,12 +3306,13 @@ a.pframe{cursor:pointer}
     var im=$('#af-imgs');if(im&&p)im.innerHTML=adImgsHtml(p);
   }
   function adRender(){
-    [].forEach.call($('#admtabs').children,function(b){b.setAttribute('aria-pressed',b.dataset.t===adTab)});
+    [].forEach.call(adm.querySelectorAll('#admtabs button,#admbnav button'),function(b){b.setAttribute('aria-pressed',b.dataset.t===adTab)});
     admStatus();
+    var _t=$('#admttl');if(_t){var _n=NAVI.filter(function(x){return x[0]===adTab})[0];_t.textContent=matchMedia('(max-width:899px)').matches&&_n?_n[2]==='Backup'?'Backup':_n[1].replace('&amp;','&'):'Admin'}
     if(adTab==='products'){
       if(!adSel&&ALL[0])adSel=ALL[0].id;
       var p=selP();
-      admpane.innerHTML='<div class="adprod">'+adListHtml()+'<div id="adform">'+adFormHtml(p)+'</div>'+adPreview(p)+'</div>';
+      admpane.innerHTML='<div class="adprod'+(adEdit?' editing':'')+'">'+adListHtml()+'<div id="adform">'+adFormHtml(p)+'</div>'+adPreview(p)+'</div>';
     }else if(adTab==='site'){
       admpane.innerHTML='<div class="adf" style="max-width:640px"><div><label class="l" for="as-ann">Announcement bar (top of every page)</label><input type="text" class="adin" id="as-ann" data-ann="1" maxlength="160" placeholder="'+esc(ANN0)+'" value="'+esc(SITE.ann||'')+'"></div><p class="adnote">Paste the full https:// links. Empty fields fall back to a search for the brand.</p>'+
         [['ig','Instagram profile link'],['fb','Facebook page link'],['yt','YouTube channel link']].map(function(x){return '<div><label class="l" for="as-'+x[0]+'">'+x[1]+'</label><input type="url" class="adin" id="as-'+x[0]+'" data-s="'+x[0]+'" placeholder="https://" value="'+esc(SOC[x[0]]||'')+'"></div>'}).join('')+'</div>';
@@ -3222,20 +3328,35 @@ a.pframe{cursor:pointer}
         '<div class="adbox"><b>Restore from a backup</b><textarea id="ad-in" placeholder="Paste a backup here"></textarea><div class="adact" style="margin-top:10px"><button class="small-cta" type="button" data-ad="import">Apply backup</button><button class="small-cta danger" type="button" data-ad="reset">Reset to the original catalog</button></div></div></div>';
     }
   }
-  function openAdm(){if(!canAdmin)return;admOn=true;adm.hidden=false;adm.setAttribute('aria-hidden','false');lock();adRender();setTimeout(function(){$('#admclose').focus()},50)}
-  function closeAdm(){if(!admOn)return;admOn=false;adm.hidden=true;adm.setAttribute('aria-hidden','true');unlock()}
+  function openAdm(){if(!canAdmin)return;admOn=true;adEdit=false;adm.hidden=false;adm.setAttribute('aria-hidden','false');lock();adRender();if(!matchMedia('(max-width:899px)').matches)setTimeout(function(){$('#admclose').focus()},50)}
+  function closeAdm(){if(!admOn)return;admOn=false;var _b=$('#admbar');if(_b)_b.hidden=true;adm.hidden=true;adm.setAttribute('aria-hidden','true');unlock()}
   admfab.addEventListener('click',openAdm);$('#admclose').addEventListener('click',closeAdm);$('#admview').addEventListener('click',closeAdm);
-  $('#admtabs').addEventListener('click',function(e){var b=e.target.closest('button');if(!b)return;adTab=b.dataset.t;adRender()});
+  var NAVI=[['products','Products','Products','<path d="M4 8l8-4 8 4v8l-8 4-8-4V8Z"/><path d="M4 8l8 4 8-4M12 12v8"/>'],['site','Site &amp; social','Site','<circle cx="12" cy="12" r="8"/><path d="M4 12h16M12 4c3 3 3 13 0 16M12 4c-3 3-3 13 0 16"/>'],['ig','Instagram posts','Posts','<rect x="4" y="4" width="16" height="16" rx="5"/><circle cx="12" cy="12" r="3.5"/><path d="M16.5 7.5h.01"/>'],['orders','Orders &amp; leads','Orders','<path d="M5 8h14l-1 12H6L5 8Z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/>'],['data','Backup','Backup','<path d="M12 4v10m0 0l-4-4m4 4l4-4M5 19h14"/>']];
+  var navH=NAVI.map(function(x){return '<button type="button" data-t="'+x[0]+'" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+x[3]+'</svg><span class="lg">'+x[1]+'</span><span class="sh">'+x[2]+'</span></button>'}).join('');
+  $('#admtabs').innerHTML=navH;$('#admbnav').innerHTML=navH;
+  function navGo(e){var b=e.target.closest('button');if(!b)return;adTab=b.dataset.t;adEdit=false;if(adTab==='orders')adOD=null;adRender();admpane.scrollTop=0}
+  $('#admtabs').addEventListener('click',navGo);$('#admbnav').addEventListener('click',navGo);
+  $('#admbarpub').addEventListener('click',function(){$('#admpub').click()});
+  var kbT;
+  adm.addEventListener('focusin',function(e){
+    if(!/^(INPUT|TEXTAREA|SELECT)$/.test(e.target.tagName)||e.target.type==='checkbox'||!matchMedia('(max-width:899px)').matches)return;
+    clearTimeout(kbT);adm.classList.add('kb');
+    setTimeout(function(){try{e.target.scrollIntoView({block:'center',behavior:'smooth'})}catch(x){}},320);
+  });
+  adm.addEventListener('focusout',function(){clearTimeout(kbT);kbT=setTimeout(function(){adm.classList.remove('kb')},180)});
   admpane.addEventListener('click',function(e){
     var el=e.target.closest('[data-ad]');if(!el)return;var a=el.dataset.ad,id=el.dataset.id,p=selP(),ix;
     function idxOf(i){for(var k=0;k<ALL.length;k++)if(ALL[k].id===i)return k;return -1}
-    if(a==='sel'){adSel=id;adDel=false;adRender();return}
+    if(a==='sel'){adSel=id;adDel=false;adEdit=true;adRender();admpane.scrollTop=0;return}
+    if(a==='back'){adEdit=false;adDel=false;adRender();admpane.scrollTop=0;return}
+    if(a==='sub'){adSub=id;admpane.innerHTML=ordersHtml();return}
+    if(a==='refresh'){adOrders();toast('Refreshing');return}
     if(a==='up'||a==='dn'){e.stopPropagation();ix=idxOf(id);var j=a==='up'?ix-1:ix+1;if(j<0||j>=ALL.length)return;var t=ALL[ix];ALL[ix]=ALL[j];ALL[j]=t;draftSave();adSide();return}
-    if(a==='add'){var np=cleanP({id:'x'+Date.now().toString(36),n:'New piece',c:'seating',m:'Describe the materials',d:'',p:10000,s:'sofa',mto:0,sw:0,img:[],hidden:1});ALL.unshift(np);adSel=np.id;adDel=false;draftSave();adRender();toast('Added as hidden. Tick "Visible" when ready.');return}
+    if(a==='add'){var np=cleanP({id:'x'+Date.now().toString(36),n:'New piece',c:'seating',m:'Describe the materials',d:'',p:10000,s:'sofa',mto:0,sw:0,img:[],hidden:1});ALL.unshift(np);adSel=np.id;adDel=false;adEdit=true;draftSave();adRender();admpane.scrollTop=0;toast('Added as hidden. Tick "Visible" when ready.');return}
     if(a==='dup'&&p){var cp=cleanP(JSON.parse(JSON.stringify(p)));cp.id='x'+Date.now().toString(36);cp.n=(p.n+' copy').slice(0,80);cp.hidden=1;ALL.splice(idxOf(p.id)+1,0,cp);adSel=cp.id;draftSave();adRender();return}
     if(a==='delask'){adDel=true;adRender();return}
     if(a==='delno'){adDel=false;adRender();return}
-    if(a==='delyes'&&p){ix=idxOf(p.id);ALL.splice(ix,1);adSel=ALL[Math.min(ix,ALL.length-1)]?ALL[Math.min(ix,ALL.length-1)].id:null;adDel=false;draftSave();adRender();return}
+    if(a==='delyes'&&p){ix=idxOf(p.id);ALL.splice(ix,1);adSel=ALL[Math.min(ix,ALL.length-1)]?ALL[Math.min(ix,ALL.length-1)].id:null;adDel=false;adEdit=false;draftSave();adRender();return}
     if(a==='imgrm'&&p){p.img.splice(+el.dataset.i,1);draftSave();adSide();return}
     if(a==='imgmain'&&p){var u=p.img.splice(+el.dataset.i,1)[0];p.img.unshift(u);draftSave();adSide();return}
     if(a==='igrm'){IGP.splice(+el.dataset.i,1);draftSave();adRender();return}
@@ -3274,7 +3395,7 @@ a.pframe{cursor:pointer}
     }
   });
   $('#admpub').addEventListener('click',async function(){
-    var btn=this,json=JSON.stringify(catJSON());btn.disabled=true;btn.textContent='Publishing…';
+    var btn=this,json=JSON.stringify(catJSON());btn.disabled=true;btn.textContent='Publishing…';$('#admbarpub').disabled=true;$('#admbarpub').textContent='Publishing…';
     var done=function(msg){btn.textContent='Publish changes';admStatus();if(msg)toast(msg)};
     try{
       if(demoAdm&&!(SB&&SBU)){draftSave();done('Saved on this device. Connect the backend to publish for everyone.');return}
@@ -3283,7 +3404,7 @@ a.pframe{cursor:pointer}
       if(!art)throw {code:'none'};
       await art.publish({'catalog.json':{content:json,contentType:'application/json'}});}
       dirty=false;try{localStorage.removeItem('bl-draft')}catch(e){}
-      published=JSON.parse(json);done('Published. The live site now shows these changes.');
+      published=JSON.parse(json);done(SB&&SBU?'Published. Everyone who opens the site now sees these changes.':'Published. The live site now shows these changes.');
     }catch(err){
       done();adTab='data';adRender();
       var c=err&&err.code;
@@ -3706,6 +3827,8 @@ a.pframe{cursor:pointer}
     SB.auth.getSession().then(function(r){if(r.data&&r.data.session)afterAuth(r.data.session.user)});
     SB.auth.onAuthStateChange(function(ev){if(ev==='SIGNED_OUT'&&SBU){SBU=null;if(me()&&me().sbId)signOut()}});
     loadRemote();
+    function live(){if(document.hidden||admOn||dirty||/^#p-/.test(location.hash))return;loadRemote()}
+    setInterval(live,60000);document.addEventListener('visibilitychange',live);
   }
 
   /* ---------- sign in with email on any device ---------- */
@@ -3759,15 +3882,28 @@ a.pframe{cursor:pointer}
   }
 
   /* ---------- admin: orders and leads ---------- */
+  var adSub='orders',adOD=null;
+  function phoneLinks(ph){
+    var d=String(ph||'').replace(/\D/g,'');if(!d)return '';
+    var wa=d.length===10?'91'+d:d;
+    return '<div class="adcontact"><a class="small-cta" href="tel:+'+(d.length===10?'91'+d:d)+'">Call</a><a class="small-cta" target="_blank" rel="noopener" href="https://wa.me/'+wa+'">WhatsApp</a></div>';
+  }
+  function ordersHtml(){
+    var o=adOD.o,q=adOD.q,b=adOD.b,dt=function(s){return new Date(s).toLocaleString('en-IN',{day:'numeric',month:'short',hour:'numeric',minute:'2-digit'})};
+    var ST=['sent','confirmed','in_production','delivered','cancelled'];
+    var chips=[['orders','Orders',o.length],['visits','Visits',b.length],['leads','Enquiries',q.length]].map(function(c){return '<button type="button" class="chip" data-ad="sub" data-id="'+c[0]+'" aria-pressed="'+(adSub===c[0])+'">'+c[1]+' ('+c[2]+')</button>'}).join('');
+    var body='';
+    if(adSub==='orders')body=o.length?o.map(function(r){return '<div class="adbox"><div class="adbh"><b>'+esc(r.name)+'</b><span>'+inr(r.total)+'</span></div><small class="adts">'+dt(r.created_at)+' · '+esc(r.phone)+'</small><p class="adnote" style="margin:8px 0">'+(r.items||[]).map(function(i){return esc(i.n)+' ('+esc(i.o||'')+') × '+(i.q||1)}).join(', ')+(r.address?'<br>'+esc(r.address):'')+(r.note?'<br>Note: '+esc(r.note):'')+'</p>'+phoneLinks(r.phone)+'<label class="l" style="margin-top:10px">Status</label><select class="adin" data-oid="'+r.id+'">'+ST.map(function(x){return '<option value="'+x+'"'+(x===r.status?' selected':'')+'>'+x.replace(/_/g,' ')+'</option>'}).join('')+'</select></div>'}).join(''):'<p class="adnote">No orders yet.</p>';
+    else if(adSub==='visits')body=b.length?b.map(function(r){return '<div class="adbox"><div class="adbh"><b>'+esc(r.name)+'</b><span>'+esc(r.visit_date)+'</span></div><small class="adts">'+esc(r.slot)+' · '+esc(r.people)+' people · '+esc(r.phone)+'</small>'+((r.interests||[]).length?'<p class="adnote" style="margin:8px 0">'+esc(r.interests.join(', '))+'</p>':'')+phoneLinks(r.phone)+'</div>'}).join(''):'<p class="adnote">No bookings yet.</p>';
+    else body=q.length?q.map(function(r){return '<div class="adbox"><div class="adbh"><b>'+esc(r.name)+'</b><span>'+esc(r.interest)+'</span></div><small class="adts">'+dt(r.created_at)+' · '+esc(r.phone)+'</small><p class="adnote" style="margin:8px 0">'+esc(r.message)+'</p>'+phoneLinks(r.phone)+'</div>'}).join(''):'<p class="adnote">No enquiries yet.</p>';
+    return '<div style="max-width:900px"><div class="adchips">'+chips+'<button type="button" class="small-cta" data-ad="refresh">Refresh</button></div>'+body+'</div>';
+  }
   async function adOrders(){
     if(!SB||!SBU){admpane.innerHTML='<p class="adnote">Orders and enquiries show here once the site is connected to Supabase and you are signed in as the admin.</p>';return}
-    admpane.innerHTML='<p class="adnote">Loading…</p>';
+    if(!adOD)admpane.innerHTML='<p class="adnote">Loading…</p>';
     var rs=await Promise.all([SB.from('bl_orders').select('*').order('created_at',{ascending:false}).limit(40),SB.from('bl_enquiries').select('*').order('created_at',{ascending:false}).limit(40),SB.from('bl_bookings').select('*').order('created_at',{ascending:false}).limit(40)]);
-    var o=rs[0].data||[],q=rs[1].data||[],b=rs[2].data||[],dt=function(s){return new Date(s).toLocaleString('en-IN',{day:'numeric',month:'short',hour:'numeric',minute:'2-digit'})};
-    var ST=['sent','confirmed','in_production','delivered','cancelled'];
-    admpane.innerHTML='<div style="max-width:900px"><h3 class="adh3">Orders ('+o.length+')</h3>'+(o.length?o.map(function(r){return '<div class="adbox"><b>'+esc(r.name)+'</b> · '+esc(r.phone)+' · '+inr(r.total)+' <small style="color:var(--muted)">'+dt(r.created_at)+'</small><p class="adnote" style="margin:6px 0">'+(r.items||[]).map(function(i){return esc(i.n)+' ('+esc(i.o||'')+') × '+(i.q||1)}).join(', ')+(r.address?'<br>'+esc(r.address):'')+(r.note?'<br>Note: '+esc(r.note):'')+'</p><select class="adin" style="max-width:220px" data-oid="'+r.id+'">'+ST.map(function(s){return '<option value="'+s+'"'+(s===r.status?' selected':'')+'>'+s.replace(/_/g,' ')+'</option>'}).join('')+'</select></div>'}).join(''):'<p class="adnote">No orders yet.</p>')+
-      '<h3 class="adh3">Showroom visits ('+b.length+')</h3>'+(b.length?b.map(function(r){return '<div class="adbox"><b>'+esc(r.name)+'</b> · '+esc(r.phone)+'<p class="adnote" style="margin:6px 0 0">'+esc(r.visit_date)+' · '+esc(r.slot)+' · '+esc(r.people)+' people'+((r.interests||[]).length?' · '+esc(r.interests.join(', ')):'')+'</p></div>'}).join(''):'<p class="adnote">No bookings yet.</p>')+
-      '<h3 class="adh3">Enquiries ('+q.length+')</h3>'+(q.length?q.map(function(r){return '<div class="adbox"><b>'+esc(r.name)+'</b> · '+esc(r.phone)+' · '+esc(r.interest)+' <small style="color:var(--muted)">'+dt(r.created_at)+'</small><p class="adnote" style="margin:6px 0 0">'+esc(r.message)+'</p></div>'}).join(''):'<p class="adnote">No enquiries yet.</p>')+'</div>';
+    adOD={o:rs[0].data||[],q:rs[1].data||[],b:rs[2].data||[]};
+    if(adTab==='orders')admpane.innerHTML=ordersHtml();
   }
   admpane.addEventListener('change',function(e){var t=e.target;if(t.dataset&&t.dataset.oid&&SB){SB.from('bl_orders').update({status:t.value}).eq('id',t.dataset.oid).then(function(r){toast(r.error?'Could not update':'Status updated')})}});
 
